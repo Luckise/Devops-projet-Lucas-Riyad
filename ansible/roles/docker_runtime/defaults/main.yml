@@ -1,0 +1,6 @@
+docker_packages:
+  - docker
+docker_service_name: docker
+docker_group_name: docker
+docker_manage_daemon_json: false
+docker_daemon_options: {}
