@@ -8,296 +8,470 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from "./routes/__root";
-import { Route as TipsRouteImport } from "./routes/tips";
-import { Route as ProfileRouteImport } from "./routes/profile";
-import { Route as EventsRouteImport } from "./routes/events";
-import { Route as AboutRouteImport } from "./routes/about";
-import { Route as IndexRouteImport } from "./routes/index";
-import { Route as DemoTanstackQueryRouteImport } from "./routes/demo/tanstack-query";
-import { Route as DemoOrpcTodoRouteImport } from "./routes/demo/orpc-todo";
-import { Route as DemoDrizzleRouteImport } from "./routes/demo/drizzle";
-import { Route as ApiSplatRouteImport } from "./routes/api.$";
-import { Route as DemoFormSimpleRouteImport } from "./routes/demo/form.simple";
-import { Route as DemoFormAddressRouteImport } from "./routes/demo/form.address";
-import { Route as ApiRpcSplatRouteImport } from "./routes/api.rpc.$";
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as TipsRouteImport } from './routes/tips'
+import { Route as TicketsRouteImport } from './routes/tickets'
+import { Route as FeedRouteImport } from './routes/feed'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as TipsIndexRouteImport } from './routes/tips.index'
+import { Route as ProfileIndexRouteImport } from './routes/profile.index'
+import { Route as TipsNewRouteImport } from './routes/tips.new'
+import { Route as TipsTipIdRouteImport } from './routes/tips.$tipId'
+import { Route as ProfileEditRouteImport } from './routes/profile.edit'
+import { Route as PostsNewRouteImport } from './routes/posts.new'
+import { Route as EventsNewRouteImport } from './routes/events.new'
+import { Route as EventsEventIdRouteImport } from './routes/events.$eventId'
+import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
+import { Route as DemoOrpcTodoRouteImport } from './routes/demo/orpc-todo'
+import { Route as DemoDrizzleRouteImport } from './routes/demo/drizzle'
+import { Route as ApiSplatRouteImport } from './routes/api.$'
+import { Route as DemoFormSimpleRouteImport } from './routes/demo/form.simple'
+import { Route as DemoFormAddressRouteImport } from './routes/demo/form.address'
+import { Route as ApiRpcSplatRouteImport } from './routes/api.rpc.$'
 
 const TipsRoute = TipsRouteImport.update({
-  id: "/tips",
-  path: "/tips",
+  id: '/tips',
+  path: '/tips',
   getParentRoute: () => rootRouteImport,
-} as any);
-const ProfileRoute = ProfileRouteImport.update({
-  id: "/profile",
-  path: "/profile",
+} as any)
+const TicketsRoute = TicketsRouteImport.update({
+  id: '/tickets',
+  path: '/tickets',
   getParentRoute: () => rootRouteImport,
-} as any);
-const EventsRoute = EventsRouteImport.update({
-  id: "/events",
-  path: "/events",
+} as any)
+const FeedRoute = FeedRouteImport.update({
+  id: '/feed',
+  path: '/feed',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const AboutRoute = AboutRouteImport.update({
-  id: "/about",
-  path: "/about",
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const IndexRoute = IndexRouteImport.update({
-  id: "/",
-  path: "/",
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
+const TipsIndexRoute = TipsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => TipsRoute,
+} as any)
+const ProfileIndexRoute = ProfileIndexRouteImport.update({
+  id: '/profile/',
+  path: '/profile/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TipsNewRoute = TipsNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => TipsRoute,
+} as any)
+const TipsTipIdRoute = TipsTipIdRouteImport.update({
+  id: '/$tipId',
+  path: '/$tipId',
+  getParentRoute: () => TipsRoute,
+} as any)
+const ProfileEditRoute = ProfileEditRouteImport.update({
+  id: '/profile/edit',
+  path: '/profile/edit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PostsNewRoute = PostsNewRouteImport.update({
+  id: '/posts/new',
+  path: '/posts/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EventsNewRoute = EventsNewRouteImport.update({
+  id: '/events/new',
+  path: '/events/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EventsEventIdRoute = EventsEventIdRouteImport.update({
+  id: '/events/$eventId',
+  path: '/events/$eventId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DemoTanstackQueryRoute = DemoTanstackQueryRouteImport.update({
-  id: "/demo/tanstack-query",
-  path: "/demo/tanstack-query",
+  id: '/demo/tanstack-query',
+  path: '/demo/tanstack-query',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const DemoOrpcTodoRoute = DemoOrpcTodoRouteImport.update({
-  id: "/demo/orpc-todo",
-  path: "/demo/orpc-todo",
+  id: '/demo/orpc-todo',
+  path: '/demo/orpc-todo',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const DemoDrizzleRoute = DemoDrizzleRouteImport.update({
-  id: "/demo/drizzle",
-  path: "/demo/drizzle",
+  id: '/demo/drizzle',
+  path: '/demo/drizzle',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ApiSplatRoute = ApiSplatRouteImport.update({
-  id: "/api/$",
-  path: "/api/$",
+  id: '/api/$',
+  path: '/api/$',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const DemoFormSimpleRoute = DemoFormSimpleRouteImport.update({
-  id: "/demo/form/simple",
-  path: "/demo/form/simple",
+  id: '/demo/form/simple',
+  path: '/demo/form/simple',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const DemoFormAddressRoute = DemoFormAddressRouteImport.update({
-  id: "/demo/form/address",
-  path: "/demo/form/address",
+  id: '/demo/form/address',
+  path: '/demo/form/address',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ApiRpcSplatRoute = ApiRpcSplatRouteImport.update({
-  id: "/api/rpc/$",
-  path: "/api/rpc/$",
+  id: '/api/rpc/$',
+  path: '/api/rpc/$',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 
 export interface FileRoutesByFullPath {
-  "/": typeof IndexRoute;
-  "/about": typeof AboutRoute;
-  "/events": typeof EventsRoute;
-  "/profile": typeof ProfileRoute;
-  "/tips": typeof TipsRoute;
-  "/api/$": typeof ApiSplatRoute;
-  "/demo/drizzle": typeof DemoDrizzleRoute;
-  "/demo/orpc-todo": typeof DemoOrpcTodoRoute;
-  "/demo/tanstack-query": typeof DemoTanstackQueryRoute;
-  "/api/rpc/$": typeof ApiRpcSplatRoute;
-  "/demo/form/address": typeof DemoFormAddressRoute;
-  "/demo/form/simple": typeof DemoFormSimpleRoute;
+  '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/feed': typeof FeedRoute
+  '/tickets': typeof TicketsRoute
+  '/tips': typeof TipsRouteWithChildren
+  '/api/$': typeof ApiSplatRoute
+  '/demo/drizzle': typeof DemoDrizzleRoute
+  '/demo/orpc-todo': typeof DemoOrpcTodoRoute
+  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/events/$eventId': typeof EventsEventIdRoute
+  '/events/new': typeof EventsNewRoute
+  '/posts/new': typeof PostsNewRoute
+  '/profile/edit': typeof ProfileEditRoute
+  '/tips/$tipId': typeof TipsTipIdRoute
+  '/tips/new': typeof TipsNewRoute
+  '/profile/': typeof ProfileIndexRoute
+  '/tips/': typeof TipsIndexRoute
+  '/api/rpc/$': typeof ApiRpcSplatRoute
+  '/demo/form/address': typeof DemoFormAddressRoute
+  '/demo/form/simple': typeof DemoFormSimpleRoute
 }
 export interface FileRoutesByTo {
-  "/": typeof IndexRoute;
-  "/about": typeof AboutRoute;
-  "/events": typeof EventsRoute;
-  "/profile": typeof ProfileRoute;
-  "/tips": typeof TipsRoute;
-  "/api/$": typeof ApiSplatRoute;
-  "/demo/drizzle": typeof DemoDrizzleRoute;
-  "/demo/orpc-todo": typeof DemoOrpcTodoRoute;
-  "/demo/tanstack-query": typeof DemoTanstackQueryRoute;
-  "/api/rpc/$": typeof ApiRpcSplatRoute;
-  "/demo/form/address": typeof DemoFormAddressRoute;
-  "/demo/form/simple": typeof DemoFormSimpleRoute;
+  '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/feed': typeof FeedRoute
+  '/tickets': typeof TicketsRoute
+  '/api/$': typeof ApiSplatRoute
+  '/demo/drizzle': typeof DemoDrizzleRoute
+  '/demo/orpc-todo': typeof DemoOrpcTodoRoute
+  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/events/$eventId': typeof EventsEventIdRoute
+  '/events/new': typeof EventsNewRoute
+  '/posts/new': typeof PostsNewRoute
+  '/profile/edit': typeof ProfileEditRoute
+  '/tips/$tipId': typeof TipsTipIdRoute
+  '/tips/new': typeof TipsNewRoute
+  '/profile': typeof ProfileIndexRoute
+  '/tips': typeof TipsIndexRoute
+  '/api/rpc/$': typeof ApiRpcSplatRoute
+  '/demo/form/address': typeof DemoFormAddressRoute
+  '/demo/form/simple': typeof DemoFormSimpleRoute
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport;
-  "/": typeof IndexRoute;
-  "/about": typeof AboutRoute;
-  "/events": typeof EventsRoute;
-  "/profile": typeof ProfileRoute;
-  "/tips": typeof TipsRoute;
-  "/api/$": typeof ApiSplatRoute;
-  "/demo/drizzle": typeof DemoDrizzleRoute;
-  "/demo/orpc-todo": typeof DemoOrpcTodoRoute;
-  "/demo/tanstack-query": typeof DemoTanstackQueryRoute;
-  "/api/rpc/$": typeof ApiRpcSplatRoute;
-  "/demo/form/address": typeof DemoFormAddressRoute;
-  "/demo/form/simple": typeof DemoFormSimpleRoute;
+  __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/feed': typeof FeedRoute
+  '/tickets': typeof TicketsRoute
+  '/tips': typeof TipsRouteWithChildren
+  '/api/$': typeof ApiSplatRoute
+  '/demo/drizzle': typeof DemoDrizzleRoute
+  '/demo/orpc-todo': typeof DemoOrpcTodoRoute
+  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/events/$eventId': typeof EventsEventIdRoute
+  '/events/new': typeof EventsNewRoute
+  '/posts/new': typeof PostsNewRoute
+  '/profile/edit': typeof ProfileEditRoute
+  '/tips/$tipId': typeof TipsTipIdRoute
+  '/tips/new': typeof TipsNewRoute
+  '/profile/': typeof ProfileIndexRoute
+  '/tips/': typeof TipsIndexRoute
+  '/api/rpc/$': typeof ApiRpcSplatRoute
+  '/demo/form/address': typeof DemoFormAddressRoute
+  '/demo/form/simple': typeof DemoFormSimpleRoute
 }
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath;
+  fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | "/"
-    | "/about"
-    | "/events"
-    | "/profile"
-    | "/tips"
-    | "/api/$"
-    | "/demo/drizzle"
-    | "/demo/orpc-todo"
-    | "/demo/tanstack-query"
-    | "/api/rpc/$"
-    | "/demo/form/address"
-    | "/demo/form/simple";
-  fileRoutesByTo: FileRoutesByTo;
+    | '/'
+    | '/about'
+    | '/feed'
+    | '/tickets'
+    | '/tips'
+    | '/api/$'
+    | '/demo/drizzle'
+    | '/demo/orpc-todo'
+    | '/demo/tanstack-query'
+    | '/events/$eventId'
+    | '/events/new'
+    | '/posts/new'
+    | '/profile/edit'
+    | '/tips/$tipId'
+    | '/tips/new'
+    | '/profile/'
+    | '/tips/'
+    | '/api/rpc/$'
+    | '/demo/form/address'
+    | '/demo/form/simple'
+  fileRoutesByTo: FileRoutesByTo
   to:
-    | "/"
-    | "/about"
-    | "/events"
-    | "/profile"
-    | "/tips"
-    | "/api/$"
-    | "/demo/drizzle"
-    | "/demo/orpc-todo"
-    | "/demo/tanstack-query"
-    | "/api/rpc/$"
-    | "/demo/form/address"
-    | "/demo/form/simple";
+    | '/'
+    | '/about'
+    | '/feed'
+    | '/tickets'
+    | '/api/$'
+    | '/demo/drizzle'
+    | '/demo/orpc-todo'
+    | '/demo/tanstack-query'
+    | '/events/$eventId'
+    | '/events/new'
+    | '/posts/new'
+    | '/profile/edit'
+    | '/tips/$tipId'
+    | '/tips/new'
+    | '/profile'
+    | '/tips'
+    | '/api/rpc/$'
+    | '/demo/form/address'
+    | '/demo/form/simple'
   id:
-    | "__root__"
-    | "/"
-    | "/about"
-    | "/events"
-    | "/profile"
-    | "/tips"
-    | "/api/$"
-    | "/demo/drizzle"
-    | "/demo/orpc-todo"
-    | "/demo/tanstack-query"
-    | "/api/rpc/$"
-    | "/demo/form/address"
-    | "/demo/form/simple";
-  fileRoutesById: FileRoutesById;
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/feed'
+    | '/tickets'
+    | '/tips'
+    | '/api/$'
+    | '/demo/drizzle'
+    | '/demo/orpc-todo'
+    | '/demo/tanstack-query'
+    | '/events/$eventId'
+    | '/events/new'
+    | '/posts/new'
+    | '/profile/edit'
+    | '/tips/$tipId'
+    | '/tips/new'
+    | '/profile/'
+    | '/tips/'
+    | '/api/rpc/$'
+    | '/demo/form/address'
+    | '/demo/form/simple'
+  fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute;
-  AboutRoute: typeof AboutRoute;
-  EventsRoute: typeof EventsRoute;
-  ProfileRoute: typeof ProfileRoute;
-  TipsRoute: typeof TipsRoute;
-  ApiSplatRoute: typeof ApiSplatRoute;
-  DemoDrizzleRoute: typeof DemoDrizzleRoute;
-  DemoOrpcTodoRoute: typeof DemoOrpcTodoRoute;
-  DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute;
-  ApiRpcSplatRoute: typeof ApiRpcSplatRoute;
-  DemoFormAddressRoute: typeof DemoFormAddressRoute;
-  DemoFormSimpleRoute: typeof DemoFormSimpleRoute;
+  IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
+  FeedRoute: typeof FeedRoute
+  TicketsRoute: typeof TicketsRoute
+  TipsRoute: typeof TipsRouteWithChildren
+  ApiSplatRoute: typeof ApiSplatRoute
+  DemoDrizzleRoute: typeof DemoDrizzleRoute
+  DemoOrpcTodoRoute: typeof DemoOrpcTodoRoute
+  DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
+  EventsEventIdRoute: typeof EventsEventIdRoute
+  EventsNewRoute: typeof EventsNewRoute
+  PostsNewRoute: typeof PostsNewRoute
+  ProfileEditRoute: typeof ProfileEditRoute
+  ProfileIndexRoute: typeof ProfileIndexRoute
+  ApiRpcSplatRoute: typeof ApiRpcSplatRoute
+  DemoFormAddressRoute: typeof DemoFormAddressRoute
+  DemoFormSimpleRoute: typeof DemoFormSimpleRoute
 }
 
-declare module "@tanstack/react-router" {
+declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    "/tips": {
-      id: "/tips";
-      path: "/tips";
-      fullPath: "/tips";
-      preLoaderRoute: typeof TipsRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/profile": {
-      id: "/profile";
-      path: "/profile";
-      fullPath: "/profile";
-      preLoaderRoute: typeof ProfileRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/events": {
-      id: "/events";
-      path: "/events";
-      fullPath: "/events";
-      preLoaderRoute: typeof EventsRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/about": {
-      id: "/about";
-      path: "/about";
-      fullPath: "/about";
-      preLoaderRoute: typeof AboutRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/": {
-      id: "/";
-      path: "/";
-      fullPath: "/";
-      preLoaderRoute: typeof IndexRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/demo/tanstack-query": {
-      id: "/demo/tanstack-query";
-      path: "/demo/tanstack-query";
-      fullPath: "/demo/tanstack-query";
-      preLoaderRoute: typeof DemoTanstackQueryRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/demo/orpc-todo": {
-      id: "/demo/orpc-todo";
-      path: "/demo/orpc-todo";
-      fullPath: "/demo/orpc-todo";
-      preLoaderRoute: typeof DemoOrpcTodoRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/demo/drizzle": {
-      id: "/demo/drizzle";
-      path: "/demo/drizzle";
-      fullPath: "/demo/drizzle";
-      preLoaderRoute: typeof DemoDrizzleRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/api/$": {
-      id: "/api/$";
-      path: "/api/$";
-      fullPath: "/api/$";
-      preLoaderRoute: typeof ApiSplatRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/demo/form/simple": {
-      id: "/demo/form/simple";
-      path: "/demo/form/simple";
-      fullPath: "/demo/form/simple";
-      preLoaderRoute: typeof DemoFormSimpleRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/demo/form/address": {
-      id: "/demo/form/address";
-      path: "/demo/form/address";
-      fullPath: "/demo/form/address";
-      preLoaderRoute: typeof DemoFormAddressRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/api/rpc/$": {
-      id: "/api/rpc/$";
-      path: "/api/rpc/$";
-      fullPath: "/api/rpc/$";
-      preLoaderRoute: typeof ApiRpcSplatRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+    '/tips': {
+      id: '/tips'
+      path: '/tips'
+      fullPath: '/tips'
+      preLoaderRoute: typeof TipsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tickets': {
+      id: '/tickets'
+      path: '/tickets'
+      fullPath: '/tickets'
+      preLoaderRoute: typeof TicketsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/feed': {
+      id: '/feed'
+      path: '/feed'
+      fullPath: '/feed'
+      preLoaderRoute: typeof FeedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tips/': {
+      id: '/tips/'
+      path: '/'
+      fullPath: '/tips/'
+      preLoaderRoute: typeof TipsIndexRouteImport
+      parentRoute: typeof TipsRoute
+    }
+    '/profile/': {
+      id: '/profile/'
+      path: '/profile'
+      fullPath: '/profile/'
+      preLoaderRoute: typeof ProfileIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tips/new': {
+      id: '/tips/new'
+      path: '/new'
+      fullPath: '/tips/new'
+      preLoaderRoute: typeof TipsNewRouteImport
+      parentRoute: typeof TipsRoute
+    }
+    '/tips/$tipId': {
+      id: '/tips/$tipId'
+      path: '/$tipId'
+      fullPath: '/tips/$tipId'
+      preLoaderRoute: typeof TipsTipIdRouteImport
+      parentRoute: typeof TipsRoute
+    }
+    '/profile/edit': {
+      id: '/profile/edit'
+      path: '/profile/edit'
+      fullPath: '/profile/edit'
+      preLoaderRoute: typeof ProfileEditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/posts/new': {
+      id: '/posts/new'
+      path: '/posts/new'
+      fullPath: '/posts/new'
+      preLoaderRoute: typeof PostsNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/events/new': {
+      id: '/events/new'
+      path: '/events/new'
+      fullPath: '/events/new'
+      preLoaderRoute: typeof EventsNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/events/$eventId': {
+      id: '/events/$eventId'
+      path: '/events/$eventId'
+      fullPath: '/events/$eventId'
+      preLoaderRoute: typeof EventsEventIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/tanstack-query': {
+      id: '/demo/tanstack-query'
+      path: '/demo/tanstack-query'
+      fullPath: '/demo/tanstack-query'
+      preLoaderRoute: typeof DemoTanstackQueryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/orpc-todo': {
+      id: '/demo/orpc-todo'
+      path: '/demo/orpc-todo'
+      fullPath: '/demo/orpc-todo'
+      preLoaderRoute: typeof DemoOrpcTodoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/drizzle': {
+      id: '/demo/drizzle'
+      path: '/demo/drizzle'
+      fullPath: '/demo/drizzle'
+      preLoaderRoute: typeof DemoDrizzleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$': {
+      id: '/api/$'
+      path: '/api/$'
+      fullPath: '/api/$'
+      preLoaderRoute: typeof ApiSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/form/simple': {
+      id: '/demo/form/simple'
+      path: '/demo/form/simple'
+      fullPath: '/demo/form/simple'
+      preLoaderRoute: typeof DemoFormSimpleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/form/address': {
+      id: '/demo/form/address'
+      path: '/demo/form/address'
+      fullPath: '/demo/form/address'
+      preLoaderRoute: typeof DemoFormAddressRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/rpc/$': {
+      id: '/api/rpc/$'
+      path: '/api/rpc/$'
+      fullPath: '/api/rpc/$'
+      preLoaderRoute: typeof ApiRpcSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
+
+interface TipsRouteChildren {
+  TipsTipIdRoute: typeof TipsTipIdRoute
+  TipsNewRoute: typeof TipsNewRoute
+  TipsIndexRoute: typeof TipsIndexRoute
+}
+
+const TipsRouteChildren: TipsRouteChildren = {
+  TipsTipIdRoute: TipsTipIdRoute,
+  TipsNewRoute: TipsNewRoute,
+  TipsIndexRoute: TipsIndexRoute,
+}
+
+const TipsRouteWithChildren = TipsRoute._addFileChildren(TipsRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
-  EventsRoute: EventsRoute,
-  ProfileRoute: ProfileRoute,
-  TipsRoute: TipsRoute,
+  FeedRoute: FeedRoute,
+  TicketsRoute: TicketsRoute,
+  TipsRoute: TipsRouteWithChildren,
   ApiSplatRoute: ApiSplatRoute,
   DemoDrizzleRoute: DemoDrizzleRoute,
   DemoOrpcTodoRoute: DemoOrpcTodoRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
+  EventsEventIdRoute: EventsEventIdRoute,
+  EventsNewRoute: EventsNewRoute,
+  PostsNewRoute: PostsNewRoute,
+  ProfileEditRoute: ProfileEditRoute,
+  ProfileIndexRoute: ProfileIndexRoute,
   ApiRpcSplatRoute: ApiRpcSplatRoute,
   DemoFormAddressRoute: DemoFormAddressRoute,
   DemoFormSimpleRoute: DemoFormSimpleRoute,
-};
+}
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>();
+  ._addFileTypes<FileRouteTypes>()
 
-import type { getRouter } from "./router.tsx";
-import type { createStart } from "@tanstack/react-start";
-declare module "@tanstack/react-start" {
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
   interface Register {
-    ssr: true;
-    router: Awaited<ReturnType<typeof getRouter>>;
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
   }
 }

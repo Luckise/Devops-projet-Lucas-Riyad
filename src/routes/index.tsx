@@ -1,150 +1,94 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { MessageCircle, Heart, Share, MoreHorizontal } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { MapPin, Calendar, Clock, ArrowRight, Users } from "lucide-react";
+import { MOCK_EVENTS, getSavedItems } from "../lib/mock-data";
+import SaveButton from "../components/SaveButton";
 
-export const Route = createFileRoute("/")({ component: App });
+export const Route = createFileRoute("/")({
+  component: EventsRoute,
+});
 
-const MOCK_FEED = [
-  {
-    id: "1",
-    author: {
-      name: "Sarah Chen",
-      handle: "@sarahc",
-      avatar:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=150&auto=format&fit=crop",
-    },
-    timestamp: "2h",
-    content:
-      "The lighting at the Warehouse 42 techno set last night was absolutely unreal. Best set I've heard all year.",
-    image:
-      "https://images.unsplash.com/photo-1574169208507-84376144848b?q=80&w=800&auto=format&fit=crop",
-    likes: 124,
-    comments: 12,
-  },
-  {
-    id: "2",
-    author: {
-      name: "Marcus Thorne",
-      handle: "@marcust",
-      avatar:
-        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150&auto=format&fit=crop",
-    },
-    timestamp: "5h",
-    content:
-      "Sunrise soundbath at The Glasshouse. Exactly what was needed to reset for the week. 🧘‍♂️✨",
-    image: null,
-    likes: 89,
-    comments: 4,
-  },
-  {
-    id: "3",
-    author: {
-      name: "Elena Rodriguez",
-      handle: "@elenar",
-      avatar:
-        "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=150&auto=format&fit=crop",
-    },
-    timestamp: "Oct 24",
-    content:
-      "Still thinking about the Autumn Street Food festival. The bao buns from that one truck... wow.",
-    image:
-      "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=800&auto=format&fit=crop",
-    likes: 256,
-    comments: 28,
-  },
-  {
-    id: "4",
-    author: {
-      name: "Alex Kim",
-      handle: "@alexk",
-      avatar:
-        "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=150&auto=format&fit=crop",
-    },
-    timestamp: "Oct 23",
-    content:
-      'The Indie Film Showcase exceeded all expectations. "Midnight in the Valley" was a masterpiece of tension.',
-    image: null,
-    likes: 42,
-    comments: 1,
-  },
-];
+function EventsRoute() {
+  const allEvents = [...getSavedItems("user_events"), ...MOCK_EVENTS];
 
-function App() {
   return (
-    <main className="min-h-screen text-white pb-20 pt-[60px] md:pt-[80px]">
-      <div className="max-w-xl mx-auto border-x border-white/10 min-h-screen">
-        <header className="sticky top-[60px] md:top-[80px] z-30 bg-black/80 backdrop-blur-xl border-b border-white/10 px-4 py-3">
-          <h1 className="text-xl font-bold">Home</h1>
+    <main className="min-h-screen pb-24 pt-[80px]">
+      <div className="max-w-md mx-auto px-4 pt-4 md:pt-8">
+        <header className="mb-6">
+          <h1 className="text-[2.5rem] font-serif font-medium tracking-tight leading-none" style={{ color: "var(--ember)" }}>
+            Events
+          </h1>
         </header>
 
-        <div className="flex flex-col">
-          {MOCK_FEED.map((post) => (
-            <article
-              key={post.id}
-              className="flex flex-row gap-3 px-4 py-3 border-b border-white/10 hover:bg-white/[0.02] transition-colors cursor-pointer"
+        <div className="flex flex-col gap-6">
+          {allEvents.map((event) => (
+            <Link
+              to="/events/$eventId"
+              params={{ eventId: event.id }}
+              key={event.id}
+              className="group relative rounded-[2rem] overflow-hidden bg-zinc-900 aspect-[4/5] flex flex-col justify-end transition-transform duration-[400ms] ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-[1.01] active:scale-[0.98] cursor-pointer ring-1 ring-white/10 block"
             >
-              <div className="flex-shrink-0 pt-1">
+              <div className="absolute inset-0 z-0">
                 <img
-                  src={post.author.avatar}
-                  alt={post.author.name}
-                  className="w-10 h-10 rounded-full object-cover"
+                  src={event.image}
+                  alt={event.title}
+                  className="w-full h-full object-cover transition-transform duration-[800ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105"
+                  loading="lazy"
                 />
               </div>
 
-              <div className="flex-1 flex flex-col min-w-0">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1.5 overflow-hidden text-[15px]">
-                    <span className="font-bold truncate">{post.author.name}</span>
-                    <span className="text-white/50 truncate">{post.author.handle}</span>
-                    <span className="text-white/50">·</span>
-                    <span className="text-white/50 flex-shrink-0">{post.timestamp}</span>
+              <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/95 via-black/50 to-black/10" />
+
+              <div className="absolute top-5 left-5 z-20 flex flex-wrap gap-2 pr-5">
+                {event.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="px-3 py-1.5 rounded-full bg-black/30 backdrop-blur-md text-[11px] font-bold tracking-wide uppercase text-white border border-white/20"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+
+              <div className="absolute top-5 right-5 z-20">
+                <SaveButton eventId={event.id} compact />
+              </div>
+
+              <div className="relative z-20 p-6 pt-12 flex flex-col gap-3">
+                <h2 className="text-[1.75rem] font-serif font-medium leading-[1.1] text-white drop-shadow-md pr-4">
+                  {event.title}
+                </h2>
+
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-[13px] font-medium text-white/80 mt-1">
+                  <div className="flex items-center gap-1.5 bg-black/20 backdrop-blur-sm px-2.5 py-1 rounded-md border border-white/5">
+                    <Calendar className="w-3.5 h-3.5 text-white/60" />
+                    <span>{event.date}</span>
                   </div>
-                  <button className="text-white/50 hover:text-white p-1 rounded-full hover:bg-white/10 transition-colors -mr-2">
-                    <MoreHorizontal className="w-4 h-4" />
-                  </button>
+                  <div className="flex items-center gap-1.5 bg-black/20 backdrop-blur-sm px-2.5 py-1 rounded-md border border-white/5">
+                    <Clock className="w-3.5 h-3.5 text-white/60" />
+                    <span>{event.time}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 bg-black/20 backdrop-blur-sm px-2.5 py-1 rounded-md border border-white/5">
+                    <Users className="w-3.5 h-3.5 text-white/60" />
+                    <span>{event.joined}</span>
+                  </div>
                 </div>
 
-                <p className="mt-0.5 text-[15px] text-white/90 leading-snug whitespace-pre-wrap">
-                  {post.content}
-                </p>
-
-                {post.image && (
-                  <div className="mt-3 rounded-2xl overflow-hidden border border-white/10 bg-white/5">
-                    <img
-                      src={post.image}
-                      alt="Post attachment"
-                      className="w-full h-auto max-h-[400px] object-cover"
-                      loading="lazy"
-                    />
+                <div className="flex items-center justify-between mt-3 pt-5 border-t border-white/10">
+                  <div className="flex items-center gap-2 text-sm text-white/90 font-medium">
+                    <MapPin className="w-4 h-4 text-white/60" />
+                    <span className="truncate max-w-[170px]">{event.location}</span>
                   </div>
-                )}
 
-                <div className="flex justify-between items-center mt-3 text-white/50 max-w-md">
-                  <button className="flex items-center gap-2 hover:text-blue-400 group transition-colors">
-                    <div className="p-2 rounded-full group-hover:bg-blue-400/10 transition-colors -ml-2">
-                      <MessageCircle className="w-[18px] h-[18px]" />
+                  <div className="flex items-center gap-3">
+                    <span className="font-bold tracking-tight text-white">{event.price === 0 ? "Free Entry" : `€${event.price}`}</span>
+                    <div className="w-9 h-9 rounded-full bg-white text-black flex items-center justify-center transition-transform duration-[400ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-1 shadow-[0_0_15px_rgba(255,255,255,0.3)]">
+                      <ArrowRight className="w-4 h-4" />
                     </div>
-                    <span className="text-[13px]">{post.comments}</span>
-                  </button>
-                  <button className="flex items-center gap-2 hover:text-pink-500 group transition-colors">
-                    <div className="p-2 rounded-full group-hover:bg-pink-500/10 transition-colors -ml-2">
-                      <Heart className="w-[18px] h-[18px]" />
-                    </div>
-                    <span className="text-[13px]">{post.likes}</span>
-                  </button>
-                  <button className="flex items-center gap-2 hover:text-green-400 group transition-colors">
-                    <div className="p-2 rounded-full group-hover:bg-green-400/10 transition-colors -ml-2">
-                      <Share className="w-[18px] h-[18px]" />
-                    </div>
-                  </button>
+                  </div>
                 </div>
               </div>
-            </article>
+            </Link>
           ))}
-        </div>
-
-        {/* Empty State / End of Feed */}
-        <div className="py-12 px-6 text-center">
-          <p className="text-white/50 text-[15px]">You're all caught up.</p>
         </div>
       </div>
     </main>
