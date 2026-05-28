@@ -7,25 +7,25 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --sea-ink: #173a40;
-  --sea-ink-soft: #416166;
-  --lagoon: #4fb8b2;
-  --lagoon-deep: #328f97;
-  --palm: #2f6a4a;
+  --ember: #7A3302;
+  --ember-deep: #7A3302;
+  --ember-surface: oklch(6.72% 0.00001 271.152);
+  --charcoal: #1a1a1a;
+  --charcoal-soft: #4a4a4a;
   --sand: #e7f0e8;
   --foam: #f3faf5;
   --surface: rgba(255, 255, 255, 0.74);
   --surface-strong: rgba(255, 255, 255, 0.9);
-  --line: rgba(23, 58, 64, 0.14);
+  --line: rgba(26, 26, 26, 0.1);
   --inset-glint: rgba(255, 255, 255, 0.82);
-  --kicker: rgba(47, 106, 74, 0.9);
+  --kicker: oklch(0.5 0.16 47 / 0.9);
   --bg-base: #fdfdfc;
-  --header-bg: rgba(251, 255, 248, 0.84);
+  --header-bg: rgba(253, 253, 252, 0.84);
   --chip-bg: rgba(255, 255, 255, 0.8);
-  --chip-line: rgba(47, 106, 74, 0.18);
+  --chip-line: oklch(0.46 0.175 47 / 0.2);
   --link-bg-hover: rgba(255, 255, 255, 0.9);
-  --hero-a: rgba(79, 184, 178, 0.36);
-  --hero-b: rgba(47, 106, 74, 0.2);
+  --hero-a: oklch(0.46 0.175 47 / 0.2);
+  --hero-b: oklch(0.46 0.175 47 / 0.08);
 
   --background: oklch(0.985 0.005 100);
   --foreground: oklch(0.141 0.005 285.823);
@@ -63,28 +63,28 @@
 }
 
 .dark {
-  --sea-ink: #d7ece8;
-  --sea-ink-soft: #afcdc8;
-  --lagoon: #60d7cf;
-  --lagoon-deep: #8de5db;
-  --palm: #6ec89a;
+  --ember: oklch(0.65 0.15 47);
+  --ember-deep: oklch(0.72 0.14 47);
+  --ember-surface: oklch(0.2 0.04 47);
+  --charcoal: #e8e8e8;
+  --charcoal-soft: #b0b0b0;
   --sand: #0f1a1e;
   --foam: #101d22;
   --surface: rgba(16, 30, 34, 0.8);
   --surface-strong: rgba(15, 27, 31, 0.92);
-  --line: rgba(141, 229, 219, 0.18);
+  --line: rgba(232, 232, 232, 0.12);
   --inset-glint: rgba(194, 247, 238, 0.14);
-  --kicker: #b8efe5;
-  --bg-base: #fdfdfc;
-  --header-bg: rgba(251, 255, 248, 0.84);
+  --kicker: oklch(0.72 0.14 47);
+  --bg-base: #0d1c20;
+  --header-bg: rgba(13, 28, 32, 0.9);
   --chip-bg: rgba(13, 28, 32, 0.9);
-  --chip-line: rgba(141, 229, 219, 0.24);
+  --chip-line: oklch(0.65 0.15 47 / 0.25);
   --link-bg-hover: rgba(24, 44, 49, 0.8);
-  --hero-a: rgba(96, 215, 207, 0.18);
-  --hero-b: rgba(110, 200, 154, 0.12);
+  --hero-a: oklch(0.65 0.15 47 / 0.15);
+  --hero-b: oklch(0.65 0.15 47 / 0.08);
 
-  --background: oklch(0.985 0.005 100);
-  --foreground: oklch(0.141 0.005 285.823);
+  --background: oklch(0.13 0.008 200);
+  --foreground: oklch(0.97 0.003 200);
   --card: oklch(0.141 0.005 285.823);
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.141 0.005 285.823);
@@ -188,14 +188,14 @@ body::after {
 }
 
 a {
-  color: var(--lagoon-deep);
-  text-decoration-color: rgba(50, 143, 151, 0.4);
+  color: var(--ember-deep);
+  text-decoration-color: color-mix(in oklab, var(--ember-deep) 40%, transparent);
   text-decoration-thickness: 1px;
   text-underline-offset: 2px;
 }
 
 a:hover {
-  color: #246f76;
+  color: var(--ember);
 }
 
 code {
@@ -236,8 +236,8 @@ pre code {
   background: linear-gradient(165deg, var(--surface-strong), var(--surface));
   box-shadow:
     0 1px 0 var(--inset-glint) inset,
-    0 22px 44px rgba(30, 90, 72, 0.1),
-    0 6px 18px rgba(23, 58, 64, 0.08);
+    0 22px 44px oklch(0.46 0.175 47 / 0.08),
+    0 6px 18px oklch(0.46 0.175 47 / 0.06);
   backdrop-filter: blur(4px);
 }
 
@@ -249,13 +249,13 @@ pre code {
   );
   box-shadow:
     0 1px 0 var(--inset-glint) inset,
-    0 18px 34px rgba(30, 90, 72, 0.1),
-    0 4px 14px rgba(23, 58, 64, 0.06);
+    0 18px 34px oklch(0.46 0.175 47 / 0.08),
+    0 4px 14px oklch(0.46 0.175 47 / 0.05);
 }
 
 .feature-card:hover {
   transform: translateY(-2px);
-  border-color: color-mix(in oklab, var(--lagoon-deep) 35%, var(--line));
+  border-color: color-mix(in oklab, var(--ember-deep) 35%, var(--line));
 }
 
 button,
@@ -279,7 +279,7 @@ a {
 .nav-link {
   position: relative;
   text-decoration: none;
-  color: var(--sea-ink-soft);
+  color: var(--charcoal-soft);
 }
 
 .nav-link::after {
@@ -291,13 +291,13 @@ a {
   height: 2px;
   transform: scaleX(0);
   transform-origin: left;
-  background: linear-gradient(90deg, var(--lagoon), #7ed3bf);
+  background: var(--ember);
   transition: transform 170ms ease;
 }
 
 .nav-link:hover,
 .nav-link.is-active {
-  color: var(--sea-ink);
+  color: var(--ember);
 }
 
 .nav-link:hover::after,
