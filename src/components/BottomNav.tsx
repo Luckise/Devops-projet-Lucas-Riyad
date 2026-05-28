@@ -1,5 +1,5 @@
-import { Link } from '@tanstack/react-router'
-import { Home, Calendar, Lightbulb, User } from 'lucide-react'
+import { Link } from "@tanstack/react-router";
+import { Home, Calendar, Lightbulb, User } from "lucide-react";
 
 export default function BottomNav() {
   return (
@@ -8,7 +8,7 @@ export default function BottomNav() {
         <Link
           to="/"
           className="flex flex-col items-center gap-1.5 p-2 text-white/40 hover:text-white/70 [&.active]:text-white transition-colors"
-          activeProps={{ className: 'active' }}
+          activeProps={{ className: "active" }}
         >
           <Home className="w-[1.375rem] h-[1.375rem]" />
           <span className="text-[10px] font-bold tracking-wide uppercase">Home</span>
@@ -16,7 +16,7 @@ export default function BottomNav() {
         <Link
           to="/events"
           className="flex flex-col items-center gap-1.5 p-2 text-white/40 hover:text-white/70 [&.active]:text-white transition-colors"
-          activeProps={{ className: 'active' }}
+          activeProps={{ className: "active" }}
         >
           <Calendar className="w-[1.375rem] h-[1.375rem]" />
           <span className="text-[10px] font-bold tracking-wide uppercase">Events</span>
@@ -24,7 +24,7 @@ export default function BottomNav() {
         <Link
           to="/tips"
           className="flex flex-col items-center gap-1.5 p-2 text-white/40 hover:text-white/70 [&.active]:text-white transition-colors"
-          activeProps={{ className: 'active' }}
+          activeProps={{ className: "active" }}
         >
           <Lightbulb className="w-[1.375rem] h-[1.375rem]" />
           <span className="text-[10px] font-bold tracking-wide uppercase">Tips</span>
@@ -32,12 +32,12 @@ export default function BottomNav() {
         <Link
           to="/profile"
           className="flex flex-col items-center gap-1.5 p-2 text-white/40 hover:text-white/70 [&.active]:text-white transition-colors"
-          activeProps={{ className: 'active' }}
+          activeProps={{ className: "active" }}
         >
           <User className="w-[1.375rem] h-[1.375rem]" />
           <span className="text-[10px] font-bold tracking-wide uppercase">Profile</span>
         </Link>
       </div>
     </nav>
-  )
+  );
 }

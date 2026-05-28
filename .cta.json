@@ -16,12 +16,5 @@
   "routerOnly": false,
   "version": 1,
   "framework": "react",
-  "chosenAddOns": [
-    "nitro",
-    "drizzle",
-    "form",
-    "oRPC",
-    "shadcn",
-    "tanstack-query"
-  ]
+  "chosenAddOns": ["nitro", "drizzle", "form", "oRPC", "shadcn", "tanstack-query"]
 }
