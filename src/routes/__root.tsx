@@ -5,7 +5,7 @@ import {
 } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
-import Footer from '../components/Footer'
+import BottomNav from '../components/BottomNav'
 import Header from '../components/Header'
 
 import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
@@ -28,10 +28,10 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       },
       {
         name: 'viewport',
-        content: 'width=device-width, initial-scale=1',
+        content: 'width=device-width, initial-scale=1, viewport-fit=cover',
       },
       {
-        title: 'TanStack Start Starter',
+        title: 'EAT. Event App',
       },
     ],
     links: [
@@ -51,10 +51,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
         <HeadContent />
       </head>
-      <body className="font-sans antialiased [overflow-wrap:anywhere] selection:bg-[rgba(79,184,178,0.24)]">
+      <body className="font-sans antialiased bg-[#fdfdfc] text-black [overflow-wrap:anywhere] selection:bg-black/10 dark:bg-black dark:text-white dark:selection:bg-white/20">
         <Header />
         {children}
-        <Footer />
+        <BottomNav />
         <TanStackDevtools
           config={{
             position: 'bottom-right',
