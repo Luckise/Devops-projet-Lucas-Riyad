@@ -1,18 +1,30 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { Settings, Bell, ChevronRight, Edit3, User } from "lucide-react";
+import { createFileRoute, Link, useNavigate, redirect } from "@tanstack/react-router";
+import { Settings, Bell, ChevronRight, Edit3, User, Shield, Calendar, Lightbulb } from "lucide-react";
 import { useState } from "react";
 import { useUser } from "../hooks/use-user";
 
 export const Route = createFileRoute("/profile/")({
+  beforeLoad: () => {
+    if (typeof window !== "undefined" && !localStorage.getItem("eat_user_profile")) {
+      throw redirect({ to: "/login" });
+    }
+  },
   component: ProfileRoute,
 });
 
 function ProfileRoute() {
+  const navigate = useNavigate();
   const { user } = useUser();
   const [notifications, setNotifications] = useState(true);
 
+  const handleLogout = () => {
+    localStorage.removeItem("eat_user_profile");
+    window.dispatchEvent(new Event("user-updated"));
+    navigate({ to: "/login" });
+  };
+
   return (
-    <main className="min-h-screen pb-24 pt-[80px] bg-zinc-50 dark:bg-zinc-950">
+    <main className="min-h-screen pb-24 pt-[80px] bg-[#fdfdfc] dark:bg-zinc-950">
       <div className="max-w-md mx-auto px-4 pt-4 md:pt-8">
         <header className="mb-8">
           <p className="text-zinc-500 text-xs font-bold uppercase tracking-[0.2em] mb-1.5 ml-0.5">
@@ -57,6 +69,52 @@ function ProfileRoute() {
             <ChevronRight className="w-5 h-5 text-zinc-400" />
           </Link>
 
+          {/* My Tips */}
+          <Link
+            to="/profile/tips"
+            className="w-full flex items-center justify-between p-4 rounded-2xl bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors border border-zinc-200 dark:border-white/10 shadow-sm"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+                <Lightbulb className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+              </div>
+              <span className="font-medium text-zinc-900 dark:text-white">My Tips</span>
+            </div>
+            <ChevronRight className="w-5 h-5 text-zinc-400" />
+          </Link>
+
+          {/* My Events */}
+          {user.isAdmin && (
+            <Link
+              to="/profile/events"
+              className="w-full flex items-center justify-between p-4 rounded-2xl bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors border border-zinc-200 dark:border-white/10 shadow-sm"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+                  <Calendar className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                </div>
+                <span className="font-medium text-zinc-900 dark:text-white">My Events</span>
+              </div>
+              <ChevronRight className="w-5 h-5 text-zinc-400" />
+            </Link>
+          )}
+
+          {/* My Groups */}
+          {user.isAdmin && (
+            <Link
+              to="/profile/groups"
+              className="w-full flex items-center justify-between p-4 rounded-2xl bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors border border-zinc-200 dark:border-white/10 shadow-sm"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
+                  <Shield className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                </div>
+                <span className="font-medium text-zinc-900 dark:text-white">My Groups</span>
+              </div>
+              <ChevronRight className="w-5 h-5 text-zinc-400" />
+            </Link>
+          )}
+
           {/* Notifications Toggle */}
           <div className="w-full flex items-center justify-between p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 shadow-sm cursor-pointer" onClick={() => setNotifications(!notifications)}>
             <div className="flex items-center gap-4">
@@ -86,7 +144,7 @@ function ProfileRoute() {
         </div>
 
         <div className="mt-8 pt-8 border-t border-zinc-200 dark:border-white/10">
-          <button className="w-full text-center text-red-500 font-medium hover:text-red-600 transition-colors py-2">
+          <button onClick={handleLogout} className="w-full text-center text-red-500 font-medium hover:text-red-600 transition-colors py-2">
             Log Out
           </button>
         </div>

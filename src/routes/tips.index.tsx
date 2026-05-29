@@ -15,7 +15,7 @@ function TipsRoute() {
   const allTips = [...getSavedItems("user_tips"), ...MOCK_TIPS];
 
   const filteredTips = allTips.filter(
-    (tip) => activeCategory === "All" || tip.category === activeCategory,
+    (tip) => (activeCategory === "All" || tip.category === activeCategory) && !tip.hidden,
   );
 
   return (

@@ -11,13 +11,19 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TipsRouteImport } from './routes/tips'
 import { Route as TicketsRouteImport } from './routes/tickets'
+import { Route as SignupRouteImport } from './routes/signup'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as FeedRouteImport } from './routes/feed'
+import { Route as EventsRouteImport } from './routes/events'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TipsIndexRouteImport } from './routes/tips.index'
 import { Route as ProfileIndexRouteImport } from './routes/profile.index'
 import { Route as TipsNewRouteImport } from './routes/tips.new'
 import { Route as TipsTipIdRouteImport } from './routes/tips.$tipId'
+import { Route as ProfileTipsRouteImport } from './routes/profile.tips'
+import { Route as ProfileGroupsRouteImport } from './routes/profile.groups'
+import { Route as ProfileEventsRouteImport } from './routes/profile.events'
 import { Route as ProfileEditRouteImport } from './routes/profile.edit'
 import { Route as PostsNewRouteImport } from './routes/posts.new'
 import { Route as EventsNewRouteImport } from './routes/events.new'
@@ -26,9 +32,12 @@ import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-qu
 import { Route as DemoOrpcTodoRouteImport } from './routes/demo/orpc-todo'
 import { Route as DemoDrizzleRouteImport } from './routes/demo/drizzle'
 import { Route as ApiSplatRouteImport } from './routes/api.$'
+import { Route as PostsPostIdModifyRouteImport } from './routes/posts.$postId.modify'
 import { Route as DemoFormSimpleRouteImport } from './routes/demo/form.simple'
 import { Route as DemoFormAddressRouteImport } from './routes/demo/form.address'
 import { Route as ApiRpcSplatRouteImport } from './routes/api.rpc.$'
+import { Route as ProfileTipsTipIdModifyRouteImport } from './routes/profile.tips.$tipId.modify'
+import { Route as ProfileEventsEventIdModifyRouteImport } from './routes/profile.events.$eventId.modify'
 
 const TipsRoute = TipsRouteImport.update({
   id: '/tips',
@@ -40,9 +49,24 @@ const TicketsRoute = TicketsRouteImport.update({
   path: '/tickets',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FeedRoute = FeedRouteImport.update({
   id: '/feed',
   path: '/feed',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EventsRoute = EventsRouteImport.update({
+  id: '/events',
+  path: '/events',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -75,6 +99,21 @@ const TipsTipIdRoute = TipsTipIdRouteImport.update({
   path: '/$tipId',
   getParentRoute: () => TipsRoute,
 } as any)
+const ProfileTipsRoute = ProfileTipsRouteImport.update({
+  id: '/profile/tips',
+  path: '/profile/tips',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileGroupsRoute = ProfileGroupsRouteImport.update({
+  id: '/profile/groups',
+  path: '/profile/groups',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileEventsRoute = ProfileEventsRouteImport.update({
+  id: '/profile/events',
+  path: '/profile/events',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProfileEditRoute = ProfileEditRouteImport.update({
   id: '/profile/edit',
   path: '/profile/edit',
@@ -86,14 +125,14 @@ const PostsNewRoute = PostsNewRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const EventsNewRoute = EventsNewRouteImport.update({
-  id: '/events/new',
-  path: '/events/new',
-  getParentRoute: () => rootRouteImport,
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => EventsRoute,
 } as any)
 const EventsEventIdRoute = EventsEventIdRouteImport.update({
-  id: '/events/$eventId',
-  path: '/events/$eventId',
-  getParentRoute: () => rootRouteImport,
+  id: '/$eventId',
+  path: '/$eventId',
+  getParentRoute: () => EventsRoute,
 } as any)
 const DemoTanstackQueryRoute = DemoTanstackQueryRouteImport.update({
   id: '/demo/tanstack-query',
@@ -115,6 +154,11 @@ const ApiSplatRoute = ApiSplatRouteImport.update({
   path: '/api/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PostsPostIdModifyRoute = PostsPostIdModifyRouteImport.update({
+  id: '/posts/$postId/modify',
+  path: '/posts/$postId/modify',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DemoFormSimpleRoute = DemoFormSimpleRouteImport.update({
   id: '/demo/form/simple',
   path: '/demo/form/simple',
@@ -130,11 +174,25 @@ const ApiRpcSplatRoute = ApiRpcSplatRouteImport.update({
   path: '/api/rpc/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProfileTipsTipIdModifyRoute = ProfileTipsTipIdModifyRouteImport.update({
+  id: '/$tipId/modify',
+  path: '/$tipId/modify',
+  getParentRoute: () => ProfileTipsRoute,
+} as any)
+const ProfileEventsEventIdModifyRoute =
+  ProfileEventsEventIdModifyRouteImport.update({
+    id: '/$eventId/modify',
+    path: '/$eventId/modify',
+    getParentRoute: () => ProfileEventsRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/events': typeof EventsRouteWithChildren
   '/feed': typeof FeedRoute
+  '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
   '/tickets': typeof TicketsRoute
   '/tips': typeof TipsRouteWithChildren
   '/api/$': typeof ApiSplatRoute
@@ -145,6 +203,9 @@ export interface FileRoutesByFullPath {
   '/events/new': typeof EventsNewRoute
   '/posts/new': typeof PostsNewRoute
   '/profile/edit': typeof ProfileEditRoute
+  '/profile/events': typeof ProfileEventsRouteWithChildren
+  '/profile/groups': typeof ProfileGroupsRoute
+  '/profile/tips': typeof ProfileTipsRouteWithChildren
   '/tips/$tipId': typeof TipsTipIdRoute
   '/tips/new': typeof TipsNewRoute
   '/profile/': typeof ProfileIndexRoute
@@ -152,11 +213,17 @@ export interface FileRoutesByFullPath {
   '/api/rpc/$': typeof ApiRpcSplatRoute
   '/demo/form/address': typeof DemoFormAddressRoute
   '/demo/form/simple': typeof DemoFormSimpleRoute
+  '/posts/$postId/modify': typeof PostsPostIdModifyRoute
+  '/profile/events/$eventId/modify': typeof ProfileEventsEventIdModifyRoute
+  '/profile/tips/$tipId/modify': typeof ProfileTipsTipIdModifyRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/events': typeof EventsRouteWithChildren
   '/feed': typeof FeedRoute
+  '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
   '/tickets': typeof TicketsRoute
   '/api/$': typeof ApiSplatRoute
   '/demo/drizzle': typeof DemoDrizzleRoute
@@ -166,6 +233,9 @@ export interface FileRoutesByTo {
   '/events/new': typeof EventsNewRoute
   '/posts/new': typeof PostsNewRoute
   '/profile/edit': typeof ProfileEditRoute
+  '/profile/events': typeof ProfileEventsRouteWithChildren
+  '/profile/groups': typeof ProfileGroupsRoute
+  '/profile/tips': typeof ProfileTipsRouteWithChildren
   '/tips/$tipId': typeof TipsTipIdRoute
   '/tips/new': typeof TipsNewRoute
   '/profile': typeof ProfileIndexRoute
@@ -173,12 +243,18 @@ export interface FileRoutesByTo {
   '/api/rpc/$': typeof ApiRpcSplatRoute
   '/demo/form/address': typeof DemoFormAddressRoute
   '/demo/form/simple': typeof DemoFormSimpleRoute
+  '/posts/$postId/modify': typeof PostsPostIdModifyRoute
+  '/profile/events/$eventId/modify': typeof ProfileEventsEventIdModifyRoute
+  '/profile/tips/$tipId/modify': typeof ProfileTipsTipIdModifyRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/events': typeof EventsRouteWithChildren
   '/feed': typeof FeedRoute
+  '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
   '/tickets': typeof TicketsRoute
   '/tips': typeof TipsRouteWithChildren
   '/api/$': typeof ApiSplatRoute
@@ -189,6 +265,9 @@ export interface FileRoutesById {
   '/events/new': typeof EventsNewRoute
   '/posts/new': typeof PostsNewRoute
   '/profile/edit': typeof ProfileEditRoute
+  '/profile/events': typeof ProfileEventsRouteWithChildren
+  '/profile/groups': typeof ProfileGroupsRoute
+  '/profile/tips': typeof ProfileTipsRouteWithChildren
   '/tips/$tipId': typeof TipsTipIdRoute
   '/tips/new': typeof TipsNewRoute
   '/profile/': typeof ProfileIndexRoute
@@ -196,13 +275,19 @@ export interface FileRoutesById {
   '/api/rpc/$': typeof ApiRpcSplatRoute
   '/demo/form/address': typeof DemoFormAddressRoute
   '/demo/form/simple': typeof DemoFormSimpleRoute
+  '/posts/$postId/modify': typeof PostsPostIdModifyRoute
+  '/profile/events/$eventId/modify': typeof ProfileEventsEventIdModifyRoute
+  '/profile/tips/$tipId/modify': typeof ProfileTipsTipIdModifyRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/about'
+    | '/events'
     | '/feed'
+    | '/login'
+    | '/signup'
     | '/tickets'
     | '/tips'
     | '/api/$'
@@ -213,6 +298,9 @@ export interface FileRouteTypes {
     | '/events/new'
     | '/posts/new'
     | '/profile/edit'
+    | '/profile/events'
+    | '/profile/groups'
+    | '/profile/tips'
     | '/tips/$tipId'
     | '/tips/new'
     | '/profile/'
@@ -220,11 +308,17 @@ export interface FileRouteTypes {
     | '/api/rpc/$'
     | '/demo/form/address'
     | '/demo/form/simple'
+    | '/posts/$postId/modify'
+    | '/profile/events/$eventId/modify'
+    | '/profile/tips/$tipId/modify'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
+    | '/events'
     | '/feed'
+    | '/login'
+    | '/signup'
     | '/tickets'
     | '/api/$'
     | '/demo/drizzle'
@@ -234,6 +328,9 @@ export interface FileRouteTypes {
     | '/events/new'
     | '/posts/new'
     | '/profile/edit'
+    | '/profile/events'
+    | '/profile/groups'
+    | '/profile/tips'
     | '/tips/$tipId'
     | '/tips/new'
     | '/profile'
@@ -241,11 +338,17 @@ export interface FileRouteTypes {
     | '/api/rpc/$'
     | '/demo/form/address'
     | '/demo/form/simple'
+    | '/posts/$postId/modify'
+    | '/profile/events/$eventId/modify'
+    | '/profile/tips/$tipId/modify'
   id:
     | '__root__'
     | '/'
     | '/about'
+    | '/events'
     | '/feed'
+    | '/login'
+    | '/signup'
     | '/tickets'
     | '/tips'
     | '/api/$'
@@ -256,6 +359,9 @@ export interface FileRouteTypes {
     | '/events/new'
     | '/posts/new'
     | '/profile/edit'
+    | '/profile/events'
+    | '/profile/groups'
+    | '/profile/tips'
     | '/tips/$tipId'
     | '/tips/new'
     | '/profile/'
@@ -263,26 +369,34 @@ export interface FileRouteTypes {
     | '/api/rpc/$'
     | '/demo/form/address'
     | '/demo/form/simple'
+    | '/posts/$postId/modify'
+    | '/profile/events/$eventId/modify'
+    | '/profile/tips/$tipId/modify'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  EventsRoute: typeof EventsRouteWithChildren
   FeedRoute: typeof FeedRoute
+  LoginRoute: typeof LoginRoute
+  SignupRoute: typeof SignupRoute
   TicketsRoute: typeof TicketsRoute
   TipsRoute: typeof TipsRouteWithChildren
   ApiSplatRoute: typeof ApiSplatRoute
   DemoDrizzleRoute: typeof DemoDrizzleRoute
   DemoOrpcTodoRoute: typeof DemoOrpcTodoRoute
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
-  EventsEventIdRoute: typeof EventsEventIdRoute
-  EventsNewRoute: typeof EventsNewRoute
   PostsNewRoute: typeof PostsNewRoute
   ProfileEditRoute: typeof ProfileEditRoute
+  ProfileEventsRoute: typeof ProfileEventsRouteWithChildren
+  ProfileGroupsRoute: typeof ProfileGroupsRoute
+  ProfileTipsRoute: typeof ProfileTipsRouteWithChildren
   ProfileIndexRoute: typeof ProfileIndexRoute
   ApiRpcSplatRoute: typeof ApiRpcSplatRoute
   DemoFormAddressRoute: typeof DemoFormAddressRoute
   DemoFormSimpleRoute: typeof DemoFormSimpleRoute
+  PostsPostIdModifyRoute: typeof PostsPostIdModifyRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -301,11 +415,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TicketsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/feed': {
       id: '/feed'
       path: '/feed'
       fullPath: '/feed'
       preLoaderRoute: typeof FeedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/events': {
+      id: '/events'
+      path: '/events'
+      fullPath: '/events'
+      preLoaderRoute: typeof EventsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -350,6 +485,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TipsTipIdRouteImport
       parentRoute: typeof TipsRoute
     }
+    '/profile/tips': {
+      id: '/profile/tips'
+      path: '/profile/tips'
+      fullPath: '/profile/tips'
+      preLoaderRoute: typeof ProfileTipsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile/groups': {
+      id: '/profile/groups'
+      path: '/profile/groups'
+      fullPath: '/profile/groups'
+      preLoaderRoute: typeof ProfileGroupsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile/events': {
+      id: '/profile/events'
+      path: '/profile/events'
+      fullPath: '/profile/events'
+      preLoaderRoute: typeof ProfileEventsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/profile/edit': {
       id: '/profile/edit'
       path: '/profile/edit'
@@ -366,17 +522,17 @@ declare module '@tanstack/react-router' {
     }
     '/events/new': {
       id: '/events/new'
-      path: '/events/new'
+      path: '/new'
       fullPath: '/events/new'
       preLoaderRoute: typeof EventsNewRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof EventsRoute
     }
     '/events/$eventId': {
       id: '/events/$eventId'
-      path: '/events/$eventId'
+      path: '/$eventId'
       fullPath: '/events/$eventId'
       preLoaderRoute: typeof EventsEventIdRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof EventsRoute
     }
     '/demo/tanstack-query': {
       id: '/demo/tanstack-query'
@@ -406,6 +562,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/posts/$postId/modify': {
+      id: '/posts/$postId/modify'
+      path: '/posts/$postId/modify'
+      fullPath: '/posts/$postId/modify'
+      preLoaderRoute: typeof PostsPostIdModifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/demo/form/simple': {
       id: '/demo/form/simple'
       path: '/demo/form/simple'
@@ -427,8 +590,35 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiRpcSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/profile/tips/$tipId/modify': {
+      id: '/profile/tips/$tipId/modify'
+      path: '/$tipId/modify'
+      fullPath: '/profile/tips/$tipId/modify'
+      preLoaderRoute: typeof ProfileTipsTipIdModifyRouteImport
+      parentRoute: typeof ProfileTipsRoute
+    }
+    '/profile/events/$eventId/modify': {
+      id: '/profile/events/$eventId/modify'
+      path: '/$eventId/modify'
+      fullPath: '/profile/events/$eventId/modify'
+      preLoaderRoute: typeof ProfileEventsEventIdModifyRouteImport
+      parentRoute: typeof ProfileEventsRoute
+    }
   }
 }
+
+interface EventsRouteChildren {
+  EventsEventIdRoute: typeof EventsEventIdRoute
+  EventsNewRoute: typeof EventsNewRoute
+}
+
+const EventsRouteChildren: EventsRouteChildren = {
+  EventsEventIdRoute: EventsEventIdRoute,
+  EventsNewRoute: EventsNewRoute,
+}
+
+const EventsRouteWithChildren =
+  EventsRoute._addFileChildren(EventsRouteChildren)
 
 interface TipsRouteChildren {
   TipsTipIdRoute: typeof TipsTipIdRoute
@@ -444,24 +634,53 @@ const TipsRouteChildren: TipsRouteChildren = {
 
 const TipsRouteWithChildren = TipsRoute._addFileChildren(TipsRouteChildren)
 
+interface ProfileEventsRouteChildren {
+  ProfileEventsEventIdModifyRoute: typeof ProfileEventsEventIdModifyRoute
+}
+
+const ProfileEventsRouteChildren: ProfileEventsRouteChildren = {
+  ProfileEventsEventIdModifyRoute: ProfileEventsEventIdModifyRoute,
+}
+
+const ProfileEventsRouteWithChildren = ProfileEventsRoute._addFileChildren(
+  ProfileEventsRouteChildren,
+)
+
+interface ProfileTipsRouteChildren {
+  ProfileTipsTipIdModifyRoute: typeof ProfileTipsTipIdModifyRoute
+}
+
+const ProfileTipsRouteChildren: ProfileTipsRouteChildren = {
+  ProfileTipsTipIdModifyRoute: ProfileTipsTipIdModifyRoute,
+}
+
+const ProfileTipsRouteWithChildren = ProfileTipsRoute._addFileChildren(
+  ProfileTipsRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  EventsRoute: EventsRouteWithChildren,
   FeedRoute: FeedRoute,
+  LoginRoute: LoginRoute,
+  SignupRoute: SignupRoute,
   TicketsRoute: TicketsRoute,
   TipsRoute: TipsRouteWithChildren,
   ApiSplatRoute: ApiSplatRoute,
   DemoDrizzleRoute: DemoDrizzleRoute,
   DemoOrpcTodoRoute: DemoOrpcTodoRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
-  EventsEventIdRoute: EventsEventIdRoute,
-  EventsNewRoute: EventsNewRoute,
   PostsNewRoute: PostsNewRoute,
   ProfileEditRoute: ProfileEditRoute,
+  ProfileEventsRoute: ProfileEventsRouteWithChildren,
+  ProfileGroupsRoute: ProfileGroupsRoute,
+  ProfileTipsRoute: ProfileTipsRouteWithChildren,
   ProfileIndexRoute: ProfileIndexRoute,
   ApiRpcSplatRoute: ApiRpcSplatRoute,
   DemoFormAddressRoute: DemoFormAddressRoute,
   DemoFormSimpleRoute: DemoFormSimpleRoute,
+  PostsPostIdModifyRoute: PostsPostIdModifyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

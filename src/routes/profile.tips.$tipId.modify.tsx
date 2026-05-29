@@ -1,63 +1,86 @@
-import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link, redirect } from "@tanstack/react-router";
 import { useState } from "react";
-import { ArrowLeft, Plus, X } from "lucide-react";
+import { ArrowLeft, X, Plus, Trash2, EyeOff } from "lucide-react";
 import ImageUpload from "../components/ImageUpload";
-import { saveItem } from "../lib/mock-data";
+import { findTip, hideTip, unhideTip, updateItem } from "../lib/mock-data";
 import { toast } from "../lib/toast";
 
-export const Route = createFileRoute("/tips/new")({
+type ContentBlock = { type: "text" | "image"; value: string };
+
+export const Route = createFileRoute("/profile/tips/$tipId/modify")({
   beforeLoad: () => {
     if (typeof window !== "undefined" && !localStorage.getItem("eat_user_profile")) {
       throw redirect({ to: "/login" });
     }
   },
-  component: TipCreate,
+  component: ProfileTipEditRoute,
+  loader: ({ params }) => {
+    const tip = findTip(params.tipId);
+    if (!tip) throw new Error("Tip not found");
+    return { tip };
+  },
 });
 
-type ContentBlock = { type: "text" | "image"; value: string };
 const CATEGORIES = ["Recipes", "Promotions", "Addresses", "Guides"] as const;
 
-function TipCreate() {
+function ProfileTipEditRoute() {
+  const { tip } = Route.useLoaderData();
   const navigate = useNavigate();
-  const [category, setCategory] = useState<typeof CATEGORIES[number] | "">("");
-  const [title, setTitle] = useState("");
-  const [image, setImage] = useState("");
-  const [cookingTimeValue, setCookingTimeValue] = useState("");
-  const [cookingTimeUnit, setCookingTimeUnit] = useState<"min" | "hour">("min");
-  const [ingredients, setIngredients] = useState<string[]>([""]);
-  const [address, setAddress] = useState("");
-  const [content, setContent] = useState<ContentBlock[]>([]);
+
+  const [title, setTitle] = useState(tip.title || "");
+  const [image, setImage] = useState(tip.image || "");
+  const [category] = useState<string>(tip.category || "");
+  const parseCookingTime = (val: string) => {
+    const match = val.match(/^(\d+)\s*(min|hour)$/);
+    return match ? { value: match[1], unit: match[2] as "min" | "hour" } : { value: "", unit: "min" as const };
+  };
+  const parsed = parseCookingTime(tip.cookingTime || "");
+  const [cookingTimeValue, setCookingTimeValue] = useState(parsed.value);
+  const [cookingTimeUnit, setCookingTimeUnit] = useState<"min" | "hour">(parsed.unit);
+  const [ingredients, setIngredients] = useState<string[]>(tip.ingredients?.length ? [...tip.ingredients] : [""]);
+  const [address, setAddress] = useState(tip.address || "");
+  const [content, setContent] = useState<ContentBlock[]>(tip.content?.length ? tip.content.map((b: any) => ({ type: b.type, value: b.value })) : []);
   const [submitting, setSubmitting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title) return;
     setSubmitting(true);
 
-    const profile = JSON.parse(localStorage.getItem("eat_user_profile") || "{}");
-
-    const tip: Record<string, unknown> = {
-      id: Date.now().toString(),
+    const updates: Record<string, unknown> = {
       title,
-      category,
       image,
-      height: "aspect-[3/4]",
       content: content.filter((b) => b.value.trim()),
-      authorEmail: profile.email || "",
     };
 
     if (category === "Recipes") {
-      tip.cookingTime = cookingTimeValue ? `${cookingTimeValue} ${cookingTimeUnit}` : "";
-      tip.ingredients = ingredients.filter(Boolean);
+      updates.cookingTime = cookingTimeValue ? `${cookingTimeValue} ${cookingTimeUnit}` : "";
+      updates.ingredients = ingredients.filter(Boolean);
     }
     if (category === "Addresses") {
-      tip.address = address;
+      updates.address = address;
     }
 
-    saveItem("user_tips", tip);
+    updateItem("user_tips", tip.id, updates as any);
     setSubmitting(false);
-    toast("Tip created successfully");
-    navigate({ to: "/tips" });
+    toast("Tip updated");
+    navigate({ to: "/profile/tips" });
+  };
+
+  const handleHide = () => setShowDeleteConfirm(true);
+
+  const confirmHide = () => {
+    hideTip(tip.id);
+    setShowDeleteConfirm(false);
+    toast("Tip hidden from feed");
+    navigate({ to: "/profile/tips" });
+  };
+
+  const handleUnhide = () => {
+    unhideTip(tip.id);
+    toast("Tip is now visible");
+    navigate({ to: "/profile/tips" });
   };
 
   const addIngredient = () => setIngredients((prev) => [...prev, ""]);
@@ -86,39 +109,48 @@ function TipCreate() {
     <main className="min-h-screen pb-24 pt-[80px] bg-[#fdfdfc] dark:bg-zinc-950">
       <div className="max-w-xl mx-auto px-5">
         <div className="flex items-center gap-4 mb-8">
-          <button
-            type="button"
-            onClick={() => navigate({ to: "/tips" })}
+          <Link
+            to="/profile/tips"
             className="w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors"
           >
             <ArrowLeft className="w-5 h-5 text-zinc-700 dark:text-zinc-300" />
-          </button>
-          <h1 className="text-2xl font-serif font-medium text-zinc-900 dark:text-white">New Tip</h1>
+          </Link>
+          <div>
+            <h1 className="text-2xl font-serif font-medium text-zinc-900 dark:text-white">Edit Tip</h1>
+            <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--ember)] mt-0.5">{category}</p>
+          </div>
+        </div>
+
+        {tip.hidden && (
+          <div className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900/30 mb-6">
+            <EyeOff className="w-4 h-4 text-red-500 shrink-0" />
+            <span className="text-sm text-red-600 dark:text-red-400 font-medium">This tip is hidden from the feed</span>
+          </div>
+        )}
+
+        <div className="flex gap-3 mb-8">
+          {tip.hidden ? (
+            <button
+              type="button"
+              onClick={handleUnhide}
+              className="flex items-center justify-center gap-2 py-3 px-5 rounded-full bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-900/30 text-emerald-600 dark:text-emerald-400 font-bold text-[13px] hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-colors"
+            >
+              <EyeOff className="w-4 h-4" />
+              Show Tip
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handleHide}
+              className="flex items-center justify-center gap-2 py-3 px-5 rounded-full bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900/30 text-red-600 dark:text-red-400 font-bold text-[13px] hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors"
+            >
+              <Trash2 className="w-4 h-4" />
+              Hide Tip
+            </button>
+          )}
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2.5 block">
-              Category
-            </label>
-            <div className="flex flex-wrap gap-2">
-              {CATEGORIES.map((cat) => (
-                <button
-                  key={cat}
-                  type="button"
-                  onClick={() => setCategory(cat)}
-                  className={`px-4 py-2.5 rounded-full text-sm font-medium transition-all border ${
-                    category === cat
-                      ? "bg-[var(--ember)] text-white border-[var(--ember)] shadow-sm"
-                      : "bg-zinc-50 dark:bg-zinc-900/50 text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-zinc-800 hover:border-[var(--ember)]/30"
-                  }`}
-                >
-                  {cat}
-                </button>
-              ))}
-            </div>
-          </div>
-
           <ImageUpload value={image} onChange={setImage} label="Image" />
 
           <div>
@@ -272,10 +304,40 @@ function TipCreate() {
             disabled={submitting || !title}
             className="w-full py-4 px-6 rounded-full bg-[var(--ember)] text-white font-bold text-[15px] hover:bg-[var(--ember)]/90 disabled:opacity-50 transition-all shadow-lg shadow-[var(--ember)]/20"
           >
-            {submitting ? "Creating..." : "Create Tip"}
+            {submitting ? "Saving..." : "Save Changes"}
           </button>
         </form>
       </div>
+
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="mx-4 w-full max-w-sm p-6 rounded-3xl bg-white dark:bg-zinc-900 shadow-xl border border-zinc-200 dark:border-zinc-800">
+            <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mx-auto mb-4">
+              <Trash2 className="w-6 h-6 text-red-600 dark:text-red-400" />
+            </div>
+            <h3 className="text-lg font-bold text-center text-zinc-900 dark:text-white mb-2">Hide this tip?</h3>
+            <p className="text-sm text-center text-zinc-500 dark:text-zinc-400 mb-6">
+              The tip will be hidden from the public feed. You can still edit and manage it from My Tips.
+            </p>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setShowDeleteConfirm(false)}
+                className="flex-1 py-3 px-4 rounded-full border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 font-bold text-[13px] hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirmHide}
+                className="flex-1 py-3 px-4 rounded-full bg-red-600 text-white font-bold text-[13px] hover:bg-red-700 transition-colors"
+              >
+                Hide Tip
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

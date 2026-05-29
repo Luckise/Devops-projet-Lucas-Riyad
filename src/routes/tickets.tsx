@@ -1,35 +1,61 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { MapPin, Calendar, Clock, QrCode, X } from "lucide-react";
-import { MOCK_EVENTS } from "../lib/mock-data";
-import { useState } from "react";
+import { createFileRoute, redirect } from "@tanstack/react-router";
+import { MapPin, Calendar, Clock, Ticket, X } from "lucide-react";
+import { MOCK_EVENTS, getSavedItems } from "../lib/mock-data";
+import { useState, useEffect } from "react";
+import QRCode from "qrcode";
 
 export const Route = createFileRoute("/tickets")({
+  beforeLoad: () => {
+    if (typeof window !== "undefined" && !localStorage.getItem("eat_user_profile")) {
+      throw redirect({ to: "/login" });
+    }
+  },
   component: TicketsRoute,
 });
 
 function TicketsRoute() {
   const [expandedQr, setExpandedQr] = useState<string | null>(null);
+  const [mockQrUrls, setMockQrUrls] = useState<Record<string, string>>({});
 
-  // For the prototype, we assume the user has a ticket for the first event
-  const myTickets = [
+  const mockTickets = [
     {
       id: "TICK-8X9P2",
-      event: MOCK_EVENTS[0], // Neon Nights
-      status: "valid",
+      event: MOCK_EVENTS[0],
       type: "General Admission",
       purchaseDate: "Oct 24, 2023",
     },
     {
       id: "TICK-4J7K1",
-      event: MOCK_EVENTS[2], // Street Food Festival (Free)
-      status: "valid",
+      event: MOCK_EVENTS[2],
       type: "Free Entry",
       purchaseDate: "Oct 25, 2023",
     }
   ];
 
+  const dynamicTickets: any[] = getSavedItems("purchased_tickets");
+
+  const allTickets = [...dynamicTickets, ...mockTickets];
+
+  useEffect(() => {
+    mockTickets.forEach(async (t) => {
+      if (!mockQrUrls[t.id]) {
+        try {
+          const url = await QRCode.toDataURL(t.id, { width: 400, margin: 2 });
+          setMockQrUrls((prev) => ({ ...prev, [t.id]: url }));
+        } catch {}
+      }
+    });
+  // Run only on mount; mock tickets are stable
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const getQrUrl = (ticket: any): string | null => {
+    if (ticket.qrDataUrl) return ticket.qrDataUrl;
+    return mockQrUrls[ticket.id] || null;
+  };
+
   return (
-    <main className="min-h-screen pb-24 pt-[80px] bg-zinc-50 dark:bg-zinc-950">
+    <main className="min-h-screen pb-24 pt-[80px] bg-[#fdfdfc] dark:bg-zinc-950">
       <div className="max-w-md mx-auto px-4 pt-4 md:pt-8">
         <header className="mb-8">
           <h1 className="text-[2.5rem] font-serif font-medium tracking-tight leading-none text-zinc-900 dark:text-white">
@@ -40,8 +66,20 @@ function TicketsRoute() {
           </p>
         </header>
 
+        {allTickets.length === 0 && (
+          <div className="text-center py-16">
+            <div className="w-16 h-16 rounded-full bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center mx-auto mb-4">
+              <Ticket className="w-7 h-7 text-zinc-400" />
+            </div>
+            <p className="text-zinc-500 dark:text-zinc-400 font-medium">No tickets yet</p>
+            <p className="text-sm text-zinc-400 dark:text-zinc-500 mt-1">Join an event to get a ticket</p>
+          </div>
+        )}
+
         <div className="flex flex-col gap-6">
-          {myTickets.map((ticket) => (
+          {allTickets.map((ticket) => {
+            const qrUrl = getQrUrl(ticket);
+            return (
             <div key={ticket.id} className="relative rounded-3xl overflow-hidden bg-white dark:bg-zinc-900 shadow-xl shadow-black/5 dark:shadow-none border border-zinc-200/50 dark:border-white/10">
               {/* Event Image Banner */}
               <div className="h-32 w-full relative">
@@ -86,13 +124,18 @@ function TicketsRoute() {
                     </div>
                   </div>
 
-                  {/* QR Code Placeholder */}
-                  <button 
-                    onClick={() => setExpandedQr(ticket.id)}
-                    className="w-24 h-24 bg-white dark:bg-white p-2 rounded-xl flex items-center justify-center flex-shrink-0 border border-zinc-200 cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-transform shadow-sm"
-                  >
-                    <QrCode className="w-full h-full text-black" strokeWidth={1} />
-                  </button>
+                  {qrUrl ? (
+                    <button 
+                      onClick={() => setExpandedQr(ticket.id)}
+                      className="w-24 h-24 bg-white dark:bg-white p-1.5 rounded-xl flex items-center justify-center flex-shrink-0 border border-zinc-200 cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-transform shadow-sm"
+                    >
+                      <img src={qrUrl} alt="QR Code" className="w-full h-full object-contain" />
+                    </button>
+                  ) : (
+                    <div className="w-24 h-24 bg-zinc-100 dark:bg-zinc-800 rounded-xl flex items-center justify-center flex-shrink-0 border border-zinc-200">
+                      <div className="w-5 h-5 border-2 border-zinc-300 border-t-zinc-500 rounded-full animate-spin" />
+                    </div>
+                  )}
                 </div>
 
                 <div className="mt-5 pt-4 border-t border-zinc-100 dark:border-white/5 flex justify-between items-center">
@@ -105,11 +148,15 @@ function TicketsRoute() {
                 </div>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Full Screen QR Modal */}
-        {expandedQr && (
+        {expandedQr && (() => {
+          const ticket = allTickets.find((t) => t.id === expandedQr);
+          const qrUrl = ticket ? getQrUrl(ticket) : null;
+          return (
           <div 
             className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md flex items-center justify-center p-6 transition-all duration-300 animate-in fade-in"
             onClick={() => setExpandedQr(null)}
@@ -119,7 +166,11 @@ function TicketsRoute() {
               onClick={e => e.stopPropagation()}
             >
               <div className="w-full aspect-square bg-white flex items-center justify-center border border-zinc-100 rounded-2xl p-4 shadow-inner">
-                 <QrCode className="w-full h-full text-black" strokeWidth={1} />
+                {qrUrl ? (
+                  <img src={qrUrl} alt="QR Code" className="w-full h-full object-contain" />
+                ) : (
+                  <div className="w-8 h-8 border-2 border-zinc-300 border-t-zinc-500 rounded-full animate-spin" />
+                )}
               </div>
               <div className="text-center">
                 <p className="text-[11px] text-zinc-500 font-bold uppercase tracking-widest mb-1">Ticket ID</p>
@@ -133,7 +184,8 @@ function TicketsRoute() {
               </button>
             </div>
           </div>
-        )}
+          );
+        })()}
       </div>
     </main>
   );
