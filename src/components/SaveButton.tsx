@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { isEventSaved, toggleSavedEvent } from "../lib/mock-data";
+import { toast } from "../lib/toast";
 
 export default function SaveButton({ eventId, compact }: { eventId: string; compact?: boolean }) {
   const [saved, setSaved] = useState(() => isEventSaved(eventId));
@@ -9,6 +10,7 @@ export default function SaveButton({ eventId, compact }: { eventId: string; comp
     e.stopPropagation();
     const next = toggleSavedEvent(eventId);
     setSaved(next);
+    toast(next ? "Added to watchlist" : "Removed from watchlist");
   };
 
   if (compact) {

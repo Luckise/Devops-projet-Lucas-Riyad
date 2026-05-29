@@ -1,7 +1,8 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
-import { MessageCircle, Heart, Share, MoreHorizontal, Calendar as CalendarIcon } from "lucide-react";
-import { MOCK_EVENTS, getMyEventIds } from "../lib/mock-data";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useState, useMemo } from "react";
+import { MessageCircle, Heart, Share, MoreHorizontal, Calendar as CalendarIcon, Pencil, Trash2 } from "lucide-react";
+import { MOCK_EVENTS, getMyEventIds, getSavedItems, deleteItem } from "../lib/mock-data";
+import { toast } from "../lib/toast";
 
 export const Route = createFileRoute("/feed")({ component: FeedRoute });
 
@@ -75,10 +76,45 @@ const MOCK_FEED = [
 ];
 
 function FeedRoute() {
+  const navigate = useNavigate();
   const [tab, setTab] = useState<"global" | "myevents">("global");
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+
+  const profile = typeof window !== "undefined"
+    ? JSON.parse(localStorage.getItem("eat_user_profile") || "{}")
+    : {};
+  const userEmail = profile.email || "";
   const myEventIds = getMyEventIds();
 
-  const filteredFeed = MOCK_FEED.filter((post) => {
+  const allPosts = useMemo(() => {
+    const userPosts = getSavedItems<any[]>("user_posts").map((p) => ({
+      id: p.id,
+      author: {
+        name: profile.firstName || "You",
+        handle: `@${(profile.nickname || profile.email || "user").split("@")[0]}`,
+        avatar: profile.avatar || "",
+      },
+      timestamp: p.createdAt,
+      content: p.content,
+      eventId: p.eventId,
+      image: null,
+      likes: 0,
+      comments: 0,
+      authorEmail: p.authorEmail,
+    }));
+    return [...MOCK_FEED, ...userPosts];
+  }, []);
+
+  const handleDeletePost = () => {
+    if (!deleteConfirmId) return;
+    deleteItem("user_posts", deleteConfirmId);
+    setDeleteConfirmId(null);
+    toast("Post deleted");
+    window.location.reload();
+  };
+
+  const filteredFeed = allPosts.filter((post) => {
     if (tab === "global") return true;
     return post.eventId && myEventIds.includes(post.eventId);
   });
@@ -136,24 +172,71 @@ function FeedRoute() {
                     <span className="text-black/50 dark:text-white/50">·</span>
                     <span className="text-black/50 dark:text-white/50 flex-shrink-0">{post.timestamp}</span>
                   </div>
-                  <button className="text-black/50 dark:text-white/50 hover:text-black dark:hover:text-white p-1 rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition-colors -mr-2">
-                    <MoreHorizontal className="w-4 h-4" />
-                  </button>
+                  {post.authorEmail === userEmail && (
+                    <div className="relative -mr-2">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setOpenMenuId(openMenuId === post.id ? null : post.id); }}
+                        className="text-black/50 dark:text-white/50 hover:text-black dark:hover:text-white p-1 rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
+                      >
+                        <MoreHorizontal className="w-4 h-4" />
+                      </button>
+                      {openMenuId === post.id && (
+                        <div className="absolute right-0 top-full mt-1 w-40 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xl z-50 overflow-hidden">
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setOpenMenuId(null); navigate({ to: "/posts/$postId/modify", params: { postId: post.id } }); }}
+                            className="w-full flex items-center gap-2.5 px-4 py-3 text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+                          >
+                            <Pencil className="w-4 h-4" />
+                            Modify
+                          </button>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setOpenMenuId(null); setDeleteConfirmId(post.id); }}
+                            className="w-full flex items-center gap-2.5 px-4 py-3 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                            Delete
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
 
-                <p className="mt-0.5 text-[15px] text-black/85 dark:text-white/90 leading-snug whitespace-pre-wrap">
-                  {post.content}
-                </p>
-
-                {post.image && (
-                  <div className="mt-3 rounded-2xl overflow-hidden border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5">
-                    <img
-                      src={post.image}
-                      alt="Post attachment"
-                      className="w-full h-auto max-h-[400px] object-cover"
-                      loading="lazy"
-                    />
+                {Array.isArray(post.content) ? (
+                  <div className="mt-0.5 space-y-2">
+                    {post.content.map((block: any, i: number) => (
+                      block.type === "text" ? (
+                        <p key={i} className="text-[15px] text-black/85 dark:text-white/90 leading-snug whitespace-pre-wrap">
+                          {block.value}
+                        </p>
+                      ) : (
+                        <div key={i} className="rounded-2xl overflow-hidden border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5">
+                          <img
+                            src={block.value}
+                            alt="Post attachment"
+                            className="w-full h-auto max-h-[400px] object-cover"
+                            loading="lazy"
+                          />
+                        </div>
+                      )
+                    ))}
                   </div>
+                ) : (
+                  <>
+                    <p className="mt-0.5 text-[15px] text-black/85 dark:text-white/90 leading-snug whitespace-pre-wrap">
+                      {post.content}
+                    </p>
+                    {post.image && (
+                      <div className="mt-3 rounded-2xl overflow-hidden border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5">
+                        <img
+                          src={post.image}
+                          alt="Post attachment"
+                          className="w-full h-auto max-h-[400px] object-cover"
+                          loading="lazy"
+                        />
+                      </div>
+                    )}
+                  </>
                 )}
 
                 {linkedEvent && (
@@ -211,6 +294,36 @@ function FeedRoute() {
           </div>
         )}
       </div>
+
+      {deleteConfirmId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="mx-4 w-full max-w-sm p-6 rounded-3xl bg-white dark:bg-zinc-900 shadow-xl border border-zinc-200 dark:border-zinc-800">
+            <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mx-auto mb-4">
+              <Trash2 className="w-6 h-6 text-red-600 dark:text-red-400" />
+            </div>
+            <h3 className="text-lg font-bold text-center text-zinc-900 dark:text-white mb-2">Delete this post?</h3>
+            <p className="text-sm text-center text-zinc-500 dark:text-zinc-400 mb-6">
+              This action cannot be undone.
+            </p>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setDeleteConfirmId(null)}
+                className="flex-1 py-3 px-4 rounded-full border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 font-bold text-[13px] hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleDeletePost}
+                className="flex-1 py-3 px-4 rounded-full bg-red-600 text-white font-bold text-[13px] hover:bg-red-700 transition-colors"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

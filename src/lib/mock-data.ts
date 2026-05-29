@@ -2,12 +2,15 @@ export const MOCK_EVENTS = [
   {
     id: "1",
     title: "Neon Nights: Underground Techno",
-    date: "Oct 28",
-    time: "11:00 PM",
+    date: "2025-10-28",
+    time: "23:00",
     location: "Warehouse 42, District 9",
     price: 15,
     joined: 342,
+    maxParticipants: 500,
     isPast: true,
+    hidden: false,
+    attendees: ["lucas.guillemin@efrei.net", "ryiad.larbaoui@efrei.net"],
     image:
       "https://images.unsplash.com/photo-1574169208507-84376144848b?q=80&w=800&auto=format&fit=crop",
     tags: ["Techno", "Underground"],
@@ -16,12 +19,15 @@ export const MOCK_EVENTS = [
   {
     id: "2",
     title: "Sunrise Yoga & Soundbath",
-    date: "Oct 29",
-    time: "06:30 AM",
+    date: "2025-10-29",
+    time: "06:30",
     location: "The Glasshouse",
     price: 25,
     joined: 45,
+    maxParticipants: 100,
     isPast: true,
+    hidden: false,
+    attendees: [],
     image:
       "https://images.unsplash.com/photo-1545205597-3d9d02c29597?q=80&w=800&auto=format&fit=crop",
     tags: ["Wellness", "Morning"],
@@ -30,12 +36,15 @@ export const MOCK_EVENTS = [
   {
     id: "3",
     title: "Street Food Festival: Autumn Edition",
-    date: "Nov 02",
-    time: "12:00 PM",
+    date: "2026-11-02",
+    time: "12:00",
     location: "Central Plaza",
     price: 0,
     joined: 1250,
+    maxParticipants: 2000,
     isPast: false,
+    hidden: false,
+    attendees: [],
     image:
       "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=800&auto=format&fit=crop",
     tags: ["Food", "Community"],
@@ -44,16 +53,36 @@ export const MOCK_EVENTS = [
   {
     id: "4",
     title: "Indie Film Showcase",
-    date: "Nov 05",
-    time: "08:00 PM",
+    date: "2026-11-05",
+    time: "20:00",
     location: "Lumina Theater",
     price: 12,
     joined: 112,
+    maxParticipants: 200,
     isPast: false,
+    hidden: false,
+    attendees: [],
     image:
       "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?q=80&w=800&auto=format&fit=crop",
     tags: ["Cinema", "Art"],
     description: "A curated evening of independent short films from emerging local directors. The screening will be followed by a Q&A session with the filmmakers and a networking mixer in the lobby.",
+  },
+  {
+    id: "5",
+    title: "SOLD OUT: DJ Snake Live",
+    date: "2026-11-10",
+    time: "22:00",
+    location: "Megaclub Arena",
+    price: 35,
+    joined: 2500,
+    maxParticipants: 2500,
+    isPast: false,
+    hidden: false,
+    attendees: [],
+    image:
+      "https://images.unsplash.com/photo-1571266028243-3716f02d2d01?q=80&w=800&auto=format&fit=crop",
+    tags: ["Concert", "Electronic"],
+    description: "The biggest electronic show of the year is completely sold out. DJ Snake brings his signature high-energy set to the Megaclub Arena with full production.",
   },
 ];
 
@@ -213,6 +242,21 @@ export function getSavedItems<T>(storageKey: string): T[] {
   return JSON.parse(localStorage.getItem(storageKey) || "[]");
 }
 
+export function updateItem<T extends { id: string }>(storageKey: string, id: string, updates: Partial<T>): void {
+  const items: T[] = JSON.parse(localStorage.getItem(storageKey) || "[]");
+  const idx = items.findIndex((i: T) => i.id === id);
+  if (idx !== -1) {
+    items[idx] = { ...items[idx], ...updates };
+    localStorage.setItem(storageKey, JSON.stringify(items));
+  }
+}
+
+export function deleteItem(storageKey: string, id: string): void {
+  const items: any[] = JSON.parse(localStorage.getItem(storageKey) || "[]");
+  const filtered = items.filter((i: any) => i.id !== id);
+  localStorage.setItem(storageKey, JSON.stringify(filtered));
+}
+
 export function getSavedEventIds(): string[] {
   return JSON.parse(localStorage.getItem("saved_events") || "[]");
 }
@@ -246,4 +290,119 @@ export function getMyEventIds(): string[] {
   const saved = getSavedEventIds();
   const purchased = getPurchasedEventIds();
   return [...new Set([...saved, ...purchased])];
+}
+
+export function getAllEvents() {
+  return [...getSavedItems("user_events"), ...MOCK_EVENTS];
+}
+
+export function unhideEvent(eventId: string): void {
+  updateItem("user_events", eventId, { hidden: false } as any);
+  const idx = MOCK_EVENTS.findIndex((e) => e.id === eventId);
+  if (idx !== -1) MOCK_EVENTS[idx].hidden = false;
+}
+
+export function hideEvent(eventId: string): void {
+  updateItem("user_events", eventId, { hidden: true } as any);
+  const idx = MOCK_EVENTS.findIndex((e) => e.id === eventId);
+  if (idx !== -1) MOCK_EVENTS[idx].hidden = true;
+}
+
+export function findEvent(eventId: string) {
+  const all = [...getSavedItems("user_events"), ...MOCK_EVENTS];
+  return all.find((e) => e.id === eventId);
+}
+
+export function unhideTip(tipId: string): void {
+  updateItem("user_tips", tipId, { hidden: false } as any);
+  const idx = MOCK_TIPS.findIndex((t) => t.id === tipId);
+  if (idx !== -1) MOCK_TIPS[idx].hidden = false;
+}
+
+export function hideTip(tipId: string): void {
+  updateItem("user_tips", tipId, { hidden: true } as any);
+  const idx = MOCK_TIPS.findIndex((t) => t.id === tipId);
+  if (idx !== -1) MOCK_TIPS[idx].hidden = true;
+}
+
+export function formatDate(dateStr: string): string {
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+    const date = new Date(dateStr + "T00:00:00");
+    return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  }
+  return dateStr;
+}
+
+export function formatTime(timeStr: string): string {
+  if (/^\d{2}:\d{2}$/.test(timeStr)) {
+    const [h, m] = timeStr.split(":").map(Number);
+    const ampm = h >= 12 ? "PM" : "AM";
+    const h12 = h % 12 || 12;
+    return `${h12}:${m.toString().padStart(2, "0")} ${ampm}`;
+  }
+  return timeStr;
+}
+
+export function isEventPast(event: { date: string; time?: string }): boolean {
+  if (!event.date) return false;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(event.date)) {
+    const timeStr = event.time || "00:00";
+    const dateTime = new Date(`${event.date}T${timeStr}`);
+    dateTime.setHours(dateTime.getHours() + 1);
+    return dateTime < new Date();
+  }
+  return false;
+}
+
+export function sortByDate<T extends { date: string }>(items: T[]): T[] {
+  return [...items].sort((a, b) => {
+    const dateA = a.date.match(/^\d{4}-\d{2}-\d{2}$/) ? a.date : "9999-99-99";
+    const dateB = b.date.match(/^\d{4}-\d{2}-\d{2}$/) ? b.date : "9999-99-99";
+    return dateA.localeCompare(dateB);
+  });
+}
+
+export function findTip(tipId: string) {
+  const all = [...getSavedItems("user_tips"), ...MOCK_TIPS];
+  return all.find((t) => t.id === tipId);
+}
+
+function generateTicketId(): string {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let id = "TICK-";
+  for (let i = 0; i < 5; i++) {
+    id += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return id;
+}
+
+export async function createTicket(event: any, profile: any): Promise<any> {
+  const ticketId = generateTicketId();
+  let qrDataUrl = "";
+  try {
+    const QRCode = (await import("qrcode")).default;
+    qrDataUrl = await QRCode.toDataURL(ticketId, {
+      width: 400,
+      margin: 2,
+      color: { dark: "#000000", light: "#ffffff" },
+    });
+  } catch {
+    qrDataUrl = "";
+  }
+  const ticket = {
+    id: ticketId,
+    eventId: event.id,
+    qrDataUrl,
+    type: event.price > 0 ? "General Admission" : "Free Entry",
+    purchaseDate: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+    event: {
+      title: event.title,
+      date: event.date,
+      time: event.time,
+      location: event.location,
+      image: event.image,
+    },
+  };
+  saveItem("purchased_tickets", ticket);
+  return ticket;
 }

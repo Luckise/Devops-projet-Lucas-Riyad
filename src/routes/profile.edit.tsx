@@ -1,9 +1,14 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, redirect } from "@tanstack/react-router";
 import { ArrowLeft, Save, Camera, User } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useUser } from "../hooks/use-user";
 
 export const Route = createFileRoute("/profile/edit")({
+  beforeLoad: () => {
+    if (typeof window !== "undefined" && !localStorage.getItem("eat_user_profile")) {
+      throw redirect({ to: "/login" });
+    }
+  },
   component: ProfileEditRoute,
 });
 
@@ -63,7 +68,7 @@ function ProfileEditRoute() {
   };
 
   return (
-    <main className="min-h-screen pb-24 pt-[80px] bg-zinc-50 dark:bg-zinc-950">
+    <main className="min-h-screen pb-24 pt-[80px] bg-[#fdfdfc] dark:bg-zinc-950">
       <div className="max-w-md mx-auto px-4 pt-2 md:pt-6">
         <header className="mb-8 flex items-center gap-4">
           <Link 

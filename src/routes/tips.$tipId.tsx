@@ -1,11 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { MOCK_TIPS } from "../lib/mock-data";
+import { findTip } from "../lib/mock-data";
 import { ArrowLeft, Clock, ChefHat, MapPin } from "lucide-react";
 
 export const Route = createFileRoute("/tips/$tipId")({
   component: TipDetailsRoute,
   loader: ({ params }) => {
-    const tip = MOCK_TIPS.find((t) => t.id === params.tipId);
+    const tip = findTip(params.tipId);
     if (!tip) throw new Error("Tip not found");
     return { tip };
   },

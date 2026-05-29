@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Plus, Calendar, Lightbulb, Feather } from "lucide-react";
+import { isUserAdmin } from "../lib/groups";
 
-const OPTIONS = [
+const OPTIONS_ALL = [
   { label: "Event", icon: Calendar, to: "/events/new" as const },
   { label: "Tip", icon: Lightbulb, to: "/tips/new" as const },
   { label: "Post", icon: Feather, to: "/posts/new" as const },
@@ -12,6 +13,10 @@ export default function CreateFAB() {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const ref = useRef<HTMLDivElement>(null);
+
+  const stored = typeof window !== "undefined" ? localStorage.getItem("eat_user_profile") : null;
+  const profile = stored ? JSON.parse(stored) : null;
+  const isAdmin = isUserAdmin(profile?.email || "");
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -29,6 +34,16 @@ export default function CreateFAB() {
       document.removeEventListener("keydown", handleEscape);
     };
   }, []);
+
+  if (!stored) return null;
+
+  const path = window.location.pathname;
+  const isEventPage = path === "/events" || path.startsWith("/events/");
+  if (!isAdmin && isEventPage) return null;
+
+  const OPTIONS = OPTIONS_ALL.filter((opt) =>
+    opt.label === "Event" ? isAdmin : true
+  );
 
   return (
     <div ref={ref} className="fixed bottom-24 right-5 z-40 flex flex-col items-end gap-3">

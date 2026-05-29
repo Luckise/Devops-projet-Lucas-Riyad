@@ -1,8 +1,9 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { MOCK_EVENTS, getSavedItems } from "../lib/mock-data";
-import { ArrowLeft, Calendar, Clock, MapPin, Ticket, CheckCircle2 } from "lucide-react";
+import { MOCK_EVENTS, getSavedItems, updateItem, formatDate, formatTime, isEventPast, createTicket } from "../lib/mock-data";
+import { ArrowLeft, Calendar, Clock, MapPin, Ticket, CheckCircle2, Users, XCircle } from "lucide-react";
 import { useState } from "react";
 import SaveButton from "../components/SaveButton";
+import { toast } from "../lib/toast";
 
 export const Route = createFileRoute("/events/$eventId")({
   component: EventDetailsRoute,
@@ -17,29 +18,47 @@ export const Route = createFileRoute("/events/$eventId")({
 function EventDetailsRoute() {
   const { event } = Route.useLoaderData();
   const navigate = useNavigate();
+  const [joined, setJoined] = useState(event.joined);
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
 
+  const eventPast = isEventPast(event);
+  const isEventFull = event.maxParticipants > 0 && joined >= event.maxParticipants;
+
   const handleJoin = async () => {
+    if (typeof window !== "undefined" && !localStorage.getItem("eat_user_profile")) {
+      navigate({ to: "/login" });
+      return;
+    }
+    if (isEventFull) return;
     setIsProcessing(true);
-    
-    // Simulate API call for both free and paid events
+
+    const profile = typeof window !== "undefined"
+      ? JSON.parse(localStorage.getItem("eat_user_profile") || "{}")
+      : {};
+    const email = profile.email || "";
+
     await new Promise((resolve) => setTimeout(resolve, 1500));
-    
+
+    const newJoined = joined + 1;
+    const newAttendees = [...(event.attendees || []), email].filter(Boolean);
+    setJoined(newJoined);
+    updateItem("user_events", event.id, { joined: newJoined, attendees: newAttendees } as any);
+
+    await createTicket(event, profile);
+
     if (event.price > 0) {
-      // For paid events, in a real app this would redirect to HelloAsso
-      // Here we simulate the payment flow
       window.open('https://www.helloasso.com/', '_blank');
       setPaymentSuccess(true);
       setIsProcessing(false);
-      
-      // Navigate to tickets after a short delay
+      toast("Redirected to HelloAsso for payment");
+
       setTimeout(() => {
         navigate({ to: "/tickets" });
       }, 2000);
     } else {
-      // Free event - instant ticket generation
       setIsProcessing(false);
+      toast("You joined! Ticket generated.");
       navigate({ to: "/tickets" });
     }
   };
@@ -70,7 +89,7 @@ function EventDetailsRoute() {
       <div className="max-w-xl mx-auto px-5 -mt-10 relative z-10">
         {/* Event Header */}
         <div className="flex flex-wrap gap-2 mb-4">
-          {event.isPast && (
+          {eventPast && (
             <span className="px-3 py-1.5 rounded-full bg-red-100 dark:bg-red-900/30 text-[11px] font-bold tracking-wide uppercase text-red-700 dark:text-red-400 border border-red-200 dark:border-red-900/50">
               Past Event
             </span>
@@ -95,14 +114,14 @@ function EventDetailsRoute() {
             <Calendar className="w-5 h-5 text-[var(--ember)] mt-0.5" />
             <div>
               <p className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1">Date</p>
-              <p className="font-medium text-zinc-900 dark:text-zinc-100">{event.date}</p>
+              <p className="font-medium text-zinc-900 dark:text-zinc-100">{formatDate(event.date)}</p>
             </div>
           </div>
           <div className="flex items-start gap-3 p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50">
             <Clock className="w-5 h-5 text-[var(--ember)] mt-0.5" />
             <div>
               <p className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1">Time</p>
-              <p className="font-medium text-zinc-900 dark:text-zinc-100">{event.time}</p>
+              <p className="font-medium text-zinc-900 dark:text-zinc-100">{formatTime(event.time)}</p>
             </div>
           </div>
           <div className="flex items-start gap-3 p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 col-span-2">
@@ -124,7 +143,7 @@ function EventDetailsRoute() {
       </div>
 
       {/* Sticky Bottom Action Bar */}
-      {!event.isPast && (
+      {!eventPast && (
         <div className="fixed bottom-[4.5rem] left-0 w-full p-4 pb-6 bg-gradient-to-t from-white via-white/95 to-white/0 dark:from-zinc-950 dark:via-zinc-950/95 dark:to-zinc-950/0 z-40">
           <div className="max-w-xl mx-auto flex items-center justify-between gap-4">
             <div className="flex items-center gap-4">
@@ -135,34 +154,47 @@ function EventDetailsRoute() {
                   {event.price === 0 ? "Free" : `€${event.price}`}
                 </span>
               </div>
+              {event.maxParticipants > 0 && (
+                <div className="flex flex-col">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Capacity</span>
+                  <span className="text-base font-bold tracking-tight text-zinc-900 dark:text-white">{joined}/{event.maxParticipants}</span>
+                </div>
+              )}
             </div>
             
-            <button
-              onClick={handleJoin}
-              disabled={isProcessing || paymentSuccess}
-              className={`flex-1 flex items-center justify-center gap-2 py-4 px-6 rounded-full font-bold text-[15px] transition-all duration-300 ${
-                paymentSuccess 
-                  ? "bg-green-500 text-white" 
-                  : "bg-[var(--ember)] hover:bg-[var(--ember)]/90 text-white shadow-lg shadow-[var(--ember)]/20"
-              } disabled:opacity-80`}
-            >
-              {isProcessing ? (
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  <span>{event.price > 0 ? "Redirecting to HelloAsso..." : "Generating Ticket..."}</span>
-                </div>
-              ) : paymentSuccess ? (
-                <>
-                  <CheckCircle2 className="w-5 h-5" />
-                  <span>Payment Complete</span>
-                </>
-              ) : (
-                <>
-                  <Ticket className="w-5 h-5" />
-                  <span>{event.price > 0 ? "Buy Ticket" : "Get Free Ticket"}</span>
-                </>
-              )}
-            </button>
+            {isEventFull ? (
+              <div className="flex-1 flex items-center justify-center gap-2 py-4 px-6 rounded-full font-bold text-[15px] bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-900/50">
+                <XCircle className="w-5 h-5" />
+                <span>Event Full</span>
+              </div>
+            ) : (
+              <button
+                onClick={handleJoin}
+                disabled={isProcessing || paymentSuccess}
+                className={`flex-1 flex items-center justify-center gap-2 py-4 px-6 rounded-full font-bold text-[15px] transition-all duration-300 ${
+                  paymentSuccess 
+                    ? "bg-green-500 text-white" 
+                    : "bg-[var(--ember)] hover:bg-[var(--ember)]/90 text-white shadow-lg shadow-[var(--ember)]/20"
+                } disabled:opacity-80`}
+              >
+                {isProcessing ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <span>{event.price > 0 ? "Redirecting to HelloAsso..." : "Generating Ticket..."}</span>
+                  </div>
+                ) : paymentSuccess ? (
+                  <>
+                    <CheckCircle2 className="w-5 h-5" />
+                    <span>Payment Complete</span>
+                  </>
+                ) : (
+                  <>
+                    <Ticket className="w-5 h-5" />
+                    <span>{event.price > 0 ? "Buy Ticket" : "Get Free Ticket"}</span>
+                  </>
+                )}
+              </button>
+            )}
           </div>
         </div>
       )}
