@@ -5,12 +5,35 @@ import { useState } from "react";
 import SaveButton from "../components/SaveButton";
 import { toast } from "../lib/toast";
 
+interface LoaderEvent {
+  id: string;
+  title: string;
+  date: string;
+  time: string;
+  location: string;
+  image: string;
+  price: number;
+  maxParticipants: number;
+  joined: number;
+  attendees: string[];
+  tags?: string[];
+  category?: string;
+  description?: string;
+}
+
+function assertEvent(raw: unknown): LoaderEvent {
+  if (!raw || typeof raw !== "object") throw new Error("Event not found");
+  const e = raw as Record<string, unknown>;
+  if (typeof e.id !== "string" || typeof e.title !== "string") throw new Error("Event not found");
+  return e as unknown as LoaderEvent;
+}
+
 export const Route = createFileRoute("/events/$eventId")({
   component: EventDetailsRoute,
   loader: ({ params }) => {
     const allEvents = [...getSavedItems("user_events"), ...MOCK_EVENTS];
-    const event = allEvents.find((e) => e.id === params.eventId);
-    if (!event) throw new Error("Event not found");
+    const raw = allEvents.find((e: any) => e.id === params.eventId);
+    const event = assertEvent(raw);
     return { event };
   },
 });

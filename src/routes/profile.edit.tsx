@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate, redirect } from "@tanstack/react-router";
 import { ArrowLeft, Save, Camera, User } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useUser } from "../hooks/use-user";
 
 export const Route = createFileRoute("/profile/edit")({
@@ -24,7 +24,10 @@ function ProfileEditRoute() {
     avatar: user.avatar
   });
 
+  const initialised = useRef(false);
   useEffect(() => {
+    if (initialised.current) return;
+    initialised.current = true;
     setFormData({
       firstName: user.firstName,
       lastName: user.lastName,
