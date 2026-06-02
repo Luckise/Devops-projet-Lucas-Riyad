@@ -23,11 +23,32 @@ const SEEDED_KEY = "eat_seeded";
 
 async function hashPassword(password: string): Promise<string> {
   const encoder = new TextEncoder();
-  const data = encoder.encode(password);
-  const hash = await crypto.subtle.digest("SHA-256", data);
-  return Array.from(new Uint8Array(hash))
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const key = await crypto.subtle.importKey("raw", encoder.encode(password), "PBKDF2", false, ["deriveBits"]);
+  const bits = await crypto.subtle.deriveBits(
+    { name: "PBKDF2", salt, iterations: 600000, hash: "SHA-256" },
+    key,
+    256
+  );
+  const hash = new Uint8Array(bits);
+  const saltHex = Array.from(salt).map((b) => b.toString(16).padStart(2, "0")).join("");
+  const hashHex = Array.from(hash).map((b) => b.toString(16).padStart(2, "0")).join("");
+  return `${saltHex}:${hashHex}`;
+}
+
+async function verifyPassword(password: string, stored: string): Promise<boolean> {
+  const [saltHex, hashHex] = stored.split(":");
+  if (!saltHex || !hashHex) return false;
+  const salt = new Uint8Array(saltHex.match(/.{2}/g)!.map((b) => parseInt(b, 16)));
+  const encoder = new TextEncoder();
+  const key = await crypto.subtle.importKey("raw", encoder.encode(password), "PBKDF2", false, ["deriveBits"]);
+  const bits = await crypto.subtle.deriveBits(
+    { name: "PBKDF2", salt, iterations: 600000, hash: "SHA-256" },
+    key,
+    256
+  );
+  const computed = Array.from(new Uint8Array(bits)).map((b) => b.toString(16).padStart(2, "0")).join("");
+  return computed === hashHex;
 }
 
 async function seedAccounts() {
@@ -134,8 +155,8 @@ function LoginRoute() {
       setIsSubmitting(false);
       return;
     }
-    const inputHash = await hashPassword(password);
-    if (inputHash !== storedHash) {
+    const match = await verifyPassword(password, storedHash);
+    if (!match) {
       setLoginError("Incorrect password. Please try again.");
       setIsSubmitting(false);
       return;

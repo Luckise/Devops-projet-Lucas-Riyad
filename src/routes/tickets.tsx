@@ -37,13 +37,18 @@ function TicketsRoute() {
   const allTickets = [...dynamicTickets, ...mockTickets];
 
   useEffect(() => {
-    mockTickets.forEach(async (t) => {
-      if (!mockQrUrls[t.id]) {
+    Promise.all(
+      mockTickets.map(async (t) => {
         try {
           const url = await QRCode.toDataURL(t.id, { width: 400, margin: 2 });
-          setMockQrUrls((prev) => ({ ...prev, [t.id]: url }));
-        } catch {}
-      }
+          return [t.id, url] as const;
+        } catch {
+          return null;
+        }
+      })
+    ).then((results) => {
+      const entries = results.filter(Boolean) as [string, string][];
+      setMockQrUrls(Object.fromEntries(entries));
     });
   // Run only on mount; mock tickets are stable
   // eslint-disable-next-line react-hooks/exhaustive-deps
