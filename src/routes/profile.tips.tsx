@@ -33,12 +33,12 @@ function ProfileTipsRoute() {
   if (hasChild) return <Outlet />;
 
   return (
-    <main className="min-h-screen pb-24 pt-[80px] bg-[#fdfdfc] dark:bg-zinc-950">
+    <main className="min-h-screen pb-24 pt-[80px]">
       <div className="max-w-md mx-auto px-4 pt-4 md:pt-8">
         <div className="flex items-center gap-4 mb-8">
           <Link
             to="/profile"
-            className="w-10 h-10 rounded-full bg-white dark:bg-zinc-900 flex items-center justify-center hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors border border-zinc-200 dark:border-white/10 shadow-sm"
+            className="w-11 h-11 rounded-full bg-white dark:bg-zinc-900 flex items-center justify-center hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors border border-zinc-200 dark:border-white/10 shadow-sm"
           >
             <ChevronLeft className="w-5 h-5 text-zinc-700 dark:text-zinc-300" />
           </Link>

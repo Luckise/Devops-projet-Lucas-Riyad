@@ -71,10 +71,10 @@ function ProfileGroupsRoute() {
   };
 
   return (
-    <main className="min-h-screen pb-24 pt-[80px] bg-[#fdfdfc] dark:bg-zinc-950">
+    <main className="min-h-screen pb-24 pt-[80px]">
       <div className="max-w-md mx-auto px-4 pt-4 md:pt-8">
         <header className="mb-8 flex items-center gap-4">
-          <button onClick={() => navigate({ to: "/profile" })} className="w-10 h-10 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 flex items-center justify-center shadow-sm hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors">
+          <button onClick={() => navigate({ to: "/profile" })} className="w-11 h-11 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 flex items-center justify-center shadow-sm hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors">
             <ChevronLeft className="w-5 h-5 text-zinc-700 dark:text-zinc-300" />
           </button>
           <div>
@@ -182,7 +182,7 @@ function ProfileGroupsRoute() {
                         />
                         <button
                           onClick={() => handleAddMember(group.id)}
-                          className="w-9 h-9 rounded-xl bg-[var(--ember)] text-white flex items-center justify-center hover:bg-[var(--ember)]/90 transition-colors"
+                          className="w-11 h-11 rounded-xl bg-[var(--ember)] text-white flex items-center justify-center hover:bg-[var(--ember)]/90 transition-colors"
                         >
                           <UserPlus className="w-4 h-4" />
                         </button>
@@ -207,18 +207,18 @@ function ProfileGroupsRoute() {
                                 {!isOwner && m !== email && (
                                   <button
                                     onClick={() => setConfirmRemove({ groupId: group.id, memberEmail: m })}
-                                    className="w-7 h-7 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-500 flex items-center justify-center hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors"
+                                    className="w-11 h-11 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-500 flex items-center justify-center hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors"
                                   >
-                                    <UserMinus className="w-3.5 h-3.5" />
+                                    <UserMinus className="w-4 h-4" />
                                   </button>
                                 )}
                                 {!isOwner && (
                                   <button
                                     onClick={() => setConfirmTransfer({ groupId: group.id, memberEmail: m })}
-                                    className="w-7 h-7 rounded-lg bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 flex items-center justify-center hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-colors"
+                                    className="w-11 h-11 rounded-lg bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 flex items-center justify-center hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-colors"
                                     title="Transfer ownership"
                                   >
-                                    <Send className="w-3.5 h-3.5" />
+                                    <Send className="w-4 h-4" />
                                   </button>
                                 )}
                               </div>

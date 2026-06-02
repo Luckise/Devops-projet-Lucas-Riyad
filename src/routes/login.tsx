@@ -151,7 +151,7 @@ function LoginRoute() {
   const isEmailValid = email.trim() && EMAIL_REGEX.test(email);
 
   return (
-    <main className="min-h-screen pb-24 pt-[80px] bg-[#fdfdfc] dark:bg-zinc-950">
+    <main className="min-h-screen pb-24 pt-[80px]">
       <div className="max-w-sm mx-auto px-4 pt-8 md:pt-12">
         {step === "email" && (
           <div className="rise-in">

@@ -68,12 +68,12 @@ function ProfileEditRoute() {
   };
 
   return (
-    <main className="min-h-screen pb-24 pt-[80px] bg-[#fdfdfc] dark:bg-zinc-950">
+    <main className="min-h-screen pb-24 pt-[80px]">
       <div className="max-w-md mx-auto px-4 pt-2 md:pt-6">
         <header className="mb-8 flex items-center gap-4">
           <Link 
             to="/profile"
-            className="w-10 h-10 rounded-full bg-white dark:bg-zinc-900 flex items-center justify-center text-zinc-900 dark:text-white border border-zinc-200 dark:border-white/10 shadow-sm hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+            className="w-11 h-11 rounded-full bg-white dark:bg-zinc-900 flex items-center justify-center text-zinc-900 dark:text-white border border-zinc-200 dark:border-white/10 shadow-sm hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
           </Link>

@@ -42,14 +42,15 @@ export function toast(message: string, type: ToastType = "success") {
     "transform: translateY(12px) scale(0.95)",
   ].join(";");
 
+  const isDark = document.documentElement.classList.contains("dark");
   if (type === "success") {
-    el.style.background = "#065f46";
+    el.style.background = isDark ? "#065f46" : "#065f46";
     el.style.color = "#fff";
   } else if (type === "error") {
-    el.style.background = "#991b1b";
+    el.style.background = isDark ? "#7f1d1d" : "#991b1b";
     el.style.color = "#fff";
   } else {
-    el.style.background = "#1e293b";
+    el.style.background = isDark ? "#1e293b" : "#334155";
     el.style.color = "#fff";
   }
 

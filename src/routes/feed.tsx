@@ -80,6 +80,7 @@ function FeedRoute() {
   const [tab, setTab] = useState<"global" | "myevents">("global");
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [deletedPostIds, setDeletedPostIds] = useState<string[]>(() => JSON.parse(localStorage.getItem("eat_deleted_posts") || "[]"));
 
   const profile = typeof window !== "undefined"
     ? JSON.parse(localStorage.getItem("eat_user_profile") || "{}")
@@ -109,12 +110,14 @@ function FeedRoute() {
   const handleDeletePost = () => {
     if (!deleteConfirmId) return;
     deleteItem("user_posts", deleteConfirmId);
+    const nextDeleted = [...deletedPostIds, deleteConfirmId];
+    setDeletedPostIds(nextDeleted);
+    localStorage.setItem("eat_deleted_posts", JSON.stringify(nextDeleted));
     setDeleteConfirmId(null);
     toast("Post deleted");
-    window.location.reload();
   };
 
-  const filteredFeed = allPosts.filter((post) => {
+  const filteredFeed = allPosts.filter((post) => !deletedPostIds.includes(post.id)).filter((post) => {
     if (tab === "global") return true;
     return post.eventId && myEventIds.includes(post.eventId);
   });
@@ -176,7 +179,7 @@ function FeedRoute() {
                     <div className="relative -mr-2">
                       <button
                         onClick={(e) => { e.stopPropagation(); setOpenMenuId(openMenuId === post.id ? null : post.id); }}
-                        className="text-black/50 dark:text-white/50 hover:text-black dark:hover:text-white p-1 rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
+                        className="text-black/50 dark:text-white/50 hover:text-black dark:hover:text-white p-3 rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
                       >
                         <MoreHorizontal className="w-4 h-4" />
                       </button>

@@ -51,7 +51,7 @@ export default function ImageUpload({
           <button
             type="button"
             onClick={handleRemove}
-            className="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center hover:bg-black/70 transition-colors"
+            className="absolute top-2 right-2 w-11 h-11 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center hover:bg-black/70 transition-colors"
           >
             <X className="w-4 h-4 text-white" />
           </button>
