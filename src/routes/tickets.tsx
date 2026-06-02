@@ -55,7 +55,7 @@ function TicketsRoute() {
   };
 
   return (
-    <main className="min-h-screen pb-24 pt-[80px] bg-[#fdfdfc] dark:bg-zinc-950">
+    <main className="min-h-screen pb-24 pt-[80px]">
       <div className="max-w-md mx-auto px-4 pt-4 md:pt-8">
         <header className="mb-8">
           <h1 className="text-[2.5rem] font-serif font-medium tracking-tight leading-none text-zinc-900 dark:text-white">
@@ -158,6 +158,9 @@ function TicketsRoute() {
           const qrUrl = ticket ? getQrUrl(ticket) : null;
           return (
           <div 
+            role="dialog"
+            aria-modal="true"
+            aria-label="Expanded QR code"
             className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md flex items-center justify-center p-6 transition-all duration-300 animate-in fade-in"
             onClick={() => setExpandedQr(null)}
           >
@@ -178,6 +181,7 @@ function TicketsRoute() {
               </div>
               <button 
                 onClick={() => setExpandedQr(null)}
+                aria-label="Close QR code"
                 className="w-12 h-12 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-600 hover:bg-zinc-200 transition-colors mt-2"
               >
                 <X className="w-5 h-5" />

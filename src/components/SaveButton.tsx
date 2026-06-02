@@ -19,7 +19,7 @@ export default function SaveButton({ eventId, compact }: { eventId: string; comp
         type="button"
         onClick={handleClick}
         aria-label={saved ? "Remove from watchlist" : "Add to watchlist"}
-        className={`min-w-[40px] h-10 rounded-full flex items-center justify-center transition-all duration-200 ease-out border px-3 ${
+        className={`min-w-[44px] h-11 rounded-full flex items-center justify-center transition-all duration-200 ease-out border px-3 ${
           saved
             ? "bg-[var(--ember)] text-white border-[var(--ember)] shadow-[0_0_12px_var(--ember)/0.4]"
             : "bg-black/40 backdrop-blur-md text-white border-white/20 hover:bg-black/60 hover:border-white/40"

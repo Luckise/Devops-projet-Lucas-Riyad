@@ -24,7 +24,7 @@ function ProfileRoute() {
   };
 
   return (
-    <main className="min-h-screen pb-24 pt-[80px] bg-[#fdfdfc] dark:bg-zinc-950">
+    <main className="min-h-screen pb-24 pt-[80px]">
       <div className="max-w-md mx-auto px-4 pt-4 md:pt-8">
         <header className="mb-8">
           <p className="text-zinc-500 text-xs font-bold uppercase tracking-[0.2em] mb-1.5 ml-0.5">

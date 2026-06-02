@@ -173,19 +173,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: -1;
-  opacity: 0.15;
-  background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.1), transparent 100%);
-}
 
-body::after {
-  display: none;
-}
 
 a {
   color: var(--ember-deep);
@@ -233,12 +221,10 @@ pre code {
 
 .island-shell {
   border: 1px solid var(--line);
-  background: linear-gradient(165deg, var(--surface-strong), var(--surface));
+  background: var(--surface-strong);
   box-shadow:
     0 1px 0 var(--inset-glint) inset,
-    0 22px 44px oklch(0.46 0.175 47 / 0.08),
-    0 6px 18px oklch(0.46 0.175 47 / 0.06);
-  backdrop-filter: blur(4px);
+    0 4px 12px oklch(0.46 0.175 47 / 0.06);
 }
 
 .feature-card {
