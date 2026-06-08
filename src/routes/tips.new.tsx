@@ -4,10 +4,13 @@ import { ArrowLeft, Plus, X } from "lucide-react";
 import ImageUpload from "../components/ImageUpload";
 import { saveItem } from "../lib/mock-data";
 import { toast } from "../lib/toast";
+import { getCurrentUser } from "aws-amplify/auth";
 
 export const Route = createFileRoute("/tips/new")({
-  beforeLoad: () => {
-    if (typeof window !== "undefined" && !localStorage.getItem("eat_user_profile")) {
+  beforeLoad: async () => {
+    try {
+      await getCurrentUser();
+    } catch {
       throw redirect({ to: "/login" });
     }
   },
@@ -88,7 +91,7 @@ function TipCreate() {
         <div className="flex items-center gap-4 mb-8">
           <button
             type="button"
-            onClick={() => navigate({ to: "/tips" })}
+            onClick={() => window.history.back()}
             className="w-11 h-11 rounded-full bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors"
           >
             <ArrowLeft className="w-5 h-5 text-zinc-700 dark:text-zinc-300" />

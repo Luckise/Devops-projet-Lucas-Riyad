@@ -5,14 +5,18 @@ import ImageUpload from "../components/ImageUpload";
 import { saveItem } from "../lib/mock-data";
 import { toast } from "../lib/toast";
 import { getUserGroups, isUserAdmin } from "../lib/groups";
+import { getCurrentUser, fetchUserAttributes } from "aws-amplify/auth";
+import "../lib/amplify";
 
 export const Route = createFileRoute("/events/new")({
-  beforeLoad: () => {
-    if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("eat_user_profile");
-      if (!stored) throw redirect({ to: "/login" });
-      const profile = JSON.parse(stored);
-      if (!isUserAdmin(profile.email)) throw redirect({ to: "/" });
+  beforeLoad: async () => {
+    try {
+      const user = await getCurrentUser();
+      const attrs = await fetchUserAttributes();
+      if (!isUserAdmin(attrs.email || user.userId)) throw redirect({ to: "/" });
+    } catch (err) {
+      if (err instanceof redirect) throw err;
+      throw redirect({ to: "/login" });
     }
   },
   component: EventCreate,
@@ -86,7 +90,7 @@ function EventCreate() {
         <div className="flex items-center gap-4 mb-8">
           <button
             type="button"
-            onClick={() => navigate({ to: "/" })}
+            onClick={() => window.history.back()}
             className="w-11 h-11 rounded-full bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors"
           >
             <ArrowLeft className="w-5 h-5 text-zinc-700 dark:text-zinc-300" />

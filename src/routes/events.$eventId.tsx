@@ -1,9 +1,10 @@
-import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { MOCK_EVENTS, getSavedItems, updateItem, formatDate, formatTime, isEventPast, createTicket } from "../lib/mock-data";
 import { ArrowLeft, Calendar, Clock, MapPin, Ticket, CheckCircle2, Users, XCircle } from "lucide-react";
 import { useState } from "react";
 import SaveButton from "../components/SaveButton";
 import { toast } from "../lib/toast";
+import { getCurrentUser } from "aws-amplify/auth";
 
 interface LoaderEvent {
   id: string;
@@ -49,7 +50,9 @@ function EventDetailsRoute() {
   const isEventFull = event.maxParticipants > 0 && joined >= event.maxParticipants;
 
   const handleJoin = async () => {
-    if (typeof window !== "undefined" && !localStorage.getItem("eat_user_profile")) {
+    try {
+      await getCurrentUser();
+    } catch {
       navigate({ to: "/login" });
       return;
     }
@@ -100,12 +103,13 @@ function EventDetailsRoute() {
         
         {/* Top Nav (Back Button) */}
         <div className="absolute top-0 left-0 w-full p-4 pt-[4.5rem] flex justify-between items-center z-10">
-          <Link 
-            to="/"
+          <button
+            type="button"
+            onClick={() => window.history.back()}
             className="w-11 h-11 rounded-full bg-white/20 dark:bg-black/20 backdrop-blur-md flex items-center justify-center text-white border border-white/20 hover:bg-white/30 dark:hover:bg-black/40 transition-colors shadow-lg"
           >
             <ArrowLeft className="w-6 h-6" />
-          </Link>
+          </button>
         </div>
       </div>
 

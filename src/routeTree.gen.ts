@@ -15,10 +15,12 @@ import { Route as SignupRouteImport } from './routes/signup'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as FeedRouteImport } from './routes/feed'
 import { Route as EventsRouteImport } from './routes/events'
+import { Route as ClubsRouteImport } from './routes/clubs'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TipsIndexRouteImport } from './routes/tips.index'
 import { Route as ProfileIndexRouteImport } from './routes/profile.index'
+import { Route as ClubsIndexRouteImport } from './routes/clubs.index'
 import { Route as TipsNewRouteImport } from './routes/tips.new'
 import { Route as TipsTipIdRouteImport } from './routes/tips.$tipId'
 import { Route as ProfileTipsRouteImport } from './routes/profile.tips'
@@ -31,12 +33,15 @@ import { Route as EventsEventIdRouteImport } from './routes/events.$eventId'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
 import { Route as DemoOrpcTodoRouteImport } from './routes/demo/orpc-todo'
 import { Route as DemoDrizzleRouteImport } from './routes/demo/drizzle'
+import { Route as ClubsClubIdRouteImport } from './routes/clubs.$clubId'
 import { Route as ApiSplatRouteImport } from './routes/api.$'
+import { Route as ProfileGroupsNewRouteImport } from './routes/profile.groups.new'
 import { Route as PostsPostIdModifyRouteImport } from './routes/posts.$postId.modify'
 import { Route as DemoFormSimpleRouteImport } from './routes/demo/form.simple'
 import { Route as DemoFormAddressRouteImport } from './routes/demo/form.address'
 import { Route as ApiRpcSplatRouteImport } from './routes/api.rpc.$'
 import { Route as ProfileTipsTipIdModifyRouteImport } from './routes/profile.tips.$tipId.modify'
+import { Route as ProfileGroupsGroupIdModifyRouteImport } from './routes/profile.groups.$groupId.modify'
 import { Route as ProfileEventsEventIdModifyRouteImport } from './routes/profile.events.$eventId.modify'
 
 const TipsRoute = TipsRouteImport.update({
@@ -69,6 +74,11 @@ const EventsRoute = EventsRouteImport.update({
   path: '/events',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ClubsRoute = ClubsRouteImport.update({
+  id: '/clubs',
+  path: '/clubs',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
@@ -88,6 +98,11 @@ const ProfileIndexRoute = ProfileIndexRouteImport.update({
   id: '/profile/',
   path: '/profile/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ClubsIndexRoute = ClubsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ClubsRoute,
 } as any)
 const TipsNewRoute = TipsNewRouteImport.update({
   id: '/new',
@@ -149,10 +164,20 @@ const DemoDrizzleRoute = DemoDrizzleRouteImport.update({
   path: '/demo/drizzle',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ClubsClubIdRoute = ClubsClubIdRouteImport.update({
+  id: '/$clubId',
+  path: '/$clubId',
+  getParentRoute: () => ClubsRoute,
+} as any)
 const ApiSplatRoute = ApiSplatRouteImport.update({
   id: '/api/$',
   path: '/api/$',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileGroupsNewRoute = ProfileGroupsNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => ProfileGroupsRoute,
 } as any)
 const PostsPostIdModifyRoute = PostsPostIdModifyRouteImport.update({
   id: '/posts/$postId/modify',
@@ -179,6 +204,12 @@ const ProfileTipsTipIdModifyRoute = ProfileTipsTipIdModifyRouteImport.update({
   path: '/$tipId/modify',
   getParentRoute: () => ProfileTipsRoute,
 } as any)
+const ProfileGroupsGroupIdModifyRoute =
+  ProfileGroupsGroupIdModifyRouteImport.update({
+    id: '/$groupId/modify',
+    path: '/$groupId/modify',
+    getParentRoute: () => ProfileGroupsRoute,
+  } as any)
 const ProfileEventsEventIdModifyRoute =
   ProfileEventsEventIdModifyRouteImport.update({
     id: '/$eventId/modify',
@@ -189,6 +220,7 @@ const ProfileEventsEventIdModifyRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/clubs': typeof ClubsRouteWithChildren
   '/events': typeof EventsRouteWithChildren
   '/feed': typeof FeedRoute
   '/login': typeof LoginRoute
@@ -196,6 +228,7 @@ export interface FileRoutesByFullPath {
   '/tickets': typeof TicketsRoute
   '/tips': typeof TipsRouteWithChildren
   '/api/$': typeof ApiSplatRoute
+  '/clubs/$clubId': typeof ClubsClubIdRoute
   '/demo/drizzle': typeof DemoDrizzleRoute
   '/demo/orpc-todo': typeof DemoOrpcTodoRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
@@ -204,17 +237,20 @@ export interface FileRoutesByFullPath {
   '/posts/new': typeof PostsNewRoute
   '/profile/edit': typeof ProfileEditRoute
   '/profile/events': typeof ProfileEventsRouteWithChildren
-  '/profile/groups': typeof ProfileGroupsRoute
+  '/profile/groups': typeof ProfileGroupsRouteWithChildren
   '/profile/tips': typeof ProfileTipsRouteWithChildren
   '/tips/$tipId': typeof TipsTipIdRoute
   '/tips/new': typeof TipsNewRoute
+  '/clubs/': typeof ClubsIndexRoute
   '/profile/': typeof ProfileIndexRoute
   '/tips/': typeof TipsIndexRoute
   '/api/rpc/$': typeof ApiRpcSplatRoute
   '/demo/form/address': typeof DemoFormAddressRoute
   '/demo/form/simple': typeof DemoFormSimpleRoute
   '/posts/$postId/modify': typeof PostsPostIdModifyRoute
+  '/profile/groups/new': typeof ProfileGroupsNewRoute
   '/profile/events/$eventId/modify': typeof ProfileEventsEventIdModifyRoute
+  '/profile/groups/$groupId/modify': typeof ProfileGroupsGroupIdModifyRoute
   '/profile/tips/$tipId/modify': typeof ProfileTipsTipIdModifyRoute
 }
 export interface FileRoutesByTo {
@@ -226,6 +262,7 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupRoute
   '/tickets': typeof TicketsRoute
   '/api/$': typeof ApiSplatRoute
+  '/clubs/$clubId': typeof ClubsClubIdRoute
   '/demo/drizzle': typeof DemoDrizzleRoute
   '/demo/orpc-todo': typeof DemoOrpcTodoRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
@@ -234,23 +271,27 @@ export interface FileRoutesByTo {
   '/posts/new': typeof PostsNewRoute
   '/profile/edit': typeof ProfileEditRoute
   '/profile/events': typeof ProfileEventsRouteWithChildren
-  '/profile/groups': typeof ProfileGroupsRoute
+  '/profile/groups': typeof ProfileGroupsRouteWithChildren
   '/profile/tips': typeof ProfileTipsRouteWithChildren
   '/tips/$tipId': typeof TipsTipIdRoute
   '/tips/new': typeof TipsNewRoute
+  '/clubs': typeof ClubsIndexRoute
   '/profile': typeof ProfileIndexRoute
   '/tips': typeof TipsIndexRoute
   '/api/rpc/$': typeof ApiRpcSplatRoute
   '/demo/form/address': typeof DemoFormAddressRoute
   '/demo/form/simple': typeof DemoFormSimpleRoute
   '/posts/$postId/modify': typeof PostsPostIdModifyRoute
+  '/profile/groups/new': typeof ProfileGroupsNewRoute
   '/profile/events/$eventId/modify': typeof ProfileEventsEventIdModifyRoute
+  '/profile/groups/$groupId/modify': typeof ProfileGroupsGroupIdModifyRoute
   '/profile/tips/$tipId/modify': typeof ProfileTipsTipIdModifyRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/clubs': typeof ClubsRouteWithChildren
   '/events': typeof EventsRouteWithChildren
   '/feed': typeof FeedRoute
   '/login': typeof LoginRoute
@@ -258,6 +299,7 @@ export interface FileRoutesById {
   '/tickets': typeof TicketsRoute
   '/tips': typeof TipsRouteWithChildren
   '/api/$': typeof ApiSplatRoute
+  '/clubs/$clubId': typeof ClubsClubIdRoute
   '/demo/drizzle': typeof DemoDrizzleRoute
   '/demo/orpc-todo': typeof DemoOrpcTodoRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
@@ -266,17 +308,20 @@ export interface FileRoutesById {
   '/posts/new': typeof PostsNewRoute
   '/profile/edit': typeof ProfileEditRoute
   '/profile/events': typeof ProfileEventsRouteWithChildren
-  '/profile/groups': typeof ProfileGroupsRoute
+  '/profile/groups': typeof ProfileGroupsRouteWithChildren
   '/profile/tips': typeof ProfileTipsRouteWithChildren
   '/tips/$tipId': typeof TipsTipIdRoute
   '/tips/new': typeof TipsNewRoute
+  '/clubs/': typeof ClubsIndexRoute
   '/profile/': typeof ProfileIndexRoute
   '/tips/': typeof TipsIndexRoute
   '/api/rpc/$': typeof ApiRpcSplatRoute
   '/demo/form/address': typeof DemoFormAddressRoute
   '/demo/form/simple': typeof DemoFormSimpleRoute
   '/posts/$postId/modify': typeof PostsPostIdModifyRoute
+  '/profile/groups/new': typeof ProfileGroupsNewRoute
   '/profile/events/$eventId/modify': typeof ProfileEventsEventIdModifyRoute
+  '/profile/groups/$groupId/modify': typeof ProfileGroupsGroupIdModifyRoute
   '/profile/tips/$tipId/modify': typeof ProfileTipsTipIdModifyRoute
 }
 export interface FileRouteTypes {
@@ -284,6 +329,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/clubs'
     | '/events'
     | '/feed'
     | '/login'
@@ -291,6 +337,7 @@ export interface FileRouteTypes {
     | '/tickets'
     | '/tips'
     | '/api/$'
+    | '/clubs/$clubId'
     | '/demo/drizzle'
     | '/demo/orpc-todo'
     | '/demo/tanstack-query'
@@ -303,13 +350,16 @@ export interface FileRouteTypes {
     | '/profile/tips'
     | '/tips/$tipId'
     | '/tips/new'
+    | '/clubs/'
     | '/profile/'
     | '/tips/'
     | '/api/rpc/$'
     | '/demo/form/address'
     | '/demo/form/simple'
     | '/posts/$postId/modify'
+    | '/profile/groups/new'
     | '/profile/events/$eventId/modify'
+    | '/profile/groups/$groupId/modify'
     | '/profile/tips/$tipId/modify'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -321,6 +371,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/tickets'
     | '/api/$'
+    | '/clubs/$clubId'
     | '/demo/drizzle'
     | '/demo/orpc-todo'
     | '/demo/tanstack-query'
@@ -333,18 +384,22 @@ export interface FileRouteTypes {
     | '/profile/tips'
     | '/tips/$tipId'
     | '/tips/new'
+    | '/clubs'
     | '/profile'
     | '/tips'
     | '/api/rpc/$'
     | '/demo/form/address'
     | '/demo/form/simple'
     | '/posts/$postId/modify'
+    | '/profile/groups/new'
     | '/profile/events/$eventId/modify'
+    | '/profile/groups/$groupId/modify'
     | '/profile/tips/$tipId/modify'
   id:
     | '__root__'
     | '/'
     | '/about'
+    | '/clubs'
     | '/events'
     | '/feed'
     | '/login'
@@ -352,6 +407,7 @@ export interface FileRouteTypes {
     | '/tickets'
     | '/tips'
     | '/api/$'
+    | '/clubs/$clubId'
     | '/demo/drizzle'
     | '/demo/orpc-todo'
     | '/demo/tanstack-query'
@@ -364,19 +420,23 @@ export interface FileRouteTypes {
     | '/profile/tips'
     | '/tips/$tipId'
     | '/tips/new'
+    | '/clubs/'
     | '/profile/'
     | '/tips/'
     | '/api/rpc/$'
     | '/demo/form/address'
     | '/demo/form/simple'
     | '/posts/$postId/modify'
+    | '/profile/groups/new'
     | '/profile/events/$eventId/modify'
+    | '/profile/groups/$groupId/modify'
     | '/profile/tips/$tipId/modify'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  ClubsRoute: typeof ClubsRouteWithChildren
   EventsRoute: typeof EventsRouteWithChildren
   FeedRoute: typeof FeedRoute
   LoginRoute: typeof LoginRoute
@@ -390,7 +450,7 @@ export interface RootRouteChildren {
   PostsNewRoute: typeof PostsNewRoute
   ProfileEditRoute: typeof ProfileEditRoute
   ProfileEventsRoute: typeof ProfileEventsRouteWithChildren
-  ProfileGroupsRoute: typeof ProfileGroupsRoute
+  ProfileGroupsRoute: typeof ProfileGroupsRouteWithChildren
   ProfileTipsRoute: typeof ProfileTipsRouteWithChildren
   ProfileIndexRoute: typeof ProfileIndexRoute
   ApiRpcSplatRoute: typeof ApiRpcSplatRoute
@@ -443,6 +503,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EventsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/clubs': {
+      id: '/clubs'
+      path: '/clubs'
+      fullPath: '/clubs'
+      preLoaderRoute: typeof ClubsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/about': {
       id: '/about'
       path: '/about'
@@ -470,6 +537,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/profile/'
       preLoaderRoute: typeof ProfileIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/clubs/': {
+      id: '/clubs/'
+      path: '/'
+      fullPath: '/clubs/'
+      preLoaderRoute: typeof ClubsIndexRouteImport
+      parentRoute: typeof ClubsRoute
     }
     '/tips/new': {
       id: '/tips/new'
@@ -555,12 +629,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoDrizzleRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/clubs/$clubId': {
+      id: '/clubs/$clubId'
+      path: '/$clubId'
+      fullPath: '/clubs/$clubId'
+      preLoaderRoute: typeof ClubsClubIdRouteImport
+      parentRoute: typeof ClubsRoute
+    }
     '/api/$': {
       id: '/api/$'
       path: '/api/$'
       fullPath: '/api/$'
       preLoaderRoute: typeof ApiSplatRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/profile/groups/new': {
+      id: '/profile/groups/new'
+      path: '/new'
+      fullPath: '/profile/groups/new'
+      preLoaderRoute: typeof ProfileGroupsNewRouteImport
+      parentRoute: typeof ProfileGroupsRoute
     }
     '/posts/$postId/modify': {
       id: '/posts/$postId/modify'
@@ -597,6 +685,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfileTipsTipIdModifyRouteImport
       parentRoute: typeof ProfileTipsRoute
     }
+    '/profile/groups/$groupId/modify': {
+      id: '/profile/groups/$groupId/modify'
+      path: '/$groupId/modify'
+      fullPath: '/profile/groups/$groupId/modify'
+      preLoaderRoute: typeof ProfileGroupsGroupIdModifyRouteImport
+      parentRoute: typeof ProfileGroupsRoute
+    }
     '/profile/events/$eventId/modify': {
       id: '/profile/events/$eventId/modify'
       path: '/$eventId/modify'
@@ -606,6 +701,18 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface ClubsRouteChildren {
+  ClubsClubIdRoute: typeof ClubsClubIdRoute
+  ClubsIndexRoute: typeof ClubsIndexRoute
+}
+
+const ClubsRouteChildren: ClubsRouteChildren = {
+  ClubsClubIdRoute: ClubsClubIdRoute,
+  ClubsIndexRoute: ClubsIndexRoute,
+}
+
+const ClubsRouteWithChildren = ClubsRoute._addFileChildren(ClubsRouteChildren)
 
 interface EventsRouteChildren {
   EventsEventIdRoute: typeof EventsEventIdRoute
@@ -646,6 +753,20 @@ const ProfileEventsRouteWithChildren = ProfileEventsRoute._addFileChildren(
   ProfileEventsRouteChildren,
 )
 
+interface ProfileGroupsRouteChildren {
+  ProfileGroupsNewRoute: typeof ProfileGroupsNewRoute
+  ProfileGroupsGroupIdModifyRoute: typeof ProfileGroupsGroupIdModifyRoute
+}
+
+const ProfileGroupsRouteChildren: ProfileGroupsRouteChildren = {
+  ProfileGroupsNewRoute: ProfileGroupsNewRoute,
+  ProfileGroupsGroupIdModifyRoute: ProfileGroupsGroupIdModifyRoute,
+}
+
+const ProfileGroupsRouteWithChildren = ProfileGroupsRoute._addFileChildren(
+  ProfileGroupsRouteChildren,
+)
+
 interface ProfileTipsRouteChildren {
   ProfileTipsTipIdModifyRoute: typeof ProfileTipsTipIdModifyRoute
 }
@@ -661,6 +782,7 @@ const ProfileTipsRouteWithChildren = ProfileTipsRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  ClubsRoute: ClubsRouteWithChildren,
   EventsRoute: EventsRouteWithChildren,
   FeedRoute: FeedRoute,
   LoginRoute: LoginRoute,
@@ -674,7 +796,7 @@ const rootRouteChildren: RootRouteChildren = {
   PostsNewRoute: PostsNewRoute,
   ProfileEditRoute: ProfileEditRoute,
   ProfileEventsRoute: ProfileEventsRouteWithChildren,
-  ProfileGroupsRoute: ProfileGroupsRoute,
+  ProfileGroupsRoute: ProfileGroupsRouteWithChildren,
   ProfileTipsRoute: ProfileTipsRouteWithChildren,
   ProfileIndexRoute: ProfileIndexRoute,
   ApiRpcSplatRoute: ApiRpcSplatRoute,

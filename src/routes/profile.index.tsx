@@ -2,10 +2,13 @@ import { createFileRoute, Link, useNavigate, redirect } from "@tanstack/react-ro
 import { Settings, Bell, ChevronRight, Edit3, User, Shield, Calendar, Lightbulb } from "lucide-react";
 import { useState } from "react";
 import { useUser } from "../hooks/use-user";
+import { getCurrentUser } from "aws-amplify/auth";
 
 export const Route = createFileRoute("/profile/")({
-  beforeLoad: () => {
-    if (typeof window !== "undefined" && !localStorage.getItem("eat_user_profile")) {
+  beforeLoad: async () => {
+    try {
+      await getCurrentUser();
+    } catch {
       throw redirect({ to: "/login" });
     }
   },
@@ -14,12 +17,11 @@ export const Route = createFileRoute("/profile/")({
 
 function ProfileRoute() {
   const navigate = useNavigate();
-  const { user } = useUser();
+  const { user, logout } = useUser();
   const [notifications, setNotifications] = useState(true);
 
-  const handleLogout = () => {
-    localStorage.removeItem("eat_user_profile");
-    window.dispatchEvent(new Event("user-updated"));
+  const handleLogout = async () => {
+    await logout();
     navigate({ to: "/login" });
   };
 
@@ -99,7 +101,7 @@ function ProfileRoute() {
             </Link>
           )}
 
-          {/* My Groups */}
+          {/* My Clubs */}
           {user.isAdmin && (
             <Link
               to="/profile/groups"
@@ -109,7 +111,7 @@ function ProfileRoute() {
                 <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
                   <Shield className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                 </div>
-                <span className="font-medium text-zinc-900 dark:text-white">My Groups</span>
+                <span className="font-medium text-zinc-900 dark:text-white">My Clubs</span>
               </div>
               <ChevronRight className="w-5 h-5 text-zinc-400" />
             </Link>

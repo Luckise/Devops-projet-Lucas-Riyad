@@ -1,15 +1,18 @@
-import { createFileRoute, useNavigate, Link, redirect } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
 import { useState } from "react";
 import { ArrowLeft, X, Plus, Trash2, EyeOff } from "lucide-react";
 import ImageUpload from "../components/ImageUpload";
 import { findTip, hideTip, unhideTip, updateItem } from "../lib/mock-data";
 import { toast } from "../lib/toast";
+import { getCurrentUser } from "aws-amplify/auth";
 
 type ContentBlock = { type: "text" | "image"; value: string };
 
 export const Route = createFileRoute("/profile/tips/$tipId/modify")({
-  beforeLoad: () => {
-    if (typeof window !== "undefined" && !localStorage.getItem("eat_user_profile")) {
+  beforeLoad: async () => {
+    try {
+      await getCurrentUser();
+    } catch {
       throw redirect({ to: "/login" });
     }
   },
@@ -109,12 +112,13 @@ function ProfileTipEditRoute() {
     <main className="min-h-screen pb-24 pt-[80px]">
       <div className="max-w-xl mx-auto px-5">
         <div className="flex items-center gap-4 mb-8">
-          <Link
-            to="/profile/tips"
+          <button
+            type="button"
+            onClick={() => window.history.back()}
             className="w-11 h-11 rounded-full bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors"
           >
             <ArrowLeft className="w-5 h-5 text-zinc-700 dark:text-zinc-300" />
-          </Link>
+          </button>
           <div>
             <h1 className="text-2xl font-serif font-medium text-zinc-900 dark:text-white">Edit Tip</h1>
             <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--ember)] mt-0.5">{category}</p>

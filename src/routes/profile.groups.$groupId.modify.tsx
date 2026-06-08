@@ -2,13 +2,13 @@ import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
 import { useState } from "react";
 import { ArrowLeft, Plus, X } from "lucide-react";
 import ImageUpload from "../components/ImageUpload";
-import { getSavedItems, updateItem } from "../lib/mock-data";
+import { getGroup, saveClubPage } from "../lib/groups";
 import { toast } from "../lib/toast";
 import { getCurrentUser } from "aws-amplify/auth";
 
 type ContentBlock = { type: "text" | "image"; value: string };
 
-export const Route = createFileRoute("/posts/$postId/modify")({
+export const Route = createFileRoute("/profile/groups/$groupId/modify")({
   beforeLoad: async () => {
     try {
       await getCurrentUser();
@@ -16,40 +16,43 @@ export const Route = createFileRoute("/posts/$postId/modify")({
       throw redirect({ to: "/login" });
     }
   },
-  component: PostEditRoute,
+  component: ClubEditRoute,
   loader: ({ params }) => {
-    const userPosts = getSavedItems<any[]>("user_posts");
-    const post = userPosts.find((p: any) => p.id === params.postId);
-    if (!post) throw new Error("Post not found");
-    return { post };
+    const group = getGroup(params.groupId);
+    if (!group) throw new Error("Group not found");
+    return { group };
   },
 });
 
-function PostEditRoute() {
-  const { post } = Route.useLoaderData();
+function ClubEditRoute() {
+  const { group } = Route.useLoaderData();
   const navigate = useNavigate();
 
-  const initialContent = post.content?.length ? post.content : [{ type: "text", value: "" }];
-  const [content, setContent] = useState<ContentBlock[]>(initialContent);
+  const [name] = useState(group.name || "");
+  const [image, setImage] = useState(group.image || "");
+  const [content, setContent] = useState<ContentBlock[]>(
+    group.content?.length ? group.content.map((b) => ({ type: b.type, value: b.value })) : []
+  );
   const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const filledContent = content.filter((b: ContentBlock) => b.value.trim());
-    const hasText = filledContent.some((b: ContentBlock) => b.type === "text");
-    if (!hasText) return;
     setSubmitting(true);
 
-    updateItem("user_posts", post.id, { content: filledContent } as any);
+    if (!image) {
+      toast("Please add a cover image");
+      setSubmitting(false);
+      return;
+    }
+
+    saveClubPage(group.id, image, content.filter((b) => b.value.trim()));
     setSubmitting(false);
-    toast("Post updated");
-    navigate({ to: "/feed" });
+    toast("Club page saved");
+    navigate({ to: "/profile/groups" });
   };
 
   const addContentBlock = (type: "text" | "image") => setContent((prev) => [...prev, { type, value: "" }]);
-  const removeContentBlock = (i: number) => {
-    if (content.length > 1) setContent(content.filter((_, idx) => idx !== i));
-  };
+  const removeContentBlock = (i: number) => setContent((prev) => prev.filter((_, idx) => idx !== i));
   const updateContentBlock = (i: number, v: string) => {
     setContent((prev) => {
       const next = [...prev];
@@ -70,11 +73,14 @@ function PostEditRoute() {
             <ArrowLeft className="w-5 h-5 text-zinc-700 dark:text-zinc-300" />
           </button>
           <div>
-            <h1 className="text-2xl font-serif font-medium text-zinc-900 dark:text-white">Edit Post</h1>
+            <h1 className="text-2xl font-serif font-medium text-zinc-900 dark:text-white">Edit Club</h1>
+            <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--ember)] mt-0.5">{name}</p>
           </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
+          <ImageUpload value={image} onChange={setImage} label="Cover Image" />
+
           <div>
             <div className="flex items-center justify-between mb-2.5">
               <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
@@ -106,8 +112,8 @@ function PostEditRoute() {
                     <textarea
                       value={block.value}
                       onChange={(e) => updateContentBlock(idx, e.target.value)}
-                      placeholder="Write your post..."
-                      rows={4}
+                      placeholder="Write your text..."
+                      rows={3}
                       className="flex-1 px-4 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-[var(--ember)]/30 transition-shadow resize-none"
                     />
                   ) : (
@@ -115,15 +121,13 @@ function PostEditRoute() {
                       <ImageUpload value={block.value} onChange={(v) => updateContentBlock(idx, v)} compact />
                     </div>
                   )}
-                  {content.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => removeContentBlock(idx)}
-                      className="w-11 h-11 rounded-2xl bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors shrink-0"
-                    >
-                      <X className="w-4 h-4 text-zinc-500" />
-                    </button>
-                  )}
+                  <button
+                    type="button"
+                    onClick={() => removeContentBlock(idx)}
+                    className="w-11 h-11 rounded-2xl bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors shrink-0"
+                  >
+                    <X className="w-4 h-4 text-zinc-500" />
+                  </button>
                 </div>
               ))}
             </div>
@@ -131,7 +135,7 @@ function PostEditRoute() {
 
           <button
             type="submit"
-            disabled={submitting || content.every((b) => b.type !== "text" || !b.value.trim())}
+            disabled={submitting}
             className="w-full py-4 px-6 rounded-full bg-[var(--ember)] text-white font-bold text-[15px] hover:bg-[var(--ember)]/90 disabled:opacity-50 transition-all shadow-lg shadow-[var(--ember)]/20"
           >
             {submitting ? "Saving..." : "Save Changes"}

@@ -14,6 +14,7 @@ export const MOCK_EVENTS = [
     image:
       "https://images.unsplash.com/photo-1574169208507-84376144848b?q=80&w=800&auto=format&fit=crop",
     tags: ["Techno", "Underground"],
+    groupId: "seed_efrei_esports",
     description: "Experience the pulse of the underground. Neon Nights returns to Warehouse 42 for a 12-hour marathon set featuring international and local techno artists. Expect heavy bass, immersive visuals, and a community of true music lovers.",
   },
   {
@@ -31,6 +32,7 @@ export const MOCK_EVENTS = [
     image:
       "https://images.unsplash.com/photo-1545205597-3d9d02c29597?q=80&w=800&auto=format&fit=crop",
     tags: ["Wellness", "Morning"],
+    groupId: "seed_hiking",
     description: "Start your morning with intention. Join us as the sun rises over The Glasshouse for a 90-minute vinyasa flow followed by a deeply restorative crystal bowl soundbath. Bring your own mat.",
   },
   {
@@ -48,6 +50,7 @@ export const MOCK_EVENTS = [
     image:
       "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=800&auto=format&fit=crop",
     tags: ["Food", "Community"],
+    groupId: "seed_a_table",
     description: "The city's best food trucks converge for our seasonal street food festival. Taste autumn-inspired dishes, local craft beers, and enjoy live acoustic music throughout the afternoon. Free entry!",
   },
   {
@@ -65,6 +68,7 @@ export const MOCK_EVENTS = [
     image:
       "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?q=80&w=800&auto=format&fit=crop",
     tags: ["Cinema", "Art"],
+    groupId: "seed_cine_club",
     description: "A curated evening of independent short films from emerging local directors. The screening will be followed by a Q&A session with the filmmakers and a networking mixer in the lobby.",
   },
   {
@@ -82,6 +86,7 @@ export const MOCK_EVENTS = [
     image:
       "https://images.unsplash.com/photo-1571266028243-3716f02d2d01?q=80&w=800&auto=format&fit=crop",
     tags: ["Concert", "Electronic"],
+    groupId: "seed_efrei_esports",
     description: "The biggest electronic show of the year is completely sold out. DJ Snake brings his signature high-energy set to the Megaclub Arena with full production.",
   },
 ];
