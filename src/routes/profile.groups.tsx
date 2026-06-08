@@ -1,30 +1,35 @@
-import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link, Outlet, redirect, useRouterState } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
-import { ChevronLeft, Plus, Users, Shield, Trash2, Crown, UserPlus, UserMinus, Send } from "lucide-react";
-import { getUserGroups, createGroup, addMember, removeMember, transferOwnership, renameGroup, userRole, getGroup, isUserAdmin } from "../lib/groups";
+import { ChevronLeft, Plus, Users, Shield, Crown, UserPlus, UserMinus, Send, ExternalLink } from "lucide-react";
+import { getUserGroups, addMember, removeMember, transferOwnership, renameGroup, userRole, isUserAdmin } from "../lib/groups";
 import type { Group } from "../lib/groups";
+import { getCurrentUser, fetchUserAttributes } from "aws-amplify/auth";
 
 export const Route = createFileRoute("/profile/groups")({
-  beforeLoad: () => {
-    if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("eat_user_profile");
-      if (!stored) throw redirect({ to: "/login" });
-      const profile = JSON.parse(stored);
-      if (!isUserAdmin(profile.email)) throw redirect({ to: "/profile" });
+  beforeLoad: async () => {
+    try {
+      const user = await getCurrentUser();
+      const attrs = await fetchUserAttributes();
+      if (!isUserAdmin(attrs.email || user.userId)) throw redirect({ to: "/profile" });
+    } catch (err) {
+      if (err instanceof redirect) throw err;
+      throw redirect({ to: "/login" });
     }
   },
   component: ProfileGroupsRoute,
 });
 
 function ProfileGroupsRoute() {
+  const matches = useRouterState({ select: (s) => s.matches });
+  const hasChild = matches.some(
+    (m) => m.routeId !== "__root__" && m.routeId !== "/profile/groups"
+  );
   const navigate = useNavigate();
   const stored = typeof window !== "undefined" ? localStorage.getItem("eat_user_profile") : null;
   const profile = stored ? JSON.parse(stored) : null;
   const email = profile?.email || "";
 
   const [groups, setGroups] = useState<Group[]>([]);
-  const [showCreate, setShowCreate] = useState(false);
-  const [newName, setNewName] = useState("");
   const [managing, setManaging] = useState<string | null>(null);
   const [memberInput, setMemberInput] = useState("");
   const [message, setMessage] = useState("");
@@ -36,16 +41,6 @@ function ProfileGroupsRoute() {
   const refresh = () => setGroups(getUserGroups(email));
 
   useEffect(() => { refresh(); }, [email]);
-
-  const handleCreate = () => {
-    if (!newName.trim()) return;
-    createGroup(newName.trim(), email);
-    setNewName("");
-    setShowCreate(false);
-    setMessage(`"${newName.trim()}" created`);
-    refresh();
-    setTimeout(() => setMessage(""), 2500);
-  };
 
   const handleAddMember = (groupId: string) => {
     if (!memberInput.trim()) return;
@@ -70,16 +65,18 @@ function ProfileGroupsRoute() {
     setTimeout(() => setMessage(""), 2500);
   };
 
+  if (hasChild) return <Outlet />;
+
   return (
     <main className="min-h-screen pb-24 pt-[80px]">
       <div className="max-w-md mx-auto px-4 pt-4 md:pt-8">
         <header className="mb-8 flex items-center gap-4">
-          <button onClick={() => navigate({ to: "/profile" })} className="w-11 h-11 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 flex items-center justify-center shadow-sm hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors">
+          <button onClick={() => window.history.back()} className="w-11 h-11 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 flex items-center justify-center shadow-sm hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors">
             <ChevronLeft className="w-5 h-5 text-zinc-700 dark:text-zinc-300" />
           </button>
           <div>
-            <p className="text-zinc-500 text-xs font-bold uppercase tracking-[0.2em] mb-0.5">Groups</p>
-            <h1 className="text-[2rem] font-serif font-medium tracking-tight leading-none text-zinc-900 dark:text-white">My Groups</h1>
+            <p className="text-zinc-500 text-xs font-bold uppercase tracking-[0.2em] mb-0.5">Clubs</p>
+            <h1 className="text-[2rem] font-serif font-medium tracking-tight leading-none text-zinc-900 dark:text-white">My Clubs</h1>
           </div>
         </header>
 
@@ -93,7 +90,7 @@ function ProfileGroupsRoute() {
           {groups.length === 0 && (
             <div className="text-center py-12">
               <Users className="w-10 h-10 text-zinc-300 dark:text-zinc-700 mx-auto mb-3" />
-              <p className="text-zinc-500 dark:text-zinc-400 text-sm">You are not part of any group yet.</p>
+              <p className="text-zinc-500 dark:text-zinc-400 text-sm">You are not part of any club yet.</p>
             </div>
           )}
 
@@ -227,6 +224,25 @@ function ProfileGroupsRoute() {
                         })}
                       </div>
                     </div>
+
+                    <div className="pt-4 border-t border-zinc-200 dark:border-white/10">
+                      <Link
+                        to="/profile/groups/$groupId/modify"
+                        params={{ groupId: group.id }}
+                        className="flex items-center justify-between w-full px-4 py-3 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-[var(--ember)]/30 transition-colors"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-lg bg-[var(--ember)]/10 flex items-center justify-center">
+                            <ExternalLink className="w-4 h-4 text-[var(--ember)]" />
+                          </div>
+                          <div className="text-left">
+                            <p className="text-sm font-bold text-zinc-900 dark:text-white">Club Page</p>
+                            <p className="text-[11px] text-zinc-500">{group.image ? "Edit cover and content" : "Create public page"}</p>
+                          </div>
+                        </div>
+                        <ChevronLeft className="w-4 h-4 text-zinc-400 -rotate-180" />
+                      </Link>
+                    </div>
                   </div>
                 )}
 
@@ -255,41 +271,13 @@ function ProfileGroupsRoute() {
             );
           })}
 
-          {!showCreate ? (
-            <button
-              onClick={() => setShowCreate(true)}
-              className="w-full flex items-center justify-center gap-2.5 p-4 rounded-3xl border-2 border-dashed border-zinc-300 dark:border-zinc-700 text-zinc-500 dark:text-zinc-400 hover:border-[var(--ember)] hover:text-[var(--ember)] transition-colors"
-            >
-              <Plus className="w-5 h-5" />
-              <span className="font-medium">Create a Group</span>
-            </button>
-          ) : (
-            <div className="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-white/10 shadow-sm p-5">
-              <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2 block">Group Name</label>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={newName}
-                  onChange={(e) => setNewName(e.target.value)}
-                  placeholder="e.g. EFREI Esports"
-                  className="flex-1 px-4 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-[var(--ember)]/30 text-sm"
-                  onKeyDown={(e) => { if (e.key === "Enter") handleCreate(); }}
-                />
-                <button
-                  onClick={handleCreate}
-                  className="px-5 py-3 rounded-2xl bg-[var(--ember)] text-white font-bold text-sm hover:bg-[var(--ember)]/90 transition-colors"
-                >
-                  Create
-                </button>
-              </div>
-              <button
-                onClick={() => { setShowCreate(false); setNewName(""); }}
-                className="mt-2 text-xs text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
-              >
-                Cancel
-              </button>
-            </div>
-          )}
+          <Link
+            to="/profile/groups/new"
+            className="w-full flex items-center justify-center gap-2.5 p-4 rounded-3xl border-2 border-dashed border-zinc-300 dark:border-zinc-700 text-zinc-500 dark:text-zinc-400 hover:border-[var(--ember)] hover:text-[var(--ember)] transition-colors"
+          >
+            <Plus className="w-5 h-5" />
+            <span className="font-medium text-sm">Create a Club</span>
+          </Link>
         </div>
       </div>
 

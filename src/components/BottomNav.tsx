@@ -1,6 +1,6 @@
 import { memo } from "react";
 import { Link } from "@tanstack/react-router";
-import { Calendar, Ticket, Lightbulb, MessageSquareText, User } from "lucide-react";
+import { Calendar, Ticket, Lightbulb, MessageSquareText, User, Users } from "lucide-react";
 import { useUser } from "../hooks/use-user";
 
 const BottomNav = memo(function BottomNav() {
@@ -35,6 +35,15 @@ const BottomNav = memo(function BottomNav() {
           activeProps={{ style: { color: "var(--charcoal)" } }}
         >
           <Lightbulb className="w-6 h-6" />
+        </Link>
+        <Link
+          to="/clubs"
+          aria-label="Clubs"
+          className="flex items-center justify-center p-3 transition-colors"
+          style={{ color: "var(--charcoal-soft)" }}
+          activeProps={{ style: { color: "var(--charcoal)" } }}
+        >
+          <Users className="w-6 h-6" />
         </Link>
         <Link
           to="/feed"

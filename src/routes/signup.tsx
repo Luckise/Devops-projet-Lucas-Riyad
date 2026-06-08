@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useEffect } from "react";
 import {
   Mail,
   ArrowRight,
@@ -10,6 +10,8 @@ import {
   ChevronLeft,
   GraduationCap,
 } from "lucide-react";
+import { signUp, confirmSignUp, resendSignUpCode, getCurrentUser } from "aws-amplify/auth";
+import "../lib/amplify";
 
 export const Route = createFileRoute("/signup")({
   component: SignupRoute,
@@ -23,61 +25,6 @@ const PASSWORD_RULES = [
   { label: "One number", test: (v: string) => /\d/.test(v) },
   { label: "One special character", test: (v: string) => /[!@#$%^&*(),.?":{}|<>_\-+]/.test(v) },
 ];
-
-const USER_KEY = "eat_user_profile";
-const CREDENTIALS_KEY = "eat_user_credentials";
-const PROFILES_KEY = "eat_user_profiles";
-const SEEDED_KEY = "eat_seeded";
-
-async function hashPassword(password: string): Promise<string> {
-  const encoder = new TextEncoder();
-  const salt = crypto.getRandomValues(new Uint8Array(16));
-  const key = await crypto.subtle.importKey("raw", encoder.encode(password), "PBKDF2", false, ["deriveBits"]);
-  const bits = await crypto.subtle.deriveBits(
-    { name: "PBKDF2", salt, iterations: 600000, hash: "SHA-256" },
-    key,
-    256
-  );
-  const hash = new Uint8Array(bits);
-  const saltHex = Array.from(salt).map((b) => b.toString(16).padStart(2, "0")).join("");
-  const hashHex = Array.from(hash).map((b) => b.toString(16).padStart(2, "0")).join("");
-  return `${saltHex}:${hashHex}`;
-}
-
-async function seedAccounts() {
-  if (localStorage.getItem(SEEDED_KEY)) return;
-  const credentials = JSON.parse(localStorage.getItem(CREDENTIALS_KEY) || "{}");
-  const profiles = JSON.parse(localStorage.getItem(PROFILES_KEY) || "{}");
-  const adminHash = await hashPassword("Azerty123*");
-  const userHash = await hashPassword("Azertyuiop123*");
-  credentials["lucas.guillemin@efrei.net"] = adminHash;
-  credentials["ryiad.larbaoui@efrei.net"] = userHash;
-  profiles["lucas.guillemin@efrei.net"] = {
-    firstName: "Lucas",
-    lastName: "Guillemin",
-    nickname: "@lucasg",
-    avatar: "",
-    isAdmin: true,
-  };
-  profiles["ryiad.larbaoui@efrei.net"] = {
-    firstName: "Riyad",
-    lastName: "Larbaoui",
-    nickname: "@riyadl",
-    avatar: "",
-    isAdmin: false,
-  };
-  const groups = JSON.parse(localStorage.getItem("eat_groups") || "{}");
-  groups["g1"] = {
-    id: "g1",
-    name: "EFREI Esports",
-    owner: "lucas.guillemin@efrei.net",
-    members: ["lucas.guillemin@efrei.net", "ryiad.larbaoui@efrei.net"],
-  };
-  localStorage.setItem(CREDENTIALS_KEY, JSON.stringify(credentials));
-  localStorage.setItem(PROFILES_KEY, JSON.stringify(profiles));
-  localStorage.setItem("eat_groups", JSON.stringify(groups));
-  localStorage.setItem(SEEDED_KEY, "true");
-}
 
 function SignupRoute() {
   const navigate = useNavigate();
@@ -99,17 +46,17 @@ function SignupRoute() {
   const [verifyError, setVerifyError] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
   const [resending, setResending] = useState(false);
-  const verificationCode = useRef<string>("");
 
-  useEffect(() => { seedAccounts(); }, []);
   useEffect(() => {
-    const existing = localStorage.getItem(USER_KEY);
-    if (existing) {
-      const parsed = JSON.parse(existing);
-      if (parsed.email && parsed.email !== "alex.kim@example.com") {
+    const checkSession = async () => {
+      try {
+        await getCurrentUser();
         navigate({ to: "/" });
+      } catch {
+        // not authenticated, stay on signup
       }
-    }
+    };
+    checkSession();
   }, [navigate]);
 
   const validateEmail = useCallback((value: string) => {
@@ -172,12 +119,6 @@ function SignupRoute() {
 
   const handleEmailContinue = () => {
     if (!validateEmail(email)) return;
-    const credentials = JSON.parse(localStorage.getItem(CREDENTIALS_KEY) || "{}");
-    if (credentials[email]) {
-      navigate({ to: "/login" });
-      return;
-    }
-    verificationCode.current = Math.floor(100000 + Math.random() * 900000).toString();
     setStep("details");
     setPassword("");
     setConfirmPassword("");
@@ -193,9 +134,30 @@ function SignupRoute() {
     const isConfirmValid = validateConfirmPassword(confirmPassword);
     if (!isFirstValid || !isLastValid || !isPassValid || !isConfirmValid) return;
     setIsSubmitting(true);
-    await new Promise((r) => setTimeout(r, 1800));
-    setIsSubmitting(false);
-    setStep("verify");
+
+    try {
+      await signUp({
+        username: email,
+        password,
+        options: {
+          userAttributes: {
+            email,
+            given_name: firstName,
+            family_name: lastName || "User",
+            nickname: `@${firstName.toLowerCase()}${lastName ? "_" + lastName.toLowerCase() : ""}`,
+          },
+        },
+      });
+      setIsSubmitting(false);
+      setStep("verify");
+    } catch (err: any) {
+      setIsSubmitting(false);
+      if (err.name === "UsernameExistsException") {
+        setPasswordError("An account with this email already exists. Please sign in.");
+      } else {
+        setPasswordError(err.message || "Something went wrong. Please try again.");
+      }
+    }
   };
 
   const handleVerify = async () => {
@@ -206,42 +168,33 @@ function SignupRoute() {
     }
     setIsVerifying(true);
     setVerifyError("");
-    await new Promise((r) => setTimeout(r, 1000));
-    if (code === verificationCode.current) {
-      const userProfile = {
+
+    try {
+      await confirmSignUp({ username: email, confirmationCode: code });
+      const profile = {
         firstName,
         lastName: lastName || "User",
         nickname: `@${firstName.toLowerCase()}${lastName ? "_" + lastName.toLowerCase() : ""}`,
-        email: email,
+        email,
         avatar: "",
         isAdmin: false,
       };
-      const passwordHash = await hashPassword(password);
-      const credentials = JSON.parse(localStorage.getItem(CREDENTIALS_KEY) || "{}");
-      credentials[email] = passwordHash;
-      const profiles = JSON.parse(localStorage.getItem(PROFILES_KEY) || "{}");
-      profiles[email] = {
-        firstName: userProfile.firstName,
-        lastName: userProfile.lastName,
-        nickname: userProfile.nickname,
-        avatar: userProfile.avatar,
-        isAdmin: userProfile.isAdmin,
-      };
-      localStorage.setItem(CREDENTIALS_KEY, JSON.stringify(credentials));
-      localStorage.setItem(PROFILES_KEY, JSON.stringify(profiles));
-      localStorage.setItem(USER_KEY, JSON.stringify(userProfile));
+      localStorage.setItem("eat_user_profile", JSON.stringify(profile));
       window.dispatchEvent(new Event("user-updated"));
       navigate({ to: "/" });
-    } else {
-      setVerifyError("Incorrect code. Please try again.");
-      setIsVerifying(false);
+    } catch (err: any) {
+      setVerifyError(err.message || "Incorrect code. Please try again.");
     }
+    setIsVerifying(false);
   };
 
   const handleResend = async () => {
     setResending(true);
-    await new Promise((r) => setTimeout(r, 1000));
-    verificationCode.current = Math.floor(100000 + Math.random() * 900000).toString();
+    try {
+      await resendSignUpCode({ username: email });
+    } catch {
+      // silently fail
+    }
     setResending(false);
   };
 

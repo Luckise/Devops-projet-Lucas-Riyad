@@ -1,11 +1,14 @@
-import { createFileRoute, Link, useNavigate, redirect } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
 import { ArrowLeft, Save, Camera, User } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useUser } from "../hooks/use-user";
+import { getCurrentUser } from "aws-amplify/auth";
 
 export const Route = createFileRoute("/profile/edit")({
-  beforeLoad: () => {
-    if (typeof window !== "undefined" && !localStorage.getItem("eat_user_profile")) {
+  beforeLoad: async () => {
+    try {
+      await getCurrentUser();
+    } catch {
       throw redirect({ to: "/login" });
     }
   },
@@ -52,34 +55,31 @@ function ProfileEditRoute() {
     }
   };
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      setUser({
-        ...user,
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        nickname: formData.nickname,
-        avatar: formData.avatar
-      });
-      setIsSaving(false);
-      navigate({ to: "/profile" });
-    }, 800);
+    await setUser({
+      ...user,
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      nickname: formData.nickname,
+      avatar: formData.avatar
+    });
+    setIsSaving(false);
+    navigate({ to: "/profile" });
   };
 
   return (
     <main className="min-h-screen pb-24 pt-[80px]">
       <div className="max-w-md mx-auto px-4 pt-2 md:pt-6">
         <header className="mb-8 flex items-center gap-4">
-          <Link 
-            to="/profile"
+          <button
+            type="button"
+            onClick={() => window.history.back()}
             className="w-11 h-11 rounded-full bg-white dark:bg-zinc-900 flex items-center justify-center text-zinc-900 dark:text-white border border-zinc-200 dark:border-white/10 shadow-sm hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
-          </Link>
+          </button>
           <div>
             <h1 className="text-2xl font-serif font-medium tracking-tight leading-none text-zinc-900 dark:text-white">
               Edit Information
@@ -168,7 +168,7 @@ function ProfileEditRoute() {
                 <input
                   type="email"
                   id="email"
-                  value="alex.kim@example.com"
+                  value={user.email}
                   disabled
                   className="w-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-transparent rounded-2xl px-4 py-3.5 text-zinc-500 dark:text-zinc-400 cursor-not-allowed shadow-inner"
                 />

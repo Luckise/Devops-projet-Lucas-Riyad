@@ -10,81 +10,14 @@ import {
   LogIn,
   GraduationCap,
 } from "lucide-react";
+import { signIn, getCurrentUser, fetchUserAttributes } from "aws-amplify/auth";
+import "../lib/amplify";
 
 export const Route = createFileRoute("/login")({
   component: LoginRoute,
 });
 
 const EMAIL_REGEX = /^[^\s@]+@efrei\.net$/;
-const USER_KEY = "eat_user_profile";
-const CREDENTIALS_KEY = "eat_user_credentials";
-const PROFILES_KEY = "eat_user_profiles";
-const SEEDED_KEY = "eat_seeded";
-
-async function hashPassword(password: string): Promise<string> {
-  const encoder = new TextEncoder();
-  const salt = crypto.getRandomValues(new Uint8Array(16));
-  const key = await crypto.subtle.importKey("raw", encoder.encode(password), "PBKDF2", false, ["deriveBits"]);
-  const bits = await crypto.subtle.deriveBits(
-    { name: "PBKDF2", salt, iterations: 600000, hash: "SHA-256" },
-    key,
-    256
-  );
-  const hash = new Uint8Array(bits);
-  const saltHex = Array.from(salt).map((b) => b.toString(16).padStart(2, "0")).join("");
-  const hashHex = Array.from(hash).map((b) => b.toString(16).padStart(2, "0")).join("");
-  return `${saltHex}:${hashHex}`;
-}
-
-async function verifyPassword(password: string, stored: string): Promise<boolean> {
-  const [saltHex, hashHex] = stored.split(":");
-  if (!saltHex || !hashHex) return false;
-  const salt = new Uint8Array(saltHex.match(/.{2}/g)!.map((b) => parseInt(b, 16)));
-  const encoder = new TextEncoder();
-  const key = await crypto.subtle.importKey("raw", encoder.encode(password), "PBKDF2", false, ["deriveBits"]);
-  const bits = await crypto.subtle.deriveBits(
-    { name: "PBKDF2", salt, iterations: 600000, hash: "SHA-256" },
-    key,
-    256
-  );
-  const computed = Array.from(new Uint8Array(bits)).map((b) => b.toString(16).padStart(2, "0")).join("");
-  return computed === hashHex;
-}
-
-async function seedAccounts() {
-  if (localStorage.getItem(SEEDED_KEY)) return;
-  const credentials = JSON.parse(localStorage.getItem(CREDENTIALS_KEY) || "{}");
-  const profiles = JSON.parse(localStorage.getItem(PROFILES_KEY) || "{}");
-  const adminHash = await hashPassword("Azerty123*");
-  const userHash = await hashPassword("Azertyuiop123*");
-  credentials["lucas.guillemin@efrei.net"] = adminHash;
-  credentials["ryiad.larbaoui@efrei.net"] = userHash;
-  profiles["lucas.guillemin@efrei.net"] = {
-    firstName: "Lucas",
-    lastName: "Guillemin",
-    nickname: "@lucasg",
-    avatar: "",
-    isAdmin: true,
-  };
-  profiles["ryiad.larbaoui@efrei.net"] = {
-    firstName: "Riyad",
-    lastName: "Larbaoui",
-    nickname: "@riyadl",
-    avatar: "",
-    isAdmin: false,
-  };
-  const groups = JSON.parse(localStorage.getItem("eat_groups") || "{}");
-  groups["g1"] = {
-    id: "g1",
-    name: "EFREI Esports",
-    owner: "lucas.guillemin@efrei.net",
-    members: ["lucas.guillemin@efrei.net", "ryiad.larbaoui@efrei.net"],
-  };
-  localStorage.setItem(CREDENTIALS_KEY, JSON.stringify(credentials));
-  localStorage.setItem(PROFILES_KEY, JSON.stringify(profiles));
-  localStorage.setItem("eat_groups", JSON.stringify(groups));
-  localStorage.setItem(SEEDED_KEY, "true");
-}
 
 function LoginRoute() {
   const navigate = useNavigate();
@@ -97,16 +30,16 @@ function LoginRoute() {
   const [loginError, setLoginError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => { seedAccounts(); }, []);
-
   useEffect(() => {
-    const existing = localStorage.getItem(USER_KEY);
-    if (existing) {
-      const parsed = JSON.parse(existing);
-      if (parsed.email && parsed.email !== "alex.kim@example.com") {
+    const checkSession = async () => {
+      try {
+        await getCurrentUser();
         navigate({ to: "/" });
+      } catch {
+        // not authenticated, stay on login
       }
-    }
+    };
+    checkSession();
   }, [navigate]);
 
   const validateEmail = useCallback((value: string) => {
@@ -147,26 +80,36 @@ function LoginRoute() {
     if (!validatePassword(password)) return;
     setIsSubmitting(true);
     setLoginError("");
-    await new Promise((r) => setTimeout(r, 1200));
-    const credentials = JSON.parse(localStorage.getItem(CREDENTIALS_KEY) || "{}");
-    const storedHash = credentials[email];
-    if (!storedHash) {
-      setLoginError("No account found with this email. Please sign up.");
-      setIsSubmitting(false);
-      return;
+
+    try {
+      await signIn({ username: email, password });
+      const user = await getCurrentUser();
+      const attrs = await fetchUserAttributes();
+      const profile = {
+        firstName: attrs.given_name || "",
+        lastName: attrs.family_name || "",
+        nickname: attrs.nickname || "",
+        email: attrs.email || email,
+        avatar: attrs.picture || "",
+        isAdmin: false,
+      };
+      localStorage.setItem("eat_user_profile", JSON.stringify(profile));
+      window.dispatchEvent(new Event("user-updated"));
+      navigate({ to: "/" });
+    } catch (err: any) {
+      if (err.name === "UserAlreadyAuthenticatedException") {
+        navigate({ to: "/" });
+        return;
+      }
+      if (err.name === "NotAuthorizedException") {
+        setLoginError("Incorrect password. Please try again.");
+      } else if (err.name === "UserNotFoundException") {
+        setLoginError("No account found with this email. Please sign up.");
+      } else {
+        setLoginError(err.message || "Something went wrong. Please try again.");
+      }
     }
-    const match = await verifyPassword(password, storedHash);
-    if (!match) {
-      setLoginError("Incorrect password. Please try again.");
-      setIsSubmitting(false);
-      return;
-    }
-    const profiles = JSON.parse(localStorage.getItem(PROFILES_KEY) || "{}");
-    const profile = profiles[email] || { firstName: "User", lastName: "User", nickname: "@user", avatar: "", isAdmin: false };
-    localStorage.setItem(USER_KEY, JSON.stringify({ ...profile, email }));
-    window.dispatchEvent(new Event("user-updated"));
     setIsSubmitting(false);
-    navigate({ to: "/" });
   };
 
   const isEmailValid = email.trim() && EMAIL_REGEX.test(email);

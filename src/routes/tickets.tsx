@@ -3,10 +3,13 @@ import { MapPin, Calendar, Clock, Ticket, X } from "lucide-react";
 import { MOCK_EVENTS, getSavedItems } from "../lib/mock-data";
 import { useState, useEffect } from "react";
 import QRCode from "qrcode";
+import { getCurrentUser } from "aws-amplify/auth";
 
 export const Route = createFileRoute("/tickets")({
-  beforeLoad: () => {
-    if (typeof window !== "undefined" && !localStorage.getItem("eat_user_profile")) {
+  beforeLoad: async () => {
+    try {
+      await getCurrentUser();
+    } catch {
       throw redirect({ to: "/login" });
     }
   },

@@ -3,14 +3,17 @@ import { useState, useEffect } from "react";
 import { ChevronLeft, Calendar, EyeOff } from "lucide-react";
 import { getAllEvents, formatDate, formatTime, sortByDate } from "../lib/mock-data";
 import { getUserGroups, isUserAdmin } from "../lib/groups";
+import { getCurrentUser, fetchUserAttributes } from "aws-amplify/auth";
 
 export const Route = createFileRoute("/profile/events")({
-  beforeLoad: () => {
-    if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("eat_user_profile");
-      if (!stored) throw redirect({ to: "/login" });
-      const profile = JSON.parse(stored);
-      if (!isUserAdmin(profile.email)) throw redirect({ to: "/profile" });
+  beforeLoad: async () => {
+    try {
+      const user = await getCurrentUser();
+      const attrs = await fetchUserAttributes();
+      if (!isUserAdmin(attrs.email || user.userId)) throw redirect({ to: "/profile" });
+    } catch (err) {
+      if (err instanceof redirect) throw err;
+      throw redirect({ to: "/login" });
     }
   },
   component: ProfileEventsRoute,
@@ -41,12 +44,13 @@ function ProfileEventsRoute() {
     <main className="min-h-screen pb-24 pt-[80px]">
       <div className="max-w-md mx-auto px-4 pt-4 md:pt-8">
         <div className="flex items-center gap-4 mb-8">
-          <Link
-            to="/profile"
+          <button
+            type="button"
+            onClick={() => window.history.back()}
             className="w-11 h-11 rounded-full bg-white dark:bg-zinc-900 flex items-center justify-center hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors border border-zinc-200 dark:border-white/10 shadow-sm"
           >
             <ChevronLeft className="w-5 h-5 text-zinc-700 dark:text-zinc-300" />
-          </Link>
+          </button>
           <div>
             <h1 className="text-2xl font-serif font-medium text-zinc-900 dark:text-white">My Events</h1>
             <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--ember)] mt-0.5">

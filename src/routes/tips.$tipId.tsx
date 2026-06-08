@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { findTip } from "../lib/mock-data";
 import { ArrowLeft, Clock, ChefHat, MapPin } from "lucide-react";
 
@@ -28,12 +28,13 @@ function TipDetailsRoute() {
 
         {/* Top Nav (Back Button) */}
         <div className="absolute top-0 left-0 w-full p-4 pt-[4.5rem] flex justify-between items-center z-10">
-          <Link
-            to="/tips"
+          <button
+            type="button"
+            onClick={() => window.history.back()}
             className="w-11 h-11 rounded-full bg-white/20 dark:bg-black/20 backdrop-blur-md flex items-center justify-center text-white border border-white/20 hover:bg-white/30 dark:hover:bg-black/40 transition-colors shadow-lg"
           >
             <ArrowLeft className="w-6 h-6" />
-          </Link>
+          </button>
         </div>
       </div>
 

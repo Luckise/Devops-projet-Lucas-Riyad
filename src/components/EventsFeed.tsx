@@ -1,7 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
-import { MapPin, Calendar, Clock, ArrowRight, Users, Search, X } from "lucide-react";
+import { MapPin, Calendar, Clock, ArrowRight, Users, Search, X, Shield } from "lucide-react";
 import { MOCK_EVENTS, getSavedItems, formatDate, formatTime, sortByDate, isEventPast } from "../lib/mock-data";
+import { getGroup } from "../lib/groups";
 import SaveButton from "./SaveButton";
 
 export default function EventsFeed() {
@@ -86,15 +87,22 @@ export default function EventsFeed() {
 
               <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/95 via-black/50 to-black/10" />
 
-              <div className="absolute top-5 left-5 z-20 flex flex-wrap gap-2 pr-5">
-                {event.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="px-3 py-1.5 rounded-full bg-black/30 backdrop-blur-md text-[11px] font-bold tracking-wide uppercase text-white border border-white/20"
-                  >
-                    {tag}
-                  </span>
-                ))}
+              <div className="absolute top-5 left-5 z-20 pr-5">
+                {event.groupId && (() => {
+                  const club = getGroup(event.groupId);
+                  if (!club) return null;
+                  return (
+                    <Link
+                      to="/clubs/$clubId"
+                      params={{ clubId: club.id }}
+                      onClick={(e) => e.stopPropagation()}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/30 backdrop-blur-md text-[11px] font-bold tracking-wide uppercase text-white border border-white/20 hover:bg-black/50 transition-colors"
+                    >
+                      <Shield className="w-3 h-3" />
+                      {club.name}
+                    </Link>
+                  );
+                })()}
               </div>
 
               <div className="absolute top-5 right-5 z-20">
