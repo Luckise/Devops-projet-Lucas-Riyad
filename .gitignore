@@ -11,3 +11,10 @@ dist-ssr
 .vinxi
 __unconfig*
 todos.json
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+terraform.tfvars
+terraform.tfvars.json
