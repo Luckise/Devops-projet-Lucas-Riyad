@@ -34,3 +34,8 @@ output "authentication" {
     app_client_name = module.cognito.app_client_name
   }
 }
+
+output "ec2_app_ips" {
+  description = "Planned application instance IP addresses."
+  value       = []
+}

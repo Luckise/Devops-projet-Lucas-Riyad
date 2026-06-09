@@ -1,0 +1,49 @@
+---
+- name: Install base packages
+  ansible.builtin.package:
+    name: "{{ common_packages }}"
+    state: present
+
+- name: Install Docker
+  ansible.builtin.package:
+    name: "{{ docker_packages }}"
+    state: present
+
+- name: Create application system group
+  ansible.builtin.group:
+    name: "{{ app_group }}"
+    system: true
+
+- name: Ensure Docker is enabled and running
+  ansible.builtin.service:
+    name: docker
+    state: started
+    enabled: true
+
+- name: Create application system user
+  ansible.builtin.user:
+    name: "{{ app_user }}"
+    group: "{{ app_group }}"
+    system: true
+    shell: "{{ app_user_shell }}"
+    create_home: false
+
+- name: Create AWS credentials directory for the application user
+  ansible.builtin.file:
+    path: "{{ aws_credentials_dir }}"
+    state: directory
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+    mode: "0700"
+
+- name: Install AWS credentials for the application user
+  ansible.builtin.template:
+    src: aws-credentials.j2
+    dest: "{{ aws_credentials_file }}"
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+    mode: "0600"
+  when:
+    - aws_credentials_mode == "vault"
+    - aws_access_key_id | length > 0
+    - aws_secret_access_key | length > 0

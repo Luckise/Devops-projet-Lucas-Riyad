@@ -1,0 +1,27 @@
+[Unit]
+Description={{ app_container_name }} container
+After=network-online.target docker.service
+Requires=docker.service
+
+[Service]
+Restart={{ app_restart_policy }}
+Environment=NODE_ENV={{ app_node_env }}
+Environment=PORT={{ app_container_port }}
+ExecStartPre=-{{ docker_bin }} rm -f {{ app_container_name }}
+ExecStart={{ docker_bin }} run --rm \
+  --name {{ app_container_name }} \
+  -p {{ app_container_port }}:{{ app_container_port }} \
+  -e AWS_REGION={{ aws_region }} \
+  -e ASSET_BUCKET_NAME={{ asset_bucket_name }} \
+  -e BACKUP_BUCKET_NAME={{ backup_bucket_name }} \
+  -e DB_HOST={{ db_host }} \
+  -e DB_NAME={{ db_name }} \
+  -e DB_USER={{ db_user }} \
+  -e DB_PASSWORD={{ db_password | default('') }} \
+  -e COGNITO_USER_POOL_ID={{ cognito_user_pool_id }} \
+  -e COGNITO_CLIENT_ID={{ cognito_client_id }} \
+  {{ app_image_repository }}:{{ app_image_tag }}
+ExecStop={{ docker_bin }} stop {{ app_container_name }}
+
+[Install]
+WantedBy=multi-user.target

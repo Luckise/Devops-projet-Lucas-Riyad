@@ -1,0 +1,8 @@
+---
+- name: Configure application instances
+  hosts: app
+  become: true
+  roles:
+    - common
+    - app
+    - backup

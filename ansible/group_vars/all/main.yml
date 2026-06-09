@@ -1,0 +1,58 @@
+---
+# Fill these values before the first deployment.
+
+# Inventory / connection
+ssh_user: ubuntu
+app_user_shell: /usr/sbin/nologin
+
+# Application identity
+app_user: app
+app_group: "{{ app_user }}"
+app_install_dir: "/opt/{{ app_container_name }}"
+app_backup_dir: "{{ app_install_dir }}/backup"
+app_image_tag: latest
+app_container_name: app
+app_container_port: 3000
+app_health_check_path: /health
+app_node_env: production
+app_restart_policy: always
+app_backup_cron_minute: "0"
+app_backup_cron_hour: "2"
+app_backup_cron_user: root
+
+# AWS / ECR
+aws_region: eu-west-3
+aws_profile: ""
+ecr_registry: ""
+app_image_repository: ""
+aws_credentials_mode: role
+aws_credentials_dir: "/home/{{ app_user }}/.aws"
+aws_credentials_file: "{{ aws_credentials_dir }}/credentials"
+aws_cli_bin: /usr/bin/aws
+docker_bin: /usr/bin/docker
+pg_dump_bin: /usr/bin/pg_dump
+common_packages:
+	- curl
+	- unzip
+	- ca-certificates
+	- awscli
+docker_packages:
+	- docker.io
+	- docker-compose-plugin
+aws_access_key_id: ""
+aws_secret_access_key: ""
+aws_session_token: ""
+
+# Application runtime
+asset_bucket_name: ""
+backup_bucket_name: ""
+backup_s3_prefix: "{{ app_container_name }}"
+backup_local_dir: /tmp
+backup_file_prefix: "{{ app_container_name }}"
+backup_file_extension: sql
+db_host: ""
+db_name: app
+db_user: app
+db_password: ""
+cognito_user_pool_id: ""
+cognito_client_id: ""

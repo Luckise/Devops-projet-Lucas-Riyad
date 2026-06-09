@@ -18,3 +18,7 @@ todos.json
 *.tfstate.*
 terraform.tfvars
 terraform.tfvars.json
+
+# Ansible secrets
+ansible/group_vars/all/vault.yml
+*.retry
