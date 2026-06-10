@@ -1,8 +1,9 @@
 import { Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { MapPin, Calendar, Clock, ArrowRight, Users, Search, X, Shield } from "lucide-react";
-import { MOCK_EVENTS, getSavedItems, formatDate, formatTime, sortByDate, isEventPast } from "../lib/mock-data";
+import { getServices } from "../di/container";
 import { getGroup } from "../lib/groups";
+import { formatDate, formatTime, isEventPast } from "../lib/date-utils";
 import SaveButton from "./SaveButton";
 
 export default function EventsFeed() {
@@ -10,10 +11,10 @@ export default function EventsFeed() {
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
-    const all = sortByDate(
-      [...getSavedItems("user_events"), ...MOCK_EVENTS].filter((e) => !e.hidden && !isEventPast(e))
-    );
-    setEvents(all);
+    getServices().eventService.getAll().then((all) => {
+      const upcoming = all.filter((e) => !e.hidden && !isEventPast(e));
+      setEvents(upcoming);
+    });
   }, []);
 
   const filtered = searchQuery

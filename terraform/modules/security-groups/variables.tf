@@ -3,6 +3,11 @@ variable "name_prefix" {
   type        = string
 }
 
+variable "vpc_id" {
+  description = "VPC identifier where the security groups are created."
+  type        = string
+}
+
 variable "vpc_cidr" {
   description = "CIDR block used by the VPC."
   type        = string

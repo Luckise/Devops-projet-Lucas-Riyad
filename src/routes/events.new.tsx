@@ -2,9 +2,8 @@ import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
 import { useState } from "react";
 import { ArrowLeft, X, Plus, ChevronDown } from "lucide-react";
 import ImageUpload from "../components/ImageUpload";
-import { saveItem } from "../lib/mock-data";
+import { getServices } from "../di/container";
 import { toast } from "../lib/toast";
-import { getUserGroups, isUserAdmin } from "../lib/groups";
 import { getCurrentUser, fetchUserAttributes } from "aws-amplify/auth";
 import "../lib/amplify";
 
@@ -13,7 +12,9 @@ export const Route = createFileRoute("/events/new")({
     try {
       const user = await getCurrentUser();
       const attrs = await fetchUserAttributes();
-      if (!isUserAdmin(attrs.email || user.userId)) throw redirect({ to: "/" });
+      const email = attrs.email || user.userId;
+      const isAdmin = await getServices().groupService.isUserAdmin(email || "");
+      if (!isAdmin) throw redirect({ to: "/" });
     } catch (err) {
       if (err instanceof redirect) throw err;
       throw redirect({ to: "/login" });
@@ -24,38 +25,39 @@ export const Route = createFileRoute("/events/new")({
 
 function EventCreate() {
   const navigate = useNavigate();
-  const stored = typeof window !== "undefined" ? localStorage.getItem("eat_user_profile") : null;
-  const profile = stored ? JSON.parse(stored) : null;
-  const email = profile?.email || "";
-  const userGroups = email ? getUserGroups(email) : [];
-
   const [title, setTitle] = useState("");
   const [image, setImage] = useState("");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [location, setLocation] = useState("");
   const [price, setPrice] = useState("");
-  const [helloAssoLink, setHelloAssoLink] = useState("");
   const [maxParticipants, setMaxParticipants] = useState("");
   const [description, setDescription] = useState("");
   const [tags, setTags] = useState<string[]>([""]);
   const [selectedGroup, setSelectedGroup] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [userGroups, setUserGroups] = useState<any[]>([]);
+
+  useState(() => {
+    const stored = localStorage.getItem("eat_user_profile");
+    if (stored) {
+      const profile = JSON.parse(stored);
+      getServices().groupService.getUserGroups(profile.email || "").then(setUserGroups);
+    }
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title || !date || !time || !location || !selectedGroup) return;
     setSubmitting(true);
 
-    const event = {
-      id: Date.now().toString(),
+    await getServices().eventService.create({
       title,
       image,
       date,
       time,
       location,
       price: price ? parseFloat(price) : 0,
-      helloAssoLink: helloAssoLink || undefined,
       description,
       tags: tags.filter(Boolean),
       maxParticipants: maxParticipants ? parseInt(maxParticipants, 10) : 0,
@@ -64,9 +66,8 @@ function EventCreate() {
       isPast: false,
       hidden: false,
       attendees: [],
-    };
+    });
 
-    saveItem("user_events", event);
     setSubmitting(false);
     toast("Event created successfully");
     navigate({ to: "/events" });
@@ -172,30 +173,17 @@ function EventCreate() {
             </div>
             <div>
               <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2.5 block">
-                HelloAsso Link
+                Max Participants
               </label>
               <input
-                type="url"
-                value={helloAssoLink}
-                onChange={(e) => setHelloAssoLink(e.target.value)}
-                placeholder="https://www.helloasso.com/..."
+                type="number"
+                value={maxParticipants}
+                onChange={(e) => setMaxParticipants(e.target.value)}
+                placeholder="e.g. 500"
+                min="1"
                 className="w-full px-4 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-[var(--ember)]/30 transition-shadow"
               />
             </div>
-          </div>
-
-          <div>
-            <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2.5 block">
-              Max Participants
-            </label>
-            <input
-              type="number"
-              value={maxParticipants}
-              onChange={(e) => setMaxParticipants(e.target.value)}
-              placeholder="e.g. 500"
-              min="1"
-              className="w-full px-4 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-[var(--ember)]/30 transition-shadow"
-            />
           </div>
 
           <div>
@@ -209,7 +197,7 @@ function EventCreate() {
                 className="w-full px-4 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--ember)]/30 transition-shadow appearance-none"
               >
                 <option value="">Select a group</option>
-                {userGroups.map((g) => (
+                {userGroups.map((g: any) => (
                   <option key={g.id} value={g.id}>{g.name}</option>
                 ))}
               </select>

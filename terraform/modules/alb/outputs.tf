@@ -1,9 +1,21 @@
-output "name" {
-  value = var.name
+output "dns_name" {
+  value = aws_lb.this.dns_name
 }
 
-output "subnet_cidrs" {
-  value = var.subnet_cidrs
+output "zone_id" {
+  value = aws_lb.this.zone_id
+}
+
+output "target_group_arn" {
+  value = aws_lb_target_group.this.arn
+}
+
+output "name" {
+  value = aws_lb.this.name
+}
+
+output "subnet_ids" {
+  value = var.public_subnet_ids
 }
 
 output "target_port" {

@@ -73,13 +73,13 @@ variable "app_health_check_path" {
 variable "ec2_instance_count" {
   description = "Number of application instances to plan for."
   type        = number
-  default     = 2
+  default     = 1
 }
 
 variable "ec2_instance_type" {
   description = "EC2 instance type reserved for the application tier."
   type        = string
-  default     = "t3.medium"
+  default     = "t3.micro"
 }
 
 variable "ec2_ami_id" {
@@ -151,7 +151,7 @@ variable "rds_engine" {
 variable "rds_engine_version" {
   description = "Database engine version reserved for the PostgreSQL instance."
   type        = string
-  default     = "16.3"
+  default     = "16.14"
 }
 
 variable "rds_instance_class" {
@@ -169,7 +169,13 @@ variable "rds_allocated_storage" {
 variable "rds_backup_retention_days" {
   description = "Backup retention in days reserved for the database."
   type        = number
-  default     = 7
+  default     = 1
+}
+
+variable "ecr_repository_name" {
+  description = "Name reserved for the ECR repository."
+  type        = string
+  default     = ""
 }
 
 variable "security_group_name_prefix" {

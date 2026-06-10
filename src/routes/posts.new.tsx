@@ -1,10 +1,11 @@
 import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ArrowLeft, Plus, X, Calendar, MapPin, Check } from "lucide-react";
 import ImageUpload from "../components/ImageUpload";
-import { MOCK_EVENTS, saveItem, getSavedItems } from "../lib/mock-data";
+import { getServices } from "../di/container";
 import { toast } from "../lib/toast";
 import { getCurrentUser } from "aws-amplify/auth";
+import type { Event } from "../types/models";
 
 export const Route = createFileRoute("/posts/new")({
   beforeLoad: async () => {
@@ -24,8 +25,11 @@ function PostCreate() {
   const [content, setContent] = useState<ContentBlock[]>([{ type: "text", value: "" }]);
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [allEvents, setAllEvents] = useState<Event[]>([]);
 
-  const allEvents = [...MOCK_EVENTS, ...getSavedItems("user_events")];
+  useEffect(() => {
+    getServices().eventService.getAll().then(setAllEvents);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,14 +40,13 @@ function PostCreate() {
 
     const profile = JSON.parse(localStorage.getItem("eat_user_profile") || "{}");
     const post = {
-      id: Date.now().toString(),
       content: filledContent,
-      eventId: selectedEventId || undefined,
+      eventId: selectedEventId,
       createdAt: new Date().toISOString().split("T")[0],
       authorEmail: profile.email || "",
     };
 
-    saveItem("user_posts", post);
+    await getServices().postService.create(post as any);
     setSubmitting(false);
     toast("Post published successfully");
     navigate({ to: "/feed" });
@@ -135,7 +138,6 @@ function PostCreate() {
               Link to Event
             </label>
             <div className="max-h-[280px] overflow-y-auto space-y-2 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 p-2 border border-zinc-200 dark:border-zinc-800">
-  
               {allEvents.map((event) => (
                 <button
                   key={event.id}

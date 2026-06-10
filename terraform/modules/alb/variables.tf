@@ -3,13 +3,28 @@ variable "name" {
   type        = string
 }
 
-variable "subnet_cidrs" {
+variable "name_prefix" {
+  description = "Prefix used to derive ALB resource names."
+  type        = string
+}
+
+variable "vpc_id" {
+  description = "VPC identifier where the load balancer is deployed."
+  type        = string
+}
+
+variable "public_subnet_ids" {
   description = "Subnets reserved for the public entry layer."
   type        = list(string)
 }
 
-variable "security_group_names" {
+variable "security_group_ids" {
   description = "Security groups planned for the load balancer."
+  type        = list(string)
+}
+
+variable "target_instance_ids" {
+  description = "EC2 instance identifiers used by the target group."
   type        = list(string)
 }
 

@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
 import { useState } from "react";
 import { ArrowLeft, Plus, X } from "lucide-react";
 import ImageUpload from "../components/ImageUpload";
-import { getSavedItems, updateItem } from "../lib/mock-data";
+import { getServices } from "../di/container";
 import { toast } from "../lib/toast";
 import { getCurrentUser } from "aws-amplify/auth";
 
@@ -17,9 +17,8 @@ export const Route = createFileRoute("/posts/$postId/modify")({
     }
   },
   component: PostEditRoute,
-  loader: ({ params }) => {
-    const userPosts = getSavedItems<any[]>("user_posts");
-    const post = userPosts.find((p: any) => p.id === params.postId);
+  loader: async ({ params }) => {
+    const post = await getServices().postService.getById(params.postId);
     if (!post) throw new Error("Post not found");
     return { post };
   },
@@ -30,17 +29,17 @@ function PostEditRoute() {
   const navigate = useNavigate();
 
   const initialContent = post.content?.length ? post.content : [{ type: "text", value: "" }];
-  const [content, setContent] = useState<ContentBlock[]>(initialContent);
+  const [content, setContent] = useState<ContentBlock[]>(initialContent as ContentBlock[]);
   const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const filledContent = content.filter((b: ContentBlock) => b.value.trim());
-    const hasText = filledContent.some((b: ContentBlock) => b.type === "text");
+    const filledContent = content.filter((b) => b.value.trim());
+    const hasText = filledContent.some((b) => b.type === "text");
     if (!hasText) return;
     setSubmitting(true);
 
-    updateItem("user_posts", post.id, { content: filledContent } as any);
+    await getServices().postService.update(post.id, { content: filledContent } as any);
     setSubmitting(false);
     toast("Post updated");
     navigate({ to: "/feed" });

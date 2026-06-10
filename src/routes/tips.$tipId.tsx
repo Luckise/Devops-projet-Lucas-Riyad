@@ -1,11 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { findTip } from "../lib/mock-data";
+import { getServices } from "../di/container";
 import { ArrowLeft, Clock, ChefHat, MapPin } from "lucide-react";
 
 export const Route = createFileRoute("/tips/$tipId")({
   component: TipDetailsRoute,
-  loader: ({ params }) => {
-    const tip = findTip(params.tipId);
+  loader: async ({ params }) => {
+    const tip = await getServices().tipService.getById(params.tipId);
     if (!tip) throw new Error("Tip not found");
     return { tip };
   },
@@ -16,7 +16,6 @@ function TipDetailsRoute() {
 
   return (
     <main className="min-h-screen pb-24 bg-white dark:bg-zinc-950">
-      {/* Immersive Hero Image */}
       <div className="relative h-[55vh] w-full bg-zinc-900">
         <img
           src={tip.image}
@@ -26,7 +25,6 @@ function TipDetailsRoute() {
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60" />
         <div className="absolute inset-0 bg-gradient-to-t from-white dark:from-zinc-950 via-transparent to-transparent h-full w-full" />
 
-        {/* Top Nav (Back Button) */}
         <div className="absolute top-0 left-0 w-full p-4 pt-[4.5rem] flex justify-between items-center z-10">
           <button
             type="button"
@@ -39,7 +37,6 @@ function TipDetailsRoute() {
       </div>
 
       <div className="max-w-xl mx-auto px-5 -mt-10 relative z-10">
-        {/* Category Badge */}
         <div className="flex flex-wrap gap-2 mb-4">
           <span className="px-3 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-900 text-[11px] font-bold tracking-wide uppercase text-[var(--ember)] border border-[var(--ember)]/20">
             {tip.category}
@@ -50,7 +47,6 @@ function TipDetailsRoute() {
           {tip.title}
         </h1>
 
-        {/* Main Information — Recipes */}
         {tip.category === "Recipes" && (
           <div className="mb-8 space-y-4">
             <div className="grid grid-cols-2 gap-4">
@@ -90,7 +86,6 @@ function TipDetailsRoute() {
           </div>
         )}
 
-        {/* Main Information — Addresses */}
         {tip.category === "Addresses" && tip.address && (
           <div className="mb-8">
             <div className="flex items-start gap-3 p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50">
@@ -107,7 +102,6 @@ function TipDetailsRoute() {
           </div>
         )}
 
-        {/* Content (Text & Pictures Interleaved) */}
         <div className="mb-12 space-y-6">
           {tip.content?.map((block, idx) => {
             if (block.type === "text") {

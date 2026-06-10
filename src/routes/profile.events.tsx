@@ -1,8 +1,8 @@
 import { createFileRoute, Link, Outlet, redirect, useRouterState } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { ChevronLeft, Calendar, EyeOff } from "lucide-react";
-import { getAllEvents, formatDate, formatTime, sortByDate } from "../lib/mock-data";
-import { getUserGroups, isUserAdmin } from "../lib/groups";
+import { getServices } from "../di/container";
+import { formatDate, formatTime } from "../lib/date-utils";
 import { getCurrentUser, fetchUserAttributes } from "aws-amplify/auth";
 
 export const Route = createFileRoute("/profile/events")({
@@ -10,7 +10,9 @@ export const Route = createFileRoute("/profile/events")({
     try {
       const user = await getCurrentUser();
       const attrs = await fetchUserAttributes();
-      if (!isUserAdmin(attrs.email || user.userId)) throw redirect({ to: "/profile" });
+      const email = attrs.email || user.userId;
+      const isAdmin = await getServices().groupService.isUserAdmin(email || "");
+      if (!isAdmin) throw redirect({ to: "/profile" });
     } catch (err) {
       if (err instanceof redirect) throw err;
       throw redirect({ to: "/login" });
@@ -24,18 +26,21 @@ function ProfileEventsRoute() {
   const hasChild = matches.some(
     (m) => m.routeId !== "__root__" && m.routeId !== "/profile/events"
   );
-  const stored = typeof window !== "undefined" ? localStorage.getItem("eat_user_profile") : null;
-  const profile = stored ? JSON.parse(stored) : null;
-  const email = profile?.email || "";
-  const userGroupIds = getUserGroups(email).map((g) => g.id);
-
   const [events, setEvents] = useState<any[]>([]);
 
   useEffect(() => {
     if (hasChild) return;
-    const all = getAllEvents();
-    const filtered = sortByDate(all.filter((e) => e.groupId && userGroupIds.includes(e.groupId)));
-    setEvents(filtered);
+    const stored = localStorage.getItem("eat_user_profile");
+    if (!stored) return;
+    const profile = JSON.parse(stored);
+    const email = profile?.email || "";
+    getServices().groupService.getUserGroups(email).then((groups) => {
+      const userGroupIds = groups.map((g) => g.id);
+      getServices().eventService.getAll().then((all) => {
+        const filtered = all.filter((e) => e.groupId && userGroupIds.includes(e.groupId));
+        setEvents(filtered);
+      });
+    });
   }, [hasChild]);
 
   if (hasChild) return <Outlet />;

@@ -35,7 +35,46 @@ output "authentication" {
   }
 }
 
+output "ecr" {
+  description = "Planned ECR repository details."
+  value = {
+    repository_name = module.ecr.repository_name
+    repository_url  = module.ecr.repository_url
+  }
+}
+
 output "ec2_app_ips" {
   description = "Planned application instance IP addresses."
-  value       = []
+  value       = module.ec2.public_ips
+}
+
+output "alb_dns_name" {
+  description = "Load balancer DNS name."
+  value       = module.alb.dns_name
+}
+
+output "rds_endpoint" {
+  description = "Database endpoint."
+  value       = module.rds.endpoint
+}
+
+output "rds_username" {
+  description = "Database master username."
+  value       = module.rds.username
+}
+
+output "rds_password" {
+  description = "Database master password."
+  value       = module.rds.password
+  sensitive   = true
+}
+
+output "cognito_user_pool_id" {
+  description = "Cognito user pool ID."
+  value       = module.cognito.user_pool_id
+}
+
+output "cognito_app_client_id" {
+  description = "Cognito app client ID."
+  value       = module.cognito.app_client_id
 }

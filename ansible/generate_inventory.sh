@@ -9,7 +9,11 @@ inventory_dir="$script_dir/inventory"
 output_json="$(terraform -chdir="$terraform_dir" output -json ec2_app_ips 2>/dev/null || printf '{}')"
 hosts="$(OUTPUT_JSON="$output_json" python3 -c 'import json, os
 payload = json.loads(os.environ["OUTPUT_JSON"])
-for host in payload.get("value", []) or []:
+if isinstance(payload, dict):
+  hosts = payload.get("value", []) or []
+else:
+  hosts = payload or []
+for host in hosts:
   print(host)
 ')"
 ssh_user="${ANSIBLE_SSH_USER:-ubuntu}"

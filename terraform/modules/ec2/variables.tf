@@ -6,19 +6,21 @@ variable "name_prefix" {
 variable "instance_count" {
   description = "Number of application instances planned."
   type        = number
+  default     = 1
 }
 
 variable "instance_type" {
   description = "Instance type planned for the application tier."
   type        = string
+  default     = "t3.micro"
 }
 
-variable "subnet_cidrs" {
+variable "subnet_ids" {
   description = "Subnets reserved for the application tier."
   type        = list(string)
 }
 
-variable "security_group_names" {
+variable "security_group_ids" {
   description = "Security groups planned for the application tier."
   type        = list(string)
 }
@@ -45,6 +47,12 @@ variable "user_data" {
   description = "User data planned for the application instances."
   type        = string
   default     = ""
+}
+
+variable "s3_bucket_arns" {
+  description = "S3 bucket ARNs available to the application instances."
+  type        = list(string)
+  default     = []
 }
 
 variable "tags" {

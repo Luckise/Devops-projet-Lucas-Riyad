@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
 import { useState } from "react";
 import { ArrowLeft, X, Plus, Trash2, EyeOff } from "lucide-react";
 import ImageUpload from "../components/ImageUpload";
-import { findTip, hideTip, unhideTip, updateItem } from "../lib/mock-data";
+import { getServices } from "../di/container";
 import { toast } from "../lib/toast";
 import { getCurrentUser } from "aws-amplify/auth";
 
@@ -17,8 +17,8 @@ export const Route = createFileRoute("/profile/tips/$tipId/modify")({
     }
   },
   component: ProfileTipEditRoute,
-  loader: ({ params }) => {
-    const tip = findTip(params.tipId);
+  loader: async ({ params }) => {
+    const tip = await getServices().tipService.getById(params.tipId);
     if (!tip) throw new Error("Tip not found");
     return { tip };
   },
@@ -65,7 +65,7 @@ function ProfileTipEditRoute() {
       updates.address = address;
     }
 
-    updateItem("user_tips", tip.id, updates as any);
+    await getServices().tipService.update(tip.id, updates as any);
     setSubmitting(false);
     toast("Tip updated");
     navigate({ to: "/profile/tips" });
@@ -73,15 +73,15 @@ function ProfileTipEditRoute() {
 
   const handleHide = () => setShowDeleteConfirm(true);
 
-  const confirmHide = () => {
-    hideTip(tip.id);
+  const confirmHide = async () => {
+    await getServices().tipService.hide(tip.id);
     setShowDeleteConfirm(false);
     toast("Tip hidden from feed");
     navigate({ to: "/profile/tips" });
   };
 
-  const handleUnhide = () => {
-    unhideTip(tip.id);
+  const handleUnhide = async () => {
+    await getServices().tipService.unhide(tip.id);
     toast("Tip is now visible");
     navigate({ to: "/profile/tips" });
   };
