@@ -6,8 +6,8 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 terraform_dir="$script_dir/../terraform"
 inventory_dir="$script_dir/inventory"
 
-output_json="$(terraform -chdir="$terraform_dir" output -json ec2_app_ips 2>/dev/null || printf '{}')"
-hosts="$(OUTPUT_JSON="$output_json" python3 -c 'import json, os
+ec2_json="$(terraform -chdir="$terraform_dir" output -json ec2_app_ips 2>/dev/null || printf '{}')"
+hosts="$(OUTPUT_JSON="$ec2_json" python3 -c 'import json, os
 payload = json.loads(os.environ["OUTPUT_JSON"])
 if isinstance(payload, dict):
   hosts = payload.get("value", []) or []
@@ -16,6 +16,23 @@ else:
 for host in hosts:
   print(host)
 ')"
+
+ecr_json="$(terraform -chdir="$terraform_dir" output -json ecr 2>/dev/null || printf '{}')"
+ecr_registry="$(OUTPUT_JSON="$ecr_json" python3 -c 'import json, os
+payload = json.loads(os.environ["OUTPUT_JSON"])
+if isinstance(payload, dict):
+  value = payload.get("value", {}) or {}
+  url = value.get("repository_url", "")
+  if url:
+    print(url.split("/")[0])
+' 2>/dev/null || true)"
+ecr_repo_name="$(OUTPUT_JSON="$ecr_json" python3 -c 'import json, os
+payload = json.loads(os.environ["OUTPUT_JSON"])
+if isinstance(payload, dict):
+  value = payload.get("value", {}) or {}
+  print(value.get("repository_name", ""))
+' 2>/dev/null || true)"
+
 ssh_user="${ANSIBLE_SSH_USER:-ubuntu}"
 
 mkdir -p "$inventory_dir"
@@ -35,3 +52,14 @@ mkdir -p "$inventory_dir"
     echo "      hosts: {}"
   fi
 } > "$inventory_dir/hosts.yml"
+
+if [ -n "$ecr_registry" ] && [ -n "$ecr_repo_name" ]; then
+  vars_dir="$script_dir/group_vars/all"
+  mkdir -p "$vars_dir"
+  cat > "$vars_dir/ecr.yml" <<VARS
+---
+ecr_registry: "$ecr_registry"
+ecr_repository_name: "$ecr_repo_name"
+VARS
+  echo "Generated ECR vars: $vars_dir/ecr.yml"
+fi

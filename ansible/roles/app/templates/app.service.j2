@@ -12,12 +12,10 @@ ExecStart={{ docker_bin }} run --rm \
   --name {{ app_container_name }} \
   -p {{ app_container_port }}:{{ app_container_port }} \
   -e AWS_REGION={{ aws_region }} \
+  -e AWS_DEFAULT_REGION={{ aws_region }} \
   -e ASSET_BUCKET_NAME={{ asset_bucket_name }} \
   -e BACKUP_BUCKET_NAME={{ backup_bucket_name }} \
-  -e DB_HOST={{ db_host }} \
-  -e DB_NAME={{ db_name }} \
-  -e DB_USER={{ db_user }} \
-  -e DB_PASSWORD={{ db_password | default('') }} \
+  -e DATABASE_URL="postgresql://{{ db_user }}:{{ db_password }}@{{ db_host }}:5432/{{ db_name }}" \
   -e COGNITO_USER_POOL_ID={{ cognito_user_pool_id }} \
   -e COGNITO_CLIENT_ID={{ cognito_client_id }} \
   {{ app_image_repository }}:{{ app_image_tag }}
