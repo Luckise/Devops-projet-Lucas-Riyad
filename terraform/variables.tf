@@ -73,7 +73,7 @@ variable "app_health_check_path" {
 variable "ec2_instance_count" {
   description = "Number of application instances to plan for."
   type        = number
-  default     = 1
+  default     = 2
 }
 
 variable "ec2_instance_type" {
@@ -91,7 +91,7 @@ variable "ec2_ami_id" {
 variable "ec2_key_pair_name" {
   description = "Key pair name used for SSH access to the instances."
   type        = string
-  default     = ""
+  default     = "devops-key"
 }
 
 variable "alb_name" {

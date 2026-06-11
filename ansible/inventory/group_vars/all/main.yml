@@ -10,7 +10,7 @@ app_user: app
 app_group: "{{ app_user }}"
 app_install_dir: "/opt/{{ app_container_name }}"
 app_backup_dir: "{{ app_install_dir }}/backup"
-app_image_tag: latest
+app_image_tag: efrei-a-table-latest
 app_container_name: app
 app_container_port: 3000
 app_health_check_path: /health
@@ -29,17 +29,16 @@ app_image_repository: "{{ ecr_registry }}/{{ ecr_repository_name }}"
 aws_credentials_mode: role
 aws_credentials_dir: "/home/{{ app_user }}/.aws"
 aws_credentials_file: "{{ aws_credentials_dir }}/credentials"
-aws_cli_bin: /usr/bin/aws
+aws_cli_bin: /usr/local/bin/aws
 docker_bin: /usr/bin/docker
 pg_dump_bin: /usr/bin/pg_dump
 common_packages:
-	- curl
-	- unzip
-	- ca-certificates
-	- awscli
+  - curl
+  - unzip
+  - ca-certificates
 docker_packages:
-	- docker.io
-	- docker-compose-plugin
+  - docker.io
+  - docker-compose
 aws_access_key_id: ""
 aws_secret_access_key: ""
 aws_session_token: ""

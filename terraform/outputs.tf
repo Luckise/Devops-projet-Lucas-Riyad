@@ -48,6 +48,11 @@ output "ec2_app_ips" {
   value       = module.ec2.public_ips
 }
 
+output "ec2_instance_ids" {
+  description = "Application instance IDs (for SSM-based Ansible connections)."
+  value       = module.ec2.instance_ids
+}
+
 output "alb_dns_name" {
   description = "Load balancer DNS name."
   value       = module.alb.dns_name
