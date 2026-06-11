@@ -1,0 +1,29 @@
+---
+# tests/tasks/test_aws_cli.yml
+
+- name: Test AWS CLI installation
+  ansible.builtin.import_role:
+    name: common
+  vars:
+    # Skip AWS CLI in test scenarios to speed up tests
+    aws_credentials_mode: "skip"
+    aws_access_key_id: "test-key"
+    aws_secret_access_key: "test-secret"
+    aws_session_token: ""
+  check_mode: false
+  tags: ['aws-cli-installation']
+  when: ansible_os_family == 'Debian'
+
+- name: Verify AWS CLI is installed
+  ansible.builtin.command: "aws --version"
+  register: aws_version_check
+  failed_when: aws_version_check.rc != 0
+  changed_when: false
+  tags: ['verify-aws']
+
+- name: Verify AWS CLI command help
+  ansible.builtin.command: "aws sts get-caller-identity"
+  register: aws_sts_check
+  failed_when: aws_sts_check.rc != 0
+  changed_when: false
+  tags: ['verify-aws']

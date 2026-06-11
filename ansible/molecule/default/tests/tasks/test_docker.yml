@@ -1,0 +1,37 @@
+---
+# tests/tasks/test_docker.yml
+
+- name: Test Docker installation
+  ansible.builtin.import_role:
+    name: common
+  vars:
+    docker_packages:
+      - docker.io
+      - docker-compose
+  check_mode: false
+  tags: ['docker-installation']
+  when: ansible_os_family == 'Debian'
+
+- name: Verify Docker is installed
+  ansible.builtin.command: "docker --version"
+  register: docker_version_check
+  failed_when: docker_version_check.rc != 0
+  changed_when: false
+  tags: ['verify-docker']
+
+- name: Verify docker-compose is installed
+  ansible.builtin.command: "docker compose version"
+  register: docker_compose_check
+  failed_when: docker_compose_check.rc != 0
+  changed_when: false
+  tags: ['verify-docker']
+
+- name: Test Docker service status
+  ansible.builtin.systemd:
+    name: docker
+    state: started
+    enabled: true
+  register: docker_service
+  failed_when: docker_service.failed
+  changed_when: false
+  tags: ['verify-services']

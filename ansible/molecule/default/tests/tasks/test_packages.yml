@@ -1,0 +1,35 @@
+---
+# tests/tasks/test_packages.yml
+
+- name: Test package installation
+  ansible.builtin.import_role:
+    name: common
+  vars:
+    common_packages:
+      - curl
+      - unzip
+      - ca-certificates
+  check_mode: false
+  tags: ['package-installation']
+  when: ansible_os_family in ['Debian', 'RedHat']
+
+- name: Verify packages are installed
+  ansible.builtin.command: "command -v curl"
+  register: curl_check
+  failed_when: curl_check.rc != 0
+  changed_when: false
+  tags: ['verify-packages']
+
+- name: Verify unzip is installed
+  ansible.builtin.command: "command -v unzip"
+  register: unzip_check
+  failed_when: unzip_check.rc != 0
+  changed_when: false
+  tags: ['verify-packages']
+
+- name: Verify ca-certificates is installed
+  ansible.builtin.command: "command -v ca-certificates"
+  register: ca_check
+  failed_when: ca_check.rc != 0
+  changed_when: false
+  tags: ['verify-packages']

@@ -1,0 +1,27 @@
+---
+# tests/tasks/test_groups.yml
+
+- name: Test group creation
+  ansible.builtin.import_role:
+    name: common
+  vars:
+    app_user: "testuser"
+    app_group: "testgroup"
+  check_mode: false
+  tags: ['group-creation']
+
+- name: Verify testgroup exists and is system group
+  ansible.builtin.getent:
+    name: group
+    login: testgroup
+  register: group_check
+  failed_when: group_check.failed
+  changed_when: false
+  tags: ['verify-groups']
+
+- name: Verify testgroup is a system group
+  ansible.builtin.command: "getent group testgroup | grep '^[^:]*:*-1:"
+  register: system_group_check
+  failed_when: system_group_check.rc != 0
+  changed_when: false
+  tags: ['verify-system-group']

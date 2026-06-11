@@ -22,3 +22,6 @@ terraform.tfvars.json
 # Ansible secrets
 ansible/group_vars/all/vault.yml
 *.retry
+
+# Terraform private key
+terraform/devops-key.pem
