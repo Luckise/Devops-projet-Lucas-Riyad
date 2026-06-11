@@ -1,0 +1,28 @@
+---
+# tests/test_common.yml
+
+scenario_name: common
+
+test_groups:
+  - name: test_packages
+    tests:
+      - path: tasks/test_packages.yml
+        name: "Test package installation"
+      - path: tasks/test_docker.yml
+        name: "Test Docker installation"
+      - path: tasks/test_aws_cli.yml
+        name: "Test AWS CLI installation"
+
+  - name: test_users_and_groups
+    tests:
+      - path: tasks/test_users.yml
+        name: "Test user creation"
+      - path: tasks/test_groups.yml
+        name: "Test group creation"
+      - path: tasks/test_services.yml
+        name: "Test service management"
+
+  - name: test_credentials
+    tests:
+      - path: tasks/test_credentials.yml
+        name: "Test AWS credentials setup"

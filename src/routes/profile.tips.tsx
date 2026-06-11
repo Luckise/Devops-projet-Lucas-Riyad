@@ -1,7 +1,7 @@
 import { createFileRoute, Link, Outlet, redirect, useRouterState } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { ChevronLeft, Lightbulb, EyeOff } from "lucide-react";
-import { getSavedItems } from "../lib/mock-data";
+import { getServices } from "../di/container";
 import { getCurrentUser } from "aws-amplify/auth";
 
 export const Route = createFileRoute("/profile/tips")({
@@ -28,9 +28,10 @@ function ProfileTipsRoute() {
 
   useEffect(() => {
     if (hasChild) return;
-    const all: any[] = getSavedItems("user_tips");
-    const mine = all.filter((t) => t.authorEmail === email);
-    setTips(mine);
+    getServices().tipService.getAll().then((all) => {
+      const mine = all.filter((t) => t.authorEmail === email);
+      setTips(mine);
+    });
   }, [hasChild, email]);
 
   if (hasChild) return <Outlet />;

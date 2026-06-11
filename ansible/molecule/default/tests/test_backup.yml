@@ -1,0 +1,14 @@
+---
+# tests/test_backup.yml
+
+scenario_name: backup
+
+test_groups:
+  - name: test_backup_setup
+    tests:
+      - path: tasks/test_backup_directory.yml
+        name: "Test backup directory creation"
+      - path: tasks/test_backup_script.yml
+        name: "Test backup script setup"
+      - path: tasks/test_backup_cron.yml
+        name: "Test backup cron job"

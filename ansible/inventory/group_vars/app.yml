@@ -1,0 +1,4 @@
+---
+app_restart_policy: always
+app_environment:
+  NODE_ENV: production

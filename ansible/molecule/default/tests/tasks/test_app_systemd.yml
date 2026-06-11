@@ -1,0 +1,21 @@
+---
+# tests/tasks/test_app_systemd.yml
+
+- name: Test application systemd unit
+  ansible.builtin.import_role:
+    name: app
+  vars:
+    app_container_name: "test-app"
+    app_image_repository: "test/app:latest"
+    app_container_port: 3000
+    app_health_check_path: "/health"
+    app_user: "testuser"
+  check_mode: false
+  tags: ['app-systemd']
+
+- name: Verify systemd unit file template exists
+  ansible.builtin.stat:
+    path: "/etc/systemd/system/test-app.service"
+  register: systemd_unit
+  changed_when: false
+  tags: ['verify-systemd-unit']

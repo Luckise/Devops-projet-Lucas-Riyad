@@ -1,0 +1,23 @@
+---
+scenario_name: molecule
+instance_names:
+  - alpine3
+  - centos7
+  - ubuntu2004
+test_driver:
+  name: docker
+test_cases:
+  - name: tests/
+    tag: all
+    test_suite: 'tests/'
+scenarios:
+  name: "{{ scenario_name }}"
+  create_command: "docker compose create"
+  destroy_command: "docker compose down"
+  test_command: "docker compose run test"
+  parallel: true
+verifier:
+  name: bash
+  suite: tests/
+  type: bash
+  dir: molecule/default

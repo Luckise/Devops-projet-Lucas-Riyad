@@ -1,0 +1,17 @@
+---
+# tests/test_app.yml
+
+scenario_name: app
+
+test_groups:
+  - name: test_application
+    tests:
+      - path: tasks/test_app_directory.yml
+        name: "Test application directory creation"
+      - path: tasks/test_app_image.yml
+        name: "Test application image operations"
+
+  - name: test_app_service
+    tests:
+      - path: tasks/test_app_systemd.yml
+        name: "Test application systemd unit"

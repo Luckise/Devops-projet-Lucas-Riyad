@@ -1,17 +1,25 @@
-import { useState } from "react";
-import { isEventSaved, toggleSavedEvent } from "../lib/mock-data";
+import { useState, useEffect } from "react";
+import { getServices } from "../di/container";
 import { toast } from "../lib/toast";
 
 export default function SaveButton({ eventId, compact }: { eventId: string; compact?: boolean }) {
-  const [saved, setSaved] = useState(() => isEventSaved(eventId));
+  const [saved, setSaved] = useState(false);
+  const [ready, setReady] = useState(false);
 
-  const handleClick = (e: React.MouseEvent) => {
+  useEffect(() => {
+    getServices().eventService.isSaved(eventId).then(setSaved);
+    setReady(true);
+  }, [eventId]);
+
+  const handleClick = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    const next = toggleSavedEvent(eventId);
+    const next = await getServices().eventService.toggleSaved(eventId);
     setSaved(next);
     toast(next ? "Added to watchlist" : "Removed from watchlist");
   };
+
+  if (!ready) return null;
 
   if (compact) {
     return (

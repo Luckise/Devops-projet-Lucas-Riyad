@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
 import { useState } from "react";
 import { ArrowLeft, Plus, X } from "lucide-react";
 import ImageUpload from "../components/ImageUpload";
-import { saveItem } from "../lib/mock-data";
+import { getServices } from "../di/container";
 import { toast } from "../lib/toast";
 import { getCurrentUser } from "aws-amplify/auth";
 
@@ -40,7 +40,6 @@ function TipCreate() {
     const profile = JSON.parse(localStorage.getItem("eat_user_profile") || "{}");
 
     const tip: Record<string, unknown> = {
-      id: Date.now().toString(),
       title,
       category,
       image,
@@ -57,7 +56,7 @@ function TipCreate() {
       tip.address = address;
     }
 
-    saveItem("user_tips", tip);
+    await getServices().tipService.create(tip as any);
     setSubmitting(false);
     toast("Tip created successfully");
     navigate({ to: "/tips" });

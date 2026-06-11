@@ -1,9 +1,10 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { MapPin, Calendar, Clock, Ticket, X } from "lucide-react";
-import { MOCK_EVENTS, getSavedItems } from "../lib/mock-data";
 import { useState, useEffect } from "react";
 import QRCode from "qrcode";
 import { getCurrentUser } from "aws-amplify/auth";
+import { getServices } from "../di/container";
+import type { Ticket as TicketModel } from "../types/models";
 
 export const Route = createFileRoute("/tickets")({
   beforeLoad: async () => {
@@ -16,32 +17,51 @@ export const Route = createFileRoute("/tickets")({
   component: TicketsRoute,
 });
 
+const MOCK_TICKETS: TicketModel[] = [
+  {
+    id: "TICK-8X9P2",
+    eventId: "1",
+    qrDataUrl: "",
+    type: "General Admission",
+    purchaseDate: "Oct 24, 2023",
+    event: {
+      title: "Neon Nights: Underground Techno",
+      date: "2025-10-28",
+      time: "23:00",
+      location: "Warehouse 42, District 9",
+      image: "https://images.unsplash.com/photo-1574169208507-84376144848b?q=80&w=800&auto=format&fit=crop",
+    },
+  },
+  {
+    id: "TICK-4J7K1",
+    eventId: "3",
+    qrDataUrl: "",
+    type: "Free Entry",
+    purchaseDate: "Oct 25, 2023",
+    event: {
+      title: "Wine & Cheese Night",
+      date: "2025-10-30",
+      time: "19:00",
+      location: "La Cave des Artistes",
+      image: "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?q=80&w=800&auto=format&fit=crop",
+    },
+  },
+];
+
 function TicketsRoute() {
   const [expandedQr, setExpandedQr] = useState<string | null>(null);
   const [mockQrUrls, setMockQrUrls] = useState<Record<string, string>>({});
+  const [dynamicTickets, setDynamicTickets] = useState<TicketModel[]>([]);
 
-  const mockTickets = [
-    {
-      id: "TICK-8X9P2",
-      event: MOCK_EVENTS[0],
-      type: "General Admission",
-      purchaseDate: "Oct 24, 2023",
-    },
-    {
-      id: "TICK-4J7K1",
-      event: MOCK_EVENTS[2],
-      type: "Free Entry",
-      purchaseDate: "Oct 25, 2023",
-    }
-  ];
+  useEffect(() => {
+    getServices().ticketService.getAll().then(setDynamicTickets);
+  }, []);
 
-  const dynamicTickets: any[] = getSavedItems("purchased_tickets");
-
-  const allTickets = [...dynamicTickets, ...mockTickets];
+  const allTickets = [...dynamicTickets, ...MOCK_TICKETS];
 
   useEffect(() => {
     Promise.all(
-      mockTickets.map(async (t) => {
+      MOCK_TICKETS.map(async (t) => {
         try {
           const url = await QRCode.toDataURL(t.id, { width: 400, margin: 2 });
           return [t.id, url] as const;
@@ -53,11 +73,9 @@ function TicketsRoute() {
       const entries = results.filter(Boolean) as [string, string][];
       setMockQrUrls(Object.fromEntries(entries));
     });
-  // Run only on mount; mock tickets are stable
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const getQrUrl = (ticket: any): string | null => {
+  const getQrUrl = (ticket: TicketModel): string | null => {
     if (ticket.qrDataUrl) return ticket.qrDataUrl;
     return mockQrUrls[ticket.id] || null;
   };
@@ -89,7 +107,6 @@ function TicketsRoute() {
             const qrUrl = getQrUrl(ticket);
             return (
             <div key={ticket.id} className="relative rounded-3xl overflow-hidden bg-white dark:bg-zinc-900 shadow-xl shadow-black/5 dark:shadow-none border border-zinc-200/50 dark:border-white/10">
-              {/* Event Image Banner */}
               <div className="h-32 w-full relative">
                 <img 
                   src={ticket.event.image} 
@@ -107,9 +124,7 @@ function TicketsRoute() {
                 </div>
               </div>
 
-              {/* Ticket Body */}
               <div className="p-5 relative bg-white dark:bg-zinc-900">
-                {/* Perforation Line */}
                 <div className="absolute -top-3 left-0 w-full flex justify-between items-center z-10 px-0">
                   <div className="w-6 h-6 rounded-full bg-zinc-50 dark:bg-zinc-950 -ml-3 border border-transparent shadow-[inset_-1px_0_0_0_rgba(0,0,0,0.05)] dark:shadow-[inset_-1px_0_0_0_rgba(255,255,255,0.05)]" />
                   <div className="flex-1 border-t-2 border-dashed border-zinc-200 dark:border-white/10 mx-2" />
@@ -160,7 +175,6 @@ function TicketsRoute() {
           })}
         </div>
 
-        {/* Full Screen QR Modal */}
         {expandedQr && (() => {
           const ticket = allTickets.find((t) => t.id === expandedQr);
           const qrUrl = ticket ? getQrUrl(ticket) : null;

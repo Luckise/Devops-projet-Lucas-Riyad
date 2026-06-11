@@ -1,0 +1,25 @@
+---
+- name: Configure database backups
+  when:
+    - backup_bucket_name | length > 0
+    - db_host | length > 0
+  block:
+    - name: Ensure backup scripts directory exists
+      ansible.builtin.file:
+        path: "{{ app_backup_dir }}"
+        state: directory
+        mode: "0755"
+
+    - name: Install backup script
+      ansible.builtin.template:
+        src: backup.sh.j2
+        dest: /opt/{{ app_container_name }}/backup/backup.sh
+        mode: "0755"
+
+    - name: Schedule daily database backups
+      ansible.builtin.cron:
+        name: "Application database backup"
+        minute: "{{ app_backup_cron_minute }}"
+        hour: "{{ app_backup_cron_hour }}"
+        user: "{{ app_backup_cron_user }}"
+        job: "{{ app_backup_dir }}/backup.sh"

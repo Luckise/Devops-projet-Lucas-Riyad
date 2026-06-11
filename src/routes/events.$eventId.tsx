@@ -1,40 +1,17 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { MOCK_EVENTS, getSavedItems, updateItem, formatDate, formatTime, isEventPast, createTicket } from "../lib/mock-data";
+import { getServices } from "../di/container";
+import { formatDate, formatTime, isEventPast } from "../lib/date-utils";
 import { ArrowLeft, Calendar, Clock, MapPin, Ticket, CheckCircle2, Users, XCircle } from "lucide-react";
 import { useState } from "react";
 import SaveButton from "../components/SaveButton";
 import { toast } from "../lib/toast";
 import { getCurrentUser } from "aws-amplify/auth";
 
-interface LoaderEvent {
-  id: string;
-  title: string;
-  date: string;
-  time: string;
-  location: string;
-  image: string;
-  price: number;
-  maxParticipants: number;
-  joined: number;
-  attendees: string[];
-  tags?: string[];
-  category?: string;
-  description?: string;
-}
-
-function assertEvent(raw: unknown): LoaderEvent {
-  if (!raw || typeof raw !== "object") throw new Error("Event not found");
-  const e = raw as Record<string, unknown>;
-  if (typeof e.id !== "string" || typeof e.title !== "string") throw new Error("Event not found");
-  return e as unknown as LoaderEvent;
-}
-
 export const Route = createFileRoute("/events/$eventId")({
   component: EventDetailsRoute,
-  loader: ({ params }) => {
-    const allEvents = [...getSavedItems("user_events"), ...MOCK_EVENTS];
-    const raw = allEvents.find((e: any) => e.id === params.eventId);
-    const event = assertEvent(raw);
+  loader: async ({ params }) => {
+    const event = await getServices().eventService.findEvent(params.eventId);
+    if (!event) throw new Error("Event not found");
     return { event };
   },
 });
@@ -62,16 +39,19 @@ function EventDetailsRoute() {
     const profile = typeof window !== "undefined"
       ? JSON.parse(localStorage.getItem("eat_user_profile") || "{}")
       : {};
-    const email = profile.email || "";
 
     await new Promise((resolve) => setTimeout(resolve, 1500));
 
     const newJoined = joined + 1;
-    const newAttendees = [...(event.attendees || []), email].filter(Boolean);
     setJoined(newJoined);
-    updateItem("user_events", event.id, { joined: newJoined, attendees: newAttendees } as any);
 
-    await createTicket(event, profile);
+    const services = getServices();
+    await services.eventService.update(event.id, {
+      joined: newJoined,
+      attendees: [...(event.attendees || []), profile.email].filter(Boolean),
+    } as any);
+
+    await services.ticketService.create(event, profile);
 
     if (event.price > 0) {
       window.open('https://www.helloasso.com/', '_blank');

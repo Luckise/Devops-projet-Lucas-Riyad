@@ -1,0 +1,45 @@
+---
+- name: Ensure application directory exists
+  ansible.builtin.file:
+    path: "{{ app_install_dir }}"
+    state: directory
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+    mode: "0755"
+
+- name: Configure app container deployment
+  when:
+    - ecr_registry | length > 0
+    - app_image_repository | length > 0
+  block:
+    - name: Log in to ECR
+      ansible.builtin.shell: >-
+        {{ aws_cli_bin }} ecr get-login-password --region {{ aws_region }}
+        | {{ docker_bin }} login --username AWS --password-stdin {{ ecr_registry }}
+      args:
+        executable: /bin/bash
+      changed_when: false
+
+    - name: Pull the application image
+      ansible.builtin.shell: >-
+        {{ docker_bin }} pull {{ app_image_repository }}:{{ app_image_tag }}
+      args:
+        executable: /bin/bash
+      changed_when: false
+
+    - name: Install systemd unit for the app container
+      ansible.builtin.template:
+        src: app.service.j2
+        dest: /etc/systemd/system/{{ app_container_name }}.service
+        mode: "0644"
+      notify: Restart app service
+
+    - name: Reload systemd
+      ansible.builtin.systemd:
+        daemon_reload: true
+
+    - name: Enable and start the app service
+      ansible.builtin.systemd:
+        name: "{{ app_container_name }}"
+        enabled: true
+        state: started

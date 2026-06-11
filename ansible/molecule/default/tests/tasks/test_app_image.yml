@@ -1,0 +1,21 @@
+---
+# tests/tasks/test_app_image.yml
+
+- name: Test application image operations
+  ansible.builtin.import_role:
+    name: app
+  vars:
+    ecr_registry: "697359331837.dkr.ecr.eu-west-3.amazonaws.com"
+    app_image_repository: "697359331837.dkr.ecr.eu-west-3.amazonaws.com/test-app"
+    app_image_tag: "latest"
+    docker_bin: "/usr/bin/docker"
+  check_mode: false
+  tags: ['app-image']
+  when: ecr_registry | length > 0
+
+- name: Test ECR login command construction
+  ansible.builtin.debug:
+    msg: "ECR registry: {{ ecr_registry }}"
+  register: ecr_debug
+  changed_when: false
+  tags: ['test-ecr-login']
