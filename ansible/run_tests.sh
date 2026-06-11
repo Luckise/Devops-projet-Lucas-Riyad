@@ -17,8 +17,15 @@ echo "=== Molecule Test Runner ==="
 
 # Check if molecule is available
 if ! command -v molecule &> /dev/null; then
-    echo -e "${RED}Molecule is not installed. Installing...${NC}"
-    pip install molecule molecule-docker
+    echo -e "${YELLOW}Molecule is not installed. Please install it first.${NC}"
+    echo "Install using: pip install molecule molecule-docker --break-system-packages"
+    echo "or use the virtual environment approach:"
+    echo "  python3 -m venv molecule_venv"
+    echo "  source molecule_venv/bin/activate"
+    echo "  pip install molecule molecule-docker"
+    echo ""
+    echo "After installation, make sure molecule is in your PATH."
+    exit 1
 fi
 
 # Function to run tests for a specific role
