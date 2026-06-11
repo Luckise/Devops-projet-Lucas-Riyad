@@ -18,7 +18,7 @@ todos.json
 *.tfstate.*
 terraform.tfvars
 terraform.tfvars.json
-devops-key.pem
+terraform/devops-key.pem
 
 # Ansible secrets
 ansible/group_vars/all/vault.yml
