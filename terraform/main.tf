@@ -109,3 +109,21 @@ module "alb" {
   health_check_path   = var.app_health_check_path
   tags                = local.tags
 }
+
+module "route53" {
+  source = "./modules/route53"
+
+  project_name                 = var.project_name
+  environment                  = var.environment
+  common_tags                  = var.common_tags
+  app_domain_name              = "app.infra.lucas-demo"
+  subject_alternative_names    = var.subject_alternative_names
+  enable_https                 = var.enable_https
+  alb_name                     = var.alb_name
+  app_container_port           = var.app_container_port
+  app_health_check_path        = var.app_health_check_path
+  certificate_arn              = var.certificate_arn
+  tags                         = local.tags
+  alb_dns_name                 = module.alb.dns_name
+  alb_zone_id                   = module.alb.zone_id
+}

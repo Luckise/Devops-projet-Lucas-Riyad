@@ -183,3 +183,22 @@ variable "security_group_name_prefix" {
   type        = string
   default     = "app"
 }
+
+variable "app_domain_name" {
+  description = "Application domain name for HTTPS and DNS."
+  type        = string
+  default     = ""
+}
+
+variable "subject_alternative_names" {
+  description = "Subject alternative names for ACM certificate."
+  type        = list(string)
+  default     = []
+}
+
+variable "enable_https" {
+  description = "Enable HTTPS for the ALB."
+  type        = bool
+  default     = true
+}
+
