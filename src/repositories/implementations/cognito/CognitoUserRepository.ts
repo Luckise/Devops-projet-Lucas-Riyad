@@ -1,11 +1,6 @@
-import {
-  CognitoUser,
-  AuthenticationDetails,
-  CognitoUserAttribute,
-} from "amazon-cognito-identity-js";
 import type { IUserRepository } from "../../interfaces/IUserRepository";
 import type { UserProfile, UserCredentials, SignUpData } from "../../../types/models";
-import { getUserPool } from "../../../lib/cognito";
+import { ensureAuth } from "../../../lib/cognito";
 
 type AuthListener = (event: string) => void;
 const listeners = new Set<AuthListener>();
@@ -22,15 +17,6 @@ function decodeJwtPayload(token: string): Record<string, unknown> {
   const bytes = new Uint8Array(binary.length);
   for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
   return JSON.parse(new TextDecoder().decode(bytes));
-}
-
-function getCognitoUser(email?: string): CognitoUser {
-  if (email) {
-    return new CognitoUser({ Username: email, Pool: getUserPool() });
-  }
-  const current = getUserPool().getCurrentUser();
-  if (!current) throw new Error("No authenticated user");
-  return current;
 }
 
 function deriveProfile(
@@ -50,162 +36,87 @@ function deriveProfile(
 
 export class CognitoUserRepository implements IUserRepository {
   async getCurrentUser(): Promise<UserProfile> {
-    const cognitoUser = getCognitoUser();
+    ensureAuth();
+    const { getCurrentUser, fetchAuthSession, fetchUserAttributes } =
+      await import("aws-amplify/auth");
 
-    return new Promise((resolve, reject) => {
-      cognitoUser.getSession((err: Error | null, session: any) => {
-        if (err || !session?.isValid()) {
-          reject(err || new Error("Invalid session"));
-          return;
-        }
+    const user = await getCurrentUser();
+    if (!user) throw new Error("No authenticated user");
 
-        cognitoUser.getUserAttributes((attrErr, attributes) => {
-          if (attrErr || !attributes) {
-            reject(attrErr || new Error("Cannot fetch attributes"));
-            return;
-          }
+    const session = await fetchAuthSession();
+    const idToken = session.tokens?.idToken?.toString();
+    if (!idToken) throw new Error("No ID token");
 
-          const attrs: Record<string, string> = {};
-          attributes.forEach((a) => {
-            attrs[a.getName()] = a.getValue();
-          });
+    const attributes = await fetchUserAttributes();
+    const payload = decodeJwtPayload(idToken);
+    const groups = payload["cognito:groups"] as string[] | undefined;
+    const isAdmin = Array.isArray(groups) && groups.includes("Admin");
 
-          const idToken = session.getIdToken().getJwtToken();
-          const payload = decodeJwtPayload(idToken);
-          const groups = payload["cognito:groups"] as string[] | undefined;
-          const isAdmin = Array.isArray(groups) && groups.includes("Admin");
-
-          const email = attrs.email || cognitoUser.getUsername();
-          resolve(deriveProfile(attrs, email, isAdmin));
-        });
-      });
-    });
+    return deriveProfile(
+      attributes as Record<string, string>,
+      attributes.email || user.username,
+      isAdmin,
+    );
   }
 
   async signIn(credentials: UserCredentials): Promise<UserProfile> {
-    const authDetails = new AuthenticationDetails({
-      Username: credentials.email,
-      Password: credentials.password,
-    });
-    const cognitoUser = getCognitoUser(credentials.email);
+    ensureAuth();
+    const { signIn } = await import("aws-amplify/auth");
 
-    await new Promise<void>((resolve, reject) => {
-      cognitoUser.authenticateUser(authDetails, {
-        onSuccess: () => resolve(),
-        onFailure: (err) => reject(err),
-      });
-    });
-
+    await signIn({ username: credentials.email, password: credentials.password });
     emit("signedIn");
     return this.getCurrentUser();
   }
 
   async signUp(data: SignUpData): Promise<void> {
-    const nickname = `@${data.firstName.toLowerCase()}${data.lastName ? "_" + data.lastName.toLowerCase() : ""}`;
-    const attributeList = [
-      new CognitoUserAttribute({ Name: "email", Value: data.email }),
-      new CognitoUserAttribute({
-        Name: "given_name",
-        Value: data.firstName,
-      }),
-      new CognitoUserAttribute({
-        Name: "family_name",
-        Value: data.lastName || "User",
-      }),
-      new CognitoUserAttribute({ Name: "nickname", Value: nickname }),
-    ];
+    ensureAuth();
+    const { signUp } = await import("aws-amplify/auth");
 
-    await new Promise<void>((resolve, reject) => {
-      getUserPool().signUp(data.email, data.password, attributeList, [], (err) => {
-        if (err) reject(err);
-        else resolve();
-      });
+    await signUp({
+      username: data.email,
+      password: data.password,
+      options: {
+        userAttributes: {
+          given_name: data.firstName,
+          family_name: data.lastName || "User",
+          nickname: `@${data.firstName.toLowerCase()}${data.lastName ? "_" + data.lastName.toLowerCase() : ""}`,
+        },
+      },
     });
   }
 
   async confirmSignUp(email: string, code: string): Promise<void> {
-    const cognitoUser = getCognitoUser(email);
-    await new Promise<void>((resolve, reject) => {
-      cognitoUser.confirmRegistration(code, true, (err) => {
-        if (err) reject(err);
-        else resolve();
-      });
-    });
+    ensureAuth();
+    const { confirmSignUp } = await import("aws-amplify/auth");
+    await confirmSignUp({ username: email, confirmationCode: code });
   }
 
   async resendSignUpCode(email: string): Promise<void> {
-    const cognitoUser = getCognitoUser(email);
-    await new Promise<void>((resolve, reject) => {
-      cognitoUser.resendConfirmationCode((err) => {
-        if (err) reject(err);
-        else resolve();
-      });
-    });
+    ensureAuth();
+    const { resendSignUpCode } = await import("aws-amplify/auth");
+    await resendSignUpCode({ username: email });
   }
 
   async signOut(): Promise<void> {
-    const cognitoUser = getUserPool().getCurrentUser();
-    if (cognitoUser) {
-      cognitoUser.signOut();
-    }
+    ensureAuth();
+    const { signOut } = await import("aws-amplify/auth");
+    await signOut();
     emit("signedOut");
   }
 
   async updateProfile(profile: Partial<UserProfile>): Promise<void> {
-    const cognitoUser = getCognitoUser();
+    ensureAuth();
+    const { updateUserAttributes } = await import("aws-amplify/auth");
 
-    await new Promise<void>((resolve, reject) => {
-      cognitoUser.getSession((err: Error | null) => {
-        if (err) {
-          reject(err);
-          return;
-        }
+    const updates: Record<string, string> = {};
+    if (profile.firstName !== undefined) updates.given_name = profile.firstName;
+    if (profile.lastName !== undefined) updates.family_name = profile.lastName;
+    if (profile.nickname !== undefined) updates.nickname = profile.nickname;
+    if (profile.avatar !== undefined && !profile.avatar.startsWith("data:"))
+      updates.picture = profile.avatar;
 
-        const updates: CognitoUserAttribute[] = [];
-        if (profile.firstName !== undefined) {
-          updates.push(
-            new CognitoUserAttribute({
-              Name: "given_name",
-              Value: profile.firstName,
-            }),
-          );
-        }
-        if (profile.lastName !== undefined) {
-          updates.push(
-            new CognitoUserAttribute({
-              Name: "family_name",
-              Value: profile.lastName,
-            }),
-          );
-        }
-        if (profile.nickname !== undefined) {
-          updates.push(
-            new CognitoUserAttribute({
-              Name: "nickname",
-              Value: profile.nickname,
-            }),
-          );
-        }
-        if (profile.avatar !== undefined && !profile.avatar.startsWith("data:")) {
-          updates.push(
-            new CognitoUserAttribute({
-              Name: "picture",
-              Value: profile.avatar,
-            }),
-          );
-        }
-
-        if (updates.length === 0) {
-          resolve();
-          return;
-        }
-
-        cognitoUser.updateAttributes(updates, (updateErr) => {
-          if (updateErr) reject(updateErr);
-          else resolve();
-        });
-      });
-    });
+    if (Object.keys(updates).length === 0) return;
+    await updateUserAttributes({ userAttributes: updates });
   }
 
   onAuthEvent(callback: (event: string) => void): () => void {

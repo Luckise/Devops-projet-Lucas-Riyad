@@ -18,6 +18,7 @@ const config = defineConfig({
     viteReact(),
   ],
   optimizeDeps: {
+    include: ["amazon-cognito-identity-js"],
     esbuildOptions: {
       define: { global: "globalThis" },
     },
