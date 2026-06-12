@@ -5,8 +5,7 @@ import Header from "../components/Header";
 import CreateFAB from "../components/CreateFAB";
 
 import "../lib/amplify";
-
-import appCss from "../styles.css?url";
+import "../styles.css";
 
 import type { QueryClient } from "@tanstack/react-query";
 
@@ -26,12 +25,6 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       },
       {
         title: "EAT. Event App",
-      },
-    ],
-    links: [
-      {
-        rel: "stylesheet",
-        href: appCss,
       },
     ],
   }),
