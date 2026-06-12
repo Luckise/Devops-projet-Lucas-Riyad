@@ -6,6 +6,10 @@ const userPoolId =
 const userPoolClientId =
   import.meta.env.VITE_COGNITO_CLIENT_ID ||
   (typeof process !== "undefined" && process.env?.COGNITO_CLIENT_ID);
+const region =
+  import.meta.env.VITE_AWS_REGION ||
+  (typeof process !== "undefined" && process.env?.VITE_AWS_REGION) ||
+  "eu-west-3";
 
 if (userPoolId && userPoolClientId) {
   Amplify.configure({
@@ -13,6 +17,7 @@ if (userPoolId && userPoolClientId) {
       Cognito: {
         userPoolId,
         userPoolClientId,
+        region,
       },
     },
   });
