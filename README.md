@@ -419,6 +419,6 @@ ansible-playbook ansible/playbooks/restore.yml -i ansible/inventory/hosts.yml
 - **ALB ne forwarde pas automatiquement le chemin** : il faut bien configurer le target group sur le bon port et un health check qui répond 200 (`/health`).
 - **ECR login expire toutes les 12h** : Ansible doit refaire `aws ecr get-login-password` à chaque déploiement.
 - **Security groups chaînés** : on référence le SG par son ID (`aws_security_group.app.id`), pas par son nom — sinon Terraform ne détecte pas les changements.
-- **Route 53 + sslip.io** : on ne peut pas faire un alias Route 53 vers un nom de domaine externe directement. La solution est une délégation NS.
+- **Route 53 + Duck DNS** : on ne peut pas faire un alias Route 53 vers un nom de domaine externe directement. La solution est une délégation NS.
 - **Docker restart** : sans `force_source: true`, Docker ne re-pull pas l'image si le tag existe déjà en cache. On a utilisé `ansible.builtin.shell` avec `docker pull` pour forcer.
 - **oxlint/oxfmt** : ce sont des outils Rust distribués via npm. Installation avec `npm i -g oxlint` ou via les devDependencies du projet.
