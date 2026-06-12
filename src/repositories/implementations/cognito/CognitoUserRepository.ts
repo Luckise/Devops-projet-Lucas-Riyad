@@ -5,7 +5,7 @@ import {
 } from "amazon-cognito-identity-js";
 import type { IUserRepository } from "../../interfaces/IUserRepository";
 import type { UserProfile, UserCredentials, SignUpData } from "../../../types/models";
-import { userPool } from "../../../lib/cognito";
+import { getUserPool } from "../../../lib/cognito";
 
 type AuthListener = (event: string) => void;
 const listeners = new Set<AuthListener>();
@@ -26,9 +26,9 @@ function decodeJwtPayload(token: string): Record<string, unknown> {
 
 function getCognitoUser(email?: string): CognitoUser {
   if (email) {
-    return new CognitoUser({ Username: email, Pool: userPool });
+    return new CognitoUser({ Username: email, Pool: getUserPool() });
   }
-  const current = userPool.getCurrentUser();
+  const current = getUserPool().getCurrentUser();
   if (!current) throw new Error("No authenticated user");
   return current;
 }
@@ -116,7 +116,7 @@ export class CognitoUserRepository implements IUserRepository {
     ];
 
     await new Promise<void>((resolve, reject) => {
-      userPool.signUp(data.email, data.password, attributeList, [], (err) => {
+      getUserPool().signUp(data.email, data.password, attributeList, [], (err) => {
         if (err) reject(err);
         else resolve();
       });
@@ -144,7 +144,7 @@ export class CognitoUserRepository implements IUserRepository {
   }
 
   async signOut(): Promise<void> {
-    const cognitoUser = userPool.getCurrentUser();
+    const cognitoUser = getUserPool().getCurrentUser();
     if (cognitoUser) {
       cognitoUser.signOut();
     }
