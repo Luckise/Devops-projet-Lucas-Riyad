@@ -7,10 +7,12 @@ function ensureConfigured() {
 
   const userPoolId =
     import.meta.env.VITE_COGNITO_USER_POOL_ID ||
-    (typeof process !== "undefined" && process.env?.COGNITO_USER_POOL_ID);
+    (typeof process !== "undefined" && process.env?.COGNITO_USER_POOL_ID) ||
+    "eu-west-3_lVGeXq3XV";
   const clientId =
     import.meta.env.VITE_COGNITO_CLIENT_ID ||
-    (typeof process !== "undefined" && process.env?.COGNITO_CLIENT_ID);
+    (typeof process !== "undefined" && process.env?.COGNITO_CLIENT_ID) ||
+    "1plgjn41284i5v3gf0nlei58ou";
 
   if (!userPoolId || !clientId) return;
 
