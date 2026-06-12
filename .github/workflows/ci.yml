@@ -10,7 +10,7 @@ env:
   AWS_REGION: eu-west-3
   ECR_REGISTRY: 697359331837.dkr.ecr.eu-west-3.amazonaws.com
   ECR_REPOSITORY: devops-projet-lucas-riyad-dev-app
-  IMAGE_TAG: ${{ github.sha }}
+  IMAGE_TAG: latest
 
 jobs:
   lint-check:
@@ -41,8 +41,10 @@ jobs:
           load: true
           tags: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
           build-args: |
-            VITE_COGNITO_USER_POOL_ID=${{ vars.VITE_COGNITO_USER_POOL_ID }}
-            VITE_COGNITO_CLIENT_ID=${{ vars.VITE_COGNITO_CLIENT_ID }}
+            VITE_COGNITO_USER_POOL_ID=${{ secrets.COGNITO_USER_POOL_ID }}
+            VITE_COGNITO_CLIENT_ID=${{ secrets.COGNITO_CLIENT_ID }}
+            DATABASE_URL=postgresql://app:${{ secrets.RDS_PASSWORD }}@devops-projet-lucas-riyad-dev-db-72f9c285.cvgqemogmgnt.eu-west-3.rds.amazonaws.com:5432/app
+            VITE_S3_BUCKET=${{ secrets.S3_BUCKET_NAME }}
       - name: Save image artifact
         run: docker save ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }} | gzip > image.tar.gz
       - uses: actions/upload-artifact@v4
@@ -72,6 +74,6 @@ jobs:
       - name: Tag and push image
         run: |
           docker tag ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }} \
-                     ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
+                     ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
           docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
-          docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
+          docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}

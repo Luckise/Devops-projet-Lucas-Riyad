@@ -4,7 +4,7 @@ set -euo pipefail
 timestamp="$(date +%Y%m%d%H%M%S)"
 backup_file="{{ backup_local_dir }}/{{ backup_file_prefix }}-${timestamp}.{{ backup_file_extension }}"
 
-{{ pg_dump_bin }} \
+PGPASSWORD="{{ db_password }}" {{ pg_dump_bin }} \
   --host "{{ db_host }}" \
   --username "{{ db_user }}" \
   --dbname "{{ db_name }}" \

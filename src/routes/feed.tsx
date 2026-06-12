@@ -71,18 +71,20 @@ function FeedRoute() {
   const [tab, setTab] = useState<"global" | "myevents">("global");
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
-  const [deletedPostIds, setDeletedPostIds] = useState<string[]>(() => JSON.parse(localStorage.getItem("eat_deleted_posts") || "[]"));
+  const [deletedPostIds, setDeletedPostIds] = useState<string[]>([]);
   const [myEventIds, setMyEventIds] = useState<string[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
+  const [profile, setProfile] = useState<{ email?: string }>({});
 
   useEffect(() => {
+    const saved = localStorage.getItem("eat_deleted_posts");
+    if (saved) setDeletedPostIds(JSON.parse(saved));
+    const stored = localStorage.getItem("eat_user_profile");
+    if (stored) setProfile(JSON.parse(stored));
     getServices().eventService.getMyEventIds().then(setMyEventIds);
     getServices().eventService.getAll().then(setEvents);
   }, []);
 
-  const profile = typeof window !== "undefined"
-    ? JSON.parse(localStorage.getItem("eat_user_profile") || "{}")
-    : {};
   const userEmail = profile.email || "";
 
   const allPosts = useMemo(() => {
