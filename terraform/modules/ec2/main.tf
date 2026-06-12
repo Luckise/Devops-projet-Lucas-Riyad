@@ -100,6 +100,10 @@ resource "aws_instance" "this" {
   iam_instance_profile        = aws_iam_instance_profile.this.name
   user_data                   = var.user_data
 
+  lifecycle {
+    create_before_destroy = true
+  }
+
   root_block_device {
     encrypted = true
   }

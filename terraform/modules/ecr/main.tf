@@ -17,6 +17,10 @@ resource "aws_ecr_repository" "this" {
   tags = merge(var.tags, {
     Name = local.repo_name
   })
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_ecr_lifecycle_policy" "this" {
