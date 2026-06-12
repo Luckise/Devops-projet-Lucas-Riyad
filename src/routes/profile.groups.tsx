@@ -1,16 +1,16 @@
 import { createFileRoute, useNavigate, Link, Outlet, redirect, useRouterState } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { ChevronLeft, Plus, Users, Shield, Crown, UserPlus, UserMinus, Send, ExternalLink } from "lucide-react";
-import { getUserGroups, addMember, removeMember, transferOwnership, renameGroup, userRole, isUserAdmin } from "../lib/groups";
+import { getUserGroups, addMember, removeMember, transferOwnership, renameGroup, userRole } from "../lib/groups";
 import type { Group } from "../lib/groups";
-import { getCurrentUser, fetchUserAttributes } from "aws-amplify/auth";
+import { fetchAuthSession } from "aws-amplify/auth";
+import { getServices } from "../di/container";
 
 export const Route = createFileRoute("/profile/groups")({
   beforeLoad: async () => {
     try {
-      const user = await getCurrentUser();
-      const attrs = await fetchUserAttributes();
-      if (!isUserAdmin(attrs.email || user.userId)) throw redirect({ to: "/profile" });
+      const profile = await getServices().authService.getCurrentUser();
+      if (!profile.isAdmin) throw redirect({ to: "/profile" });
     } catch (err) {
       if (err instanceof redirect) throw err;
       throw redirect({ to: "/login" });
@@ -42,13 +42,29 @@ function ProfileGroupsRoute() {
 
   useEffect(() => { refresh(); }, [email]);
 
-  const handleAddMember = (groupId: string) => {
+  const handleAddMember = async (groupId: string) => {
     if (!memberInput.trim()) return;
     const ok = addMember(groupId, memberInput.trim());
     setMessage(ok ? `${memberInput.trim()} added` : "Already a member or invalid");
     setMemberInput("");
     refresh();
     setTimeout(() => setMessage(""), 2500);
+
+    if (ok && profile?.isAdmin) {
+      try {
+        const session = await fetchAuthSession();
+        const idToken = session.tokens?.idToken?.toString();
+        if (idToken) {
+          await fetch("/api/cognito/group", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ idToken, email: memberInput.trim() }),
+          });
+        }
+      } catch {
+        // server-side Admin group assignment failed, member still added to club
+      }
+    }
   };
 
   const handleRemoveMember = (groupId: string, memberEmail: string) => {

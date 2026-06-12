@@ -1,13 +1,11 @@
 import type { IPostRepository } from "../../interfaces/IPostRepository";
 import type { Post } from "../../../types/models";
-import { MOCK_POSTS } from "./seed-data";
 
 export class LocalStoragePostRepository implements IPostRepository {
   private readonly postsKey = "user_posts";
 
   async getAll(): Promise<Post[]> {
-    const userPosts = this.getItems<Post>(this.postsKey);
-    return [...MOCK_POSTS, ...userPosts];
+    return this.getItems<Post>(this.postsKey);
   }
 
   async getById(id: string): Promise<Post | undefined> {

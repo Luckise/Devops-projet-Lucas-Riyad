@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
 import { getServices } from "../di/container";
-import { defaultUser } from "../lib/user-defaults";
 import type { UserProfile } from "../types/models";
 
+const emptyUser: UserProfile = { firstName: "", lastName: "", nickname: "", email: "", avatar: "", isAdmin: false };
+
 export function useUser() {
-  const [user, setUserState] = useState<UserProfile>(defaultUser);
+  const [user, setUserState] = useState<UserProfile>(emptyUser);
   const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
@@ -16,7 +17,7 @@ export function useUser() {
       if (saved) {
         setUserState(JSON.parse(saved));
       } else {
-        setUserState(defaultUser);
+        setUserState(emptyUser);
       }
     }
     setLoading(false);
@@ -49,7 +50,7 @@ export function useUser() {
       // fall back
     }
     localStorage.removeItem("eat_user_profile");
-    setUserState(defaultUser);
+    setUserState(emptyUser);
   };
 
   return { user, setUser, logout, loading };

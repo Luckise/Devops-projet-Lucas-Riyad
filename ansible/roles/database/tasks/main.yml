@@ -1,0 +1,153 @@
+---
+- name: Configure database security group
+  ansible.builtin.command: >-
+    aws rds modify-db-security-group \
+    --db-security-group-name "{{ db_security_group_name }}" \
+    --description "{{ db_security_group_description }}" \
+    --ingress "{{ db_ingress_rules }}" \
+    --egress "{{ db_egress_rules }}"
+  when: db_security_group_name != ""
+  changed_when: false
+
+- name: Create database user
+  ansible.builtin.command: >-
+    psql -h "{{ db_host }}" -U "{{ db_admin_user }}" -d "postgres" \
+    -c "CREATE USER {{ db_user }} WITH PASSWORD '{{ db_password }}';"
+  when: db_host | length > 0
+  changed_when: false
+
+- name: Grant privileges to database user
+  ansible.builtin.command: >-
+    psql -h "{{ db_host }}" -U "{{ db_admin_user }}" -d "{{ db_name }}" \
+    -c "GRANT ALL PRIVILEGES ON DATABASE {{ db_name }} TO {{ db_user }};"
+  when: db_host | length > 0 and db_name | length > 0
+  changed_when: false
+
+- name: Set up database backup user
+  ansible.builtin.command: >-
+    psql -h "{{ db_host }}" -U "{{ db_admin_user }}" -d "postgres" \
+    -c "CREATE USER {{ db_backup_user }} WITH PASSWORD '{{ db_backup_password }}' NOINHERIT;"
+  when: db_host | length > 0 and db_backup_user != ""
+  changed_when: false
+
+- name: Grant backup permissions to database user
+  ansible.builtin.command: >-
+    psql -h "{{ db_host }}" -U "{{ db_admin_user }}" -d "postgres" \
+    -c "GRANT {{ db_backup_user }} TO {{ db_backup_user }} WITH PASSWORD '{{ db_backup_password }}';"
+  when: db_host | length > 0 and db_backup_user != ""
+  changed_when: false
+
+- name: Set up database for application
+  ansible.builtin.command: >-
+    psql -h "{{ db_host }}" -U "{{ db_admin_user }}" -d "postgres" \
+    -c "CREATE DATABASE IF NOT EXISTS {{ db_name }} OWNER {{ db_user }};"
+  when: db_host | length > 0 and db_name | length > 0
+  changed_when: false
+
+- name: Configure IAM authentication for database
+  ansible.builtin.command: >-
+    aws rds modify-db-instance \
+    --db-instance-identifier "{{ db_instance_id }}" \
+    --enable-iam-database-authentication \
+    --apply-immediately
+  when: db_host | length > 0 and db_iam_auth | bool
+  changed_when: false
+
+- name: Enable encryption for database
+  ansible.builtin.command: >-
+    aws rds modify-db-instance \
+    --db-instance-identifier "{{ db_instance_id }}" \
+    --storage-encrypted true \
+    --apply-immediately
+  when: db_host | length > 0 and db_encryption | bool
+  changed_when: false
+
+- name: Configure backup window for database
+  ansible.builtin.command: >-
+    aws rds modify-db-instance \
+    --db-instance-identifier "{{ db_instance_id }}" \
+    --preferred-backup-window "{{ db_backup_window }}" \
+    --apply-immediately
+  when: db_host | length > 0 and db_backup_window != ""
+  changed_when: false
+
+- name: Configure maintenance window for database
+  ansible.builtin.command: >-
+    aws rds modify-db-instance \
+    --db-instance-identifier "{{ db_instance_id }}" \
+    --preferred-maintenance-window "{{ db_maintenance_window }}" \
+    --apply-immediately
+  when: db_host | length > 0 and db_maintenance_window != ""
+  changed_when: false
+
+- name: Enable performance insights for database
+  ansible.builtin.command: >-
+    aws rds modify-db-instance \
+    --db-instance-identifier "{{ db_instance_id }}" \
+    --enable-performance-insights \
+    --performance-insights-key-id "{{ db_pi_key_id }}" \
+    --apply-immediately
+  when: db_host | length > 0 and db_performance_insights | bool
+  changed_when: false
+
+- name: Enable CloudWatch logs for database
+  ansible.builtin.command: >-
+    aws rds modify-db-instance \
+    --db-instance-identifier "{{ db_instance_id }}" \
+    --enable-cloudwatch-logs-exports "{{ db_cloudwatch_logs_exports }}" \
+    --apply-immediately
+  when: db_host | length > 0 and db_cloudwatch_logs_exports != ""
+  changed_when: false
+
+- name: Set up database deletion protection
+  ansible.builtin.command: >-
+    aws rds modify-db-instance \
+    --db-instance-identifier "{{ db_instance_id }}" \
+    --deletion-protection true \
+    --apply-immediately
+  when: db_host | length > 0 and db_deletion_protection | bool
+  changed_when: false
+
+- name: Set up database snapshot copy
+  ansible.builtin.command: >-
+    aws rds modify-db-instance \
+    --db-instance-identifier "{{ db_instance_id }}" \
+    --copy-tags-to-snapshot \
+    --apply-immediately
+  when: db_host | length > 0 and db_copy_tags_to_snapshot | bool
+  changed_when: false
+
+- name: Configure database parameter group
+  ansible.builtin.command: >-
+    aws rds modify-db-instance \
+    --db-instance-identifier "{{ db_instance_id }}" \
+    --db-parameter-group-name "{{ db_parameter_group_name }}" \
+    --apply-immediately
+  when: db_host | length > 0 and db_parameter_group_name != ""
+  changed_when: false
+
+- name: Enable database read replicas
+  ansible.builtin.command: >-
+    aws rds create-db-instance-read-replica \
+    --db-instance-identifier "{{ db_read_replica_id }}" \
+    --source-db-instance-identifier "{{ db_instance_id }}" \
+    --availability-zones "{{ db_replica_azs }}" \
+    --vpc-security-group-ids "{{ db_security_group_id }}" \
+    --db-subnet-group-name "{{ db_subnet_group_name }}" \
+    --publicly-accessible false \
+    --copy-tags-to-snapshot \
+    --apply-immediately
+  when: db_host | length > 0 and db_read_replica | bool
+  changed_when: false
+
+- name: Configure database event subscription
+  ansible.builtin.command: >-
+    aws rds create-event-subscription \
+    --subscription-name "{{ db_event_subscription_name }}" \
+    --sns-topic-arn "{{ db_sns_topic_arn }}" \
+    --source-type "db-instance" \
+    --event-categories "{{ db_event_categories }}" \
+    --enabled \
+    --source-ids "{{ db_instance_id }}"
+  when: db_host | length > 0 and db_event_subscription | bool
+  changed_when: false

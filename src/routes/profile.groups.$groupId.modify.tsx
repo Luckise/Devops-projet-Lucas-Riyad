@@ -4,14 +4,14 @@ import { ArrowLeft, Plus, X } from "lucide-react";
 import ImageUpload from "../components/ImageUpload";
 import { getGroup, saveClubPage } from "../lib/groups";
 import { toast } from "../lib/toast";
-import { getCurrentUser } from "aws-amplify/auth";
+import { getServices } from "../di/container";
 
 type ContentBlock = { type: "text" | "image"; value: string };
 
 export const Route = createFileRoute("/profile/groups/$groupId/modify")({
   beforeLoad: async () => {
     try {
-      await getCurrentUser();
+      await getServices().authService.getCurrentUser();
     } catch {
       throw redirect({ to: "/login" });
     }

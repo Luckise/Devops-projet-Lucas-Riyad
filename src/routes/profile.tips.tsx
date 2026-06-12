@@ -2,12 +2,11 @@ import { createFileRoute, Link, Outlet, redirect, useRouterState } from "@tansta
 import { useState, useEffect } from "react";
 import { ChevronLeft, Lightbulb, EyeOff } from "lucide-react";
 import { getServices } from "../di/container";
-import { getCurrentUser } from "aws-amplify/auth";
 
 export const Route = createFileRoute("/profile/tips")({
   beforeLoad: async () => {
     try {
-      await getCurrentUser();
+      await getServices().authService.getCurrentUser();
     } catch {
       throw redirect({ to: "/login" });
     }

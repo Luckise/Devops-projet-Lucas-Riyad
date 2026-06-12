@@ -1,6 +1,7 @@
 import {
   getCurrentUser,
   fetchUserAttributes,
+  fetchAuthSession,
   signIn,
   signUp,
   confirmSignUp,
@@ -13,9 +14,20 @@ import type { IUserRepository } from "../../interfaces/IUserRepository";
 import type { UserProfile, UserCredentials, SignUpData } from "../../../types/models";
 import "../../../lib/amplify";
 
+async function getUserIsAdmin(): Promise<boolean> {
+  try {
+    const session = await fetchAuthSession();
+    const groups = session.tokens?.idToken?.payload?.["cognito:groups"] as string[] | undefined;
+    return Array.isArray(groups) && groups.includes("Admin");
+  } catch {
+    return false;
+  }
+}
+
 function deriveProfile(
   attrs: Record<string, string | undefined>,
-  email: string
+  email: string,
+  isAdmin: boolean
 ): UserProfile {
   return {
     firstName: attrs.given_name || "",
@@ -23,7 +35,7 @@ function deriveProfile(
     nickname: attrs.nickname || "",
     email,
     avatar: attrs.picture || "",
-    isAdmin: email.includes("admin"),
+    isAdmin,
   };
 }
 
@@ -32,7 +44,8 @@ export class CognitoUserRepository implements IUserRepository {
     const user = await getCurrentUser();
     const attrs = await fetchUserAttributes();
     const email = attrs.email || user.userId;
-    return deriveProfile(attrs, email);
+    const isAdmin = await getUserIsAdmin();
+    return deriveProfile(attrs, email, isAdmin);
   }
 
   async signIn(credentials: UserCredentials): Promise<UserProfile> {

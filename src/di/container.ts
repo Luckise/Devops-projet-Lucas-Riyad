@@ -27,12 +27,9 @@ import type {
   IImageService, ITipService, IPostService, ITicketService,
 } from "../services/interfaces";
 
-function hasAwsCredentials(): boolean {
+function hasS3Credentials(): boolean {
   if (typeof import.meta !== "undefined" && import.meta.env) {
-    return !!(
-      import.meta.env.VITE_COGNITO_USER_POOL_ID ||
-      import.meta.env.VITE_AWS_ACCESS_KEY_ID
-    );
+    return !!import.meta.env.VITE_AWS_ACCESS_KEY_ID;
   }
   return false;
 }
@@ -58,46 +55,11 @@ function createTicketRepo(): ITicketRepository {
 }
 
 function createUserRepo(): IUserRepository {
-  if (hasAwsCredentials()) {
-    return new CognitoUserRepository();
-  }
-  return {
-    getCurrentUser: async () => {
-      if (typeof window === "undefined") {
-        return { firstName: "", lastName: "", nickname: "", email: "", avatar: "", isAdmin: false };
-      }
-      const saved = localStorage.getItem("eat_user_profile");
-      if (saved) return JSON.parse(saved);
-      const { defaultUser } = await import("../lib/user-defaults");
-      return defaultUser;
-    },
-    signIn: async (credentials) => {
-      const profile = {
-        firstName: "", lastName: "", nickname: "", email: credentials.email, avatar: "", isAdmin: false,
-      };
-      localStorage.setItem("eat_user_profile", JSON.stringify(profile));
-      window.dispatchEvent(new Event("user-updated"));
-      return profile;
-    },
-    signUp: async () => {},
-    confirmSignUp: async () => {},
-    resendSignUpCode: async () => {},
-    signOut: async () => {
-      localStorage.removeItem("eat_user_profile");
-      window.dispatchEvent(new Event("user-updated"));
-    },
-    updateProfile: async (profile) => {
-      const current = localStorage.getItem("eat_user_profile");
-      if (current) {
-        const merged = { ...JSON.parse(current), ...profile };
-        localStorage.setItem("eat_user_profile", JSON.stringify(merged));
-      }
-    },
-  } as IUserRepository;
+  return new CognitoUserRepository();
 }
 
 function createImageRepo(): IImageRepository {
-  if (hasAwsCredentials()) {
+  if (hasS3Credentials()) {
     return new S3ImageRepository();
   }
   return {

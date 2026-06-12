@@ -4,17 +4,12 @@ import { ArrowLeft, X, Plus, ChevronDown } from "lucide-react";
 import ImageUpload from "../components/ImageUpload";
 import { getServices } from "../di/container";
 import { toast } from "../lib/toast";
-import { getCurrentUser, fetchUserAttributes } from "aws-amplify/auth";
-import "../lib/amplify";
 
 export const Route = createFileRoute("/events/new")({
   beforeLoad: async () => {
     try {
-      const user = await getCurrentUser();
-      const attrs = await fetchUserAttributes();
-      const email = attrs.email || user.userId;
-      const isAdmin = await getServices().groupService.isUserAdmin(email || "");
-      if (!isAdmin) throw redirect({ to: "/" });
+      const profile = await getServices().authService.getCurrentUser();
+      if (!profile.isAdmin) throw redirect({ to: "/" });
     } catch (err) {
       if (err instanceof redirect) throw err;
       throw redirect({ to: "/login" });

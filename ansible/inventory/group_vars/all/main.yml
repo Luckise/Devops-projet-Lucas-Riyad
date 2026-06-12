@@ -54,5 +54,5 @@ db_host: "devops-projet-lucas-riyad-dev-db-e751f926.cvgqemogmgnt.eu-west-3.rds.a
 db_name: app
 db_user: app
 db_password: ""
-cognito_user_pool_id: "eu-west-3_8gjpMRGyO"
-cognito_client_id: "67qh8hqn275qn19rffpgk4b6o5"
+cognito_user_pool_id: "{{ vault_cognito_user_pool_id }}"
+cognito_client_id: "{{ vault_cognito_client_id }}"

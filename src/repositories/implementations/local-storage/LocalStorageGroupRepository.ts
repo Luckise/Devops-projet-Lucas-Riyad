@@ -1,6 +1,5 @@
 import type { IGroupRepository } from "../../interfaces/IGroupRepository";
 import type { Group, ContentBlock } from "../../../types/models";
-import { MOCK_CLUBS } from "./seed-data";
 
 export class LocalStorageGroupRepository implements IGroupRepository {
   private readonly groupsKey = "eat_groups";
@@ -8,20 +7,7 @@ export class LocalStorageGroupRepository implements IGroupRepository {
   async getAll(): Promise<Record<string, Group>> {
     if (typeof window === "undefined") return {};
     const raw = localStorage.getItem(this.groupsKey);
-    const stored: Record<string, Group> = raw ? JSON.parse(raw) : {};
-
-    const seed: Record<string, Group> = {};
-    for (const club of MOCK_CLUBS) {
-      seed[club.id] = { ...stored[club.id], ...club };
-    }
-
-    const merged = { ...seed, ...stored };
-    const needsSave = Object.keys(merged).length !== Object.keys(stored).length;
-    if (!raw || needsSave) {
-      localStorage.setItem(this.groupsKey, JSON.stringify(merged));
-    }
-
-    return merged;
+    return raw ? JSON.parse(raw) : {};
   }
 
   async getAllClubs(): Promise<Group[]> {

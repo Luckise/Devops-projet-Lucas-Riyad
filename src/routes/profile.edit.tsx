@@ -2,12 +2,12 @@ import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
 import { ArrowLeft, Save, Camera, User } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useUser } from "../hooks/use-user";
-import { getCurrentUser } from "aws-amplify/auth";
+import { getServices } from "../di/container";
 
 export const Route = createFileRoute("/profile/edit")({
   beforeLoad: async () => {
     try {
-      await getCurrentUser();
+      await getServices().authService.getCurrentUser();
     } catch {
       throw redirect({ to: "/login" });
     }
