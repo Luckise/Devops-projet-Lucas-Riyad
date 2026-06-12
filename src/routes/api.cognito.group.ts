@@ -1,15 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import {
-  CognitoIdentityProviderClient,
-  AdminAddUserToGroupCommand,
-} from "@aws-sdk/client-cognito-identity-provider";
-
-const client = new CognitoIdentityProviderClient({ region: "eu-west-3" });
 
 function decodeJwtPayload(token: string): Record<string, unknown> | null {
   try {
     const payload = token.split(".")[1];
-    return JSON.parse(Buffer.from(payload, "base64url").toString());
+    let base64 = payload.replace(/-/g, "+").replace(/_/g, "/");
+    while (base64.length % 4) base64 += "=";
+    return JSON.parse(atob(base64));
   } catch {
     return null;
   }
@@ -45,6 +41,12 @@ async function handle({ request }: { request: Request }) {
         headers: { "Content-Type": "application/json" },
       });
     }
+
+    const {
+      CognitoIdentityProviderClient,
+      AdminAddUserToGroupCommand,
+    } = await import("@aws-sdk/client-cognito-identity-provider");
+    const client = new CognitoIdentityProviderClient({ region: "eu-west-3" });
 
     const userPoolId = process.env.VITE_COGNITO_USER_POOL_ID;
     if (!userPoolId) {
