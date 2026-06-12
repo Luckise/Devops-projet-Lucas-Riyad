@@ -7,13 +7,6 @@ import { nitro } from "nitro/vite";
 
 const config = defineConfig({
   resolve: { tsconfigPaths: true },
-  build: {
-    rollupOptions: {
-      output: {
-        banner: `import{Buffer as _B}from"buffer";if(typeof globalThis.Buffer==="undefined")globalThis.Buffer=_B;`,
-      },
-    },
-  },
   plugins: [
     devtools(),
     nitro({ rollupConfig: { external: [/^@sentry\//] } }),
