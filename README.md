@@ -220,9 +220,7 @@ Généré dynamiquement depuis les outputs Terraform via `ansible/generate_inven
 | **common**  | Installation Docker + AWS CLI, création user/groupe système, credentials AWS       |
 | **app**     | Login ECR, pull image Docker, installation service systemd, démarrage conteneur    |
 | **backup**  | Installation script pg_dump, configuration cron quotidien (2h00), upload S3         |
-| **jenkins** (bonus) | Installation Jenkins sur VM dédiée, service, accès initial sécurisé        |
-| **sonarqube** (bonus) | Installation SonarQube sur VM dédiée, service, port 9000                    |
-| **nexus** (bonus) | Installation Nexus sur VM dédiée, service, port 8081                          |
+
 
 ### Variables
 
@@ -303,15 +301,6 @@ Push sur main / PR
 
 Le tag `sha-<git_sha>` permet de tracer exactement quelle version tourne sur chaque EC2. Le tag `latest` est mis à jour à chaque push sur main pour le bootstrap des nouvelles instances.
 
-### `quality.yml` (bonus) — Job SonarQube
-
-```
-Push sur main
-       ↓
-  [Analyse SonarQube]  ← sonar-scanner, publie le rapport
-```
-
----
 
 ## Stratégie de backup
 
