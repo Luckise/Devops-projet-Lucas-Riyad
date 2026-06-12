@@ -10,6 +10,17 @@ const config = defineConfig({
   define: {
     global: "globalThis",
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes("aws-amplify") || id.includes("@aws-amplify")) {
+            return "aws-amplify";
+          }
+        },
+      },
+    },
+  },
   plugins: [
     devtools(),
     nitro({ rollupConfig: { external: [/^@sentry\//] } }),
