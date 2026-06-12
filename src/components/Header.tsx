@@ -4,11 +4,17 @@ import { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
 
 const Header = memo(function Header() {
-  const [dark, setDark] = useState(() =>
-    typeof document !== "undefined" ? document.documentElement.classList.contains("dark") : false,
-  );
+  const [dark, setDark] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    const html = document.documentElement;
+    setDark(html.classList.contains("dark"));
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
     const html = document.documentElement;
     if (dark) {
       html.classList.add("dark");
@@ -16,7 +22,7 @@ const Header = memo(function Header() {
       html.classList.remove("dark");
     }
     localStorage.setItem("eat_theme", dark ? "dark" : "light");
-  }, [dark]);
+  }, [dark, mounted]);
 
   return (
     <header className="fixed top-0 w-full z-50" style={{ backgroundColor: "var(--header-bg)" }}>

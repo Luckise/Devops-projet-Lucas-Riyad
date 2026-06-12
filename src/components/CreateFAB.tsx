@@ -12,8 +12,12 @@ export default function CreateFAB() {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const ref = useRef<HTMLDivElement>(null);
+  const [stored, setStored] = useState<string | null>(null);
 
-  const stored = typeof window !== "undefined" ? localStorage.getItem("eat_user_profile") : null;
+  useEffect(() => {
+    setStored(localStorage.getItem("eat_user_profile"));
+  }, []);
+
   const profile = stored ? JSON.parse(stored) : null;
   const isAdmin = profile?.isAdmin ?? false;
 
@@ -36,8 +40,8 @@ export default function CreateFAB() {
 
   if (!stored) return null;
 
-  const path = window.location.pathname;
-  const isEventPage = path === "/events" || path.startsWith("/events/");
+  const isEventPage = typeof window !== "undefined" &&
+    (window.location.pathname === "/events" || window.location.pathname.startsWith("/events/"));
   if (!isAdmin && isEventPage) return null;
 
   const OPTIONS = OPTIONS_ALL.filter((opt) => (opt.label === "Event" ? isAdmin : true));
