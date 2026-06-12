@@ -104,7 +104,8 @@ module "alb" {
   public_subnet_ids   = module.vpc.public_subnet_ids
   security_group_ids  = [module.security_groups.alb_security_group_id]
   target_instance_ids = module.ec2.instance_ids
-  certificate_arn     = var.certificate_arn
+  certificate_arn     = var.enable_https ? aws_acm_certificate.this.arn : ""
+  enable_https        = var.enable_https
   target_port         = var.app_container_port
   health_check_path   = var.app_health_check_path
   tags                = local.tags

@@ -183,3 +183,35 @@ variable "security_group_name_prefix" {
   type        = string
   default     = "app"
 }
+
+variable "app_domain_name" {
+  description = "Application domain name for HTTPS and DNS."
+  type        = string
+  default     = "app-lucas-riyad.com"
+}
+
+variable "subject_alternative_names" {
+  description = "Subject alternative names for ACM certificate."
+  type        = list(string)
+  default     = []
+}
+
+variable "enable_https" {
+  description = "Enable HTTPS for the ALB."
+  type        = bool
+  default     = false
+}
+
+variable "duckdns_subdomain" {
+  description = "DuckDNS subdomain name (without .duckdns.org)."
+  type        = string
+  default     = "app-lucas"
+}
+
+variable "duckdns_token" {
+  description = "DuckDNS API token for DNS challenge."
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+

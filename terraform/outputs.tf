@@ -83,3 +83,8 @@ output "cognito_app_client_id" {
   description = "Cognito app client ID."
   value       = module.cognito.app_client_id
 }
+
+output "acm_certificate_arn" {
+  description = "ACM certificate ARN."
+  value       = var.enable_https ? aws_acm_certificate.this.arn : ""
+}

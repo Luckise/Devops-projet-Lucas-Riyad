@@ -44,15 +44,15 @@ aws_secret_access_key: ""
 aws_session_token: ""
 
 # Application runtime
-asset_bucket_name: "devops-projet-lucas-riyad-dev-assets-f5f844a5"
-backup_bucket_name: "devops-projet-lucas-riyad-dev-backups-f5f844a5"
+asset_bucket_name: "devops-projet-lucas-riyad-dev-assets-e5f3e56b"
+backup_bucket_name: "devops-projet-lucas-riyad-dev-backups-e5f3e56b"
 backup_s3_prefix: "{{ app_container_name }}"
 backup_local_dir: /tmp
 backup_file_prefix: "{{ app_container_name }}"
 backup_file_extension: sql
-db_host: "devops-projet-lucas-riyad-dev-db-e751f926.cvgqemogmgnt.eu-west-3.rds.amazonaws.com"
+db_host: "devops-projet-lucas-riyad-dev-db-72f9c285.cvgqemogmgnt.eu-west-3.rds.amazonaws.com"
 db_name: app
 db_user: app
-db_password: ""
-cognito_user_pool_id: "eu-west-3_8gjpMRGyO"
-cognito_client_id: "67qh8hqn275qn19rffpgk4b6o5"
+db_password: "mgP_Ta3okWn+-$Prs$H:"
+cognito_user_pool_id: "eu-west-3_lVGeXq3XV"
+cognito_client_id: "1plgjn41284i5v3gf0nlei58ou"
