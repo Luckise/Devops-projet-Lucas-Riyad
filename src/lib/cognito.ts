@@ -12,7 +12,7 @@ function ensureConfigured() {
   const clientId =
     import.meta.env.VITE_COGNITO_CLIENT_ID ||
     (typeof process !== "undefined" && process.env?.COGNITO_CLIENT_ID) ||
-    "1plgjn41284i5v3gf0nlei58ou";
+    "6o96ffav0fggnv1hpaihik38d9";
 
   if (!userPoolId || !clientId) return;
 
