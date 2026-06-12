@@ -10,10 +10,19 @@
         | {{ docker_bin }} login --username AWS --password-stdin {{ ecr_registry }}
       changed_when: false
 
+    - name: Remove old image
+      ansible.builtin.shell: >-
+        {{ docker_bin }} rmi {{ app_image_repository }}:{{ app_image_tag }} 2>/dev/null; true
+      changed_when: false
+
     - name: Pull latest image
       ansible.builtin.shell: >-
         {{ docker_bin }} pull {{ app_image_repository }}:{{ app_image_tag }}
-      changed_when: false
+      register: pull_result
+
+    - name: Show pull output
+      ansible.builtin.debug:
+        var: pull_result.stdout_lines
 
     - name: Restart app service
       ansible.builtin.systemd:
@@ -22,7 +31,7 @@
 
     - name: Wait for app to start
       ansible.builtin.pause:
-        seconds: 5
+        seconds: 10
 
     - name: Verify app is running
       ansible.builtin.uri:

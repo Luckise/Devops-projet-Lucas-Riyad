@@ -67,7 +67,7 @@ variable "app_container_port" {
 variable "app_health_check_path" {
   description = "Health check path used by the load balancer target group."
   type        = string
-  default     = "/health"
+  default     = "/events"
 }
 
 variable "ec2_instance_count" {

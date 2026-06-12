@@ -1,4 +1,5 @@
 data "aws_ami" "ubuntu" {
+  count       = var.ami_id == "" ? 1 : 0
   most_recent = true
   owners      = ["099720109477"]
 
@@ -91,7 +92,7 @@ resource "aws_iam_role_policy" "cognito" {
 resource "aws_instance" "this" {
   count = var.instance_count
 
-  ami                         = data.aws_ami.ubuntu.id
+  ami                         = var.ami_id != "" ? var.ami_id : data.aws_ami.ubuntu[0].id
   instance_type               = var.instance_type
   subnet_id                   = var.subnet_ids[count.index % length(var.subnet_ids)]
   vpc_security_group_ids      = var.security_group_ids
