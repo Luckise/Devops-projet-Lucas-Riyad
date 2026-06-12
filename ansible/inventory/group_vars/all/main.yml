@@ -12,7 +12,7 @@ app_install_dir: "/opt/{{ app_container_name }}"
 app_backup_dir: "{{ app_install_dir }}/backup"
 app_container_name: app
 app_container_port: 3000
-app_health_check_path: /health
+app_health_check_path: /events
 app_node_env: production
 app_restart_policy: always
 app_backup_cron_minute: "0"
