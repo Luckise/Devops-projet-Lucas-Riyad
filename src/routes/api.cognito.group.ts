@@ -42,10 +42,8 @@ async function handle({ request }: { request: Request }) {
       });
     }
 
-    const {
-      CognitoIdentityProviderClient,
-      AdminAddUserToGroupCommand,
-    } = await import("@aws-sdk/client-cognito-identity-provider");
+    const { CognitoIdentityProviderClient, AdminAddUserToGroupCommand } =
+      await import("@aws-sdk/client-cognito-identity-provider");
     const client = new CognitoIdentityProviderClient({ region: "eu-west-3" });
 
     const userPoolId = process.env.VITE_COGNITO_USER_POOL_ID;
