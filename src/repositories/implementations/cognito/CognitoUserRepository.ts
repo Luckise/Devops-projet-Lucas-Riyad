@@ -1,31 +1,40 @@
 import {
-  getCurrentUser,
-  fetchUserAttributes,
-  fetchAuthSession,
-  signIn,
-  signUp,
-  confirmSignUp,
-  resendSignUpCode,
-  signOut,
-  updateUserAttribute,
-} from "aws-amplify/auth";
-import { Hub } from "aws-amplify/utils";
+  CognitoUser,
+  AuthenticationDetails,
+  CognitoUserAttribute,
+} from "amazon-cognito-identity-js";
 import type { IUserRepository } from "../../interfaces/IUserRepository";
 import type { UserProfile, UserCredentials, SignUpData } from "../../../types/models";
-import "../../../lib/amplify";
+import { userPool } from "../../../lib/cognito";
 
-async function getUserIsAdmin(): Promise<boolean> {
-  try {
-    const session = await fetchAuthSession();
-    const groups = session.tokens?.idToken?.payload?.["cognito:groups"] as string[] | undefined;
-    return Array.isArray(groups) && groups.includes("Admin");
-  } catch {
-    return false;
+type AuthListener = (event: string) => void;
+const listeners = new Set<AuthListener>();
+
+function emit(event: string) {
+  listeners.forEach((cb) => cb(event));
+}
+
+function decodeJwtPayload(token: string): Record<string, unknown> {
+  const payload = token.split(".")[1];
+  const base64 = payload.replace(/-/g, "+").replace(/_/g, "/");
+  const padded = base64.padEnd(base64.length + ((4 - (base64.length % 4)) % 4), "=");
+  const binary = atob(padded);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return JSON.parse(new TextDecoder().decode(bytes));
+}
+
+function getCognitoUser(email?: string): CognitoUser {
+  if (email) {
+    return new CognitoUser({ Username: email, Pool: userPool });
   }
+  const current = userPool.getCurrentUser();
+  if (!current) throw new Error("No authenticated user");
+  return current;
 }
 
 function deriveProfile(
-  attrs: Record<string, string | undefined>,
+  attrs: Record<string, string>,
   email: string,
   isAdmin: boolean,
 ): UserProfile {
@@ -41,70 +50,166 @@ function deriveProfile(
 
 export class CognitoUserRepository implements IUserRepository {
   async getCurrentUser(): Promise<UserProfile> {
-    const user = await getCurrentUser();
-    const attrs = await fetchUserAttributes();
-    const email = attrs.email || user.userId;
-    const isAdmin = await getUserIsAdmin();
-    return deriveProfile(attrs, email, isAdmin);
+    const cognitoUser = getCognitoUser();
+
+    return new Promise((resolve, reject) => {
+      cognitoUser.getSession((err: Error | null, session: any) => {
+        if (err || !session?.isValid()) {
+          reject(err || new Error("Invalid session"));
+          return;
+        }
+
+        cognitoUser.getUserAttributes((attrErr, attributes) => {
+          if (attrErr || !attributes) {
+            reject(attrErr || new Error("Cannot fetch attributes"));
+            return;
+          }
+
+          const attrs: Record<string, string> = {};
+          attributes.forEach((a) => {
+            attrs[a.getName()] = a.getValue();
+          });
+
+          const idToken = session.getIdToken().getJwtToken();
+          const payload = decodeJwtPayload(idToken);
+          const groups = payload["cognito:groups"] as string[] | undefined;
+          const isAdmin = Array.isArray(groups) && groups.includes("Admin");
+
+          const email = attrs.email || cognitoUser.getUsername();
+          resolve(deriveProfile(attrs, email, isAdmin));
+        });
+      });
+    });
   }
 
   async signIn(credentials: UserCredentials): Promise<UserProfile> {
-    await signIn({ username: credentials.email, password: credentials.password });
+    const authDetails = new AuthenticationDetails({
+      Username: credentials.email,
+      Password: credentials.password,
+    });
+    const cognitoUser = getCognitoUser(credentials.email);
+
+    await new Promise<void>((resolve, reject) => {
+      cognitoUser.authenticateUser(authDetails, {
+        onSuccess: () => resolve(),
+        onFailure: (err) => reject(err),
+      });
+    });
+
+    emit("signedIn");
     return this.getCurrentUser();
   }
 
   async signUp(data: SignUpData): Promise<void> {
-    await signUp({
-      username: data.email,
-      password: data.password,
-      options: {
-        userAttributes: {
-          email: data.email,
-          given_name: data.firstName,
-          family_name: data.lastName || "User",
-          nickname: `@${data.firstName.toLowerCase()}${data.lastName ? "_" + data.lastName.toLowerCase() : ""}`,
-        },
-      },
+    const nickname = `@${data.firstName.toLowerCase()}${data.lastName ? "_" + data.lastName.toLowerCase() : ""}`;
+    const attributeList = [
+      new CognitoUserAttribute({ Name: "email", Value: data.email }),
+      new CognitoUserAttribute({
+        Name: "given_name",
+        Value: data.firstName,
+      }),
+      new CognitoUserAttribute({
+        Name: "family_name",
+        Value: data.lastName || "User",
+      }),
+      new CognitoUserAttribute({ Name: "nickname", Value: nickname }),
+    ];
+
+    await new Promise<void>((resolve, reject) => {
+      userPool.signUp(data.email, data.password, attributeList, [], (err) => {
+        if (err) reject(err);
+        else resolve();
+      });
     });
   }
 
   async confirmSignUp(email: string, code: string): Promise<void> {
-    await confirmSignUp({ username: email, confirmationCode: code });
+    const cognitoUser = getCognitoUser(email);
+    await new Promise<void>((resolve, reject) => {
+      cognitoUser.confirmRegistration(code, true, (err) => {
+        if (err) reject(err);
+        else resolve();
+      });
+    });
   }
 
   async resendSignUpCode(email: string): Promise<void> {
-    await resendSignUpCode({ username: email });
+    const cognitoUser = getCognitoUser(email);
+    await new Promise<void>((resolve, reject) => {
+      cognitoUser.resendConfirmationCode((err) => {
+        if (err) reject(err);
+        else resolve();
+      });
+    });
   }
 
   async signOut(): Promise<void> {
-    await signOut();
+    const cognitoUser = userPool.getCurrentUser();
+    if (cognitoUser) {
+      cognitoUser.signOut();
+    }
+    emit("signedOut");
   }
 
   async updateProfile(profile: Partial<UserProfile>): Promise<void> {
-    const updates: { attributeKey: string; value: string }[] = [];
-    if (profile.firstName !== undefined) {
-      updates.push({ attributeKey: "given_name", value: profile.firstName });
-    }
-    if (profile.lastName !== undefined) {
-      updates.push({ attributeKey: "family_name", value: profile.lastName });
-    }
-    if (profile.nickname !== undefined) {
-      updates.push({ attributeKey: "nickname", value: profile.nickname });
-    }
-    if (profile.avatar !== undefined && !profile.avatar.startsWith("data:")) {
-      updates.push({ attributeKey: "picture", value: profile.avatar });
-    }
-    if (updates.length > 0) {
-      await Promise.all(updates.map((u) => updateUserAttribute({ userAttribute: u })));
-    }
+    const cognitoUser = getCognitoUser();
+
+    await new Promise<void>((resolve, reject) => {
+      cognitoUser.getSession((err: Error | null) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        const updates: CognitoUserAttribute[] = [];
+        if (profile.firstName !== undefined) {
+          updates.push(
+            new CognitoUserAttribute({
+              Name: "given_name",
+              Value: profile.firstName,
+            }),
+          );
+        }
+        if (profile.lastName !== undefined) {
+          updates.push(
+            new CognitoUserAttribute({
+              Name: "family_name",
+              Value: profile.lastName,
+            }),
+          );
+        }
+        if (profile.nickname !== undefined) {
+          updates.push(
+            new CognitoUserAttribute({
+              Name: "nickname",
+              Value: profile.nickname,
+            }),
+          );
+        }
+        if (profile.avatar !== undefined && !profile.avatar.startsWith("data:")) {
+          updates.push(
+            new CognitoUserAttribute({
+              Name: "picture",
+              Value: profile.avatar,
+            }),
+          );
+        }
+
+        if (updates.length === 0) {
+          resolve();
+          return;
+        }
+
+        cognitoUser.updateAttributes(updates, (updateErr) => {
+          if (updateErr) reject(updateErr);
+          else resolve();
+        });
+      });
+    });
   }
 
   onAuthEvent(callback: (event: string) => void): () => void {
-    const unsubscribe = Hub.listen("auth", ({ payload }) => {
-      if (payload.event === "signedIn" || payload.event === "signedOut") {
-        callback(payload.event);
-      }
-    });
-    return unsubscribe;
+    listeners.add(callback);
+    return () => listeners.delete(callback);
   }
 }

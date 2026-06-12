@@ -6,14 +6,13 @@ import tailwindcss from "@tailwindcss/vite";
 import { nitro } from "nitro/vite";
 
 const config = defineConfig({
-  resolve: {
-    tsconfigPaths: true,
-    alias: {
-      buffer: "buffer",
+  resolve: { tsconfigPaths: true },
+  build: {
+    rollupOptions: {
+      output: {
+        banner: `import{Buffer as _B}from"buffer";if(typeof globalThis.Buffer==="undefined")globalThis.Buffer=_B;`,
+      },
     },
-  },
-  define: {
-    global: "globalThis",
   },
   plugins: [
     devtools(),
@@ -22,13 +21,6 @@ const config = defineConfig({
     tanstackStart(),
     viteReact(),
   ],
-  optimizeDeps: {
-    esbuildOptions: {
-      define: {
-        global: "globalThis",
-      },
-    },
-  },
 });
 
 export default config;

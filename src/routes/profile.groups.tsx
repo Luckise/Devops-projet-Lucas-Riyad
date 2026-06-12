@@ -27,7 +27,7 @@ import {
   userRole,
 } from "../lib/groups";
 import type { Group } from "../lib/groups";
-import { fetchAuthSession } from "aws-amplify/auth";
+import { getCurrentIdToken } from "../lib/cognito";
 import { getServices } from "../di/container";
 
 export const Route = createFileRoute("/profile/groups")({
@@ -82,8 +82,7 @@ function ProfileGroupsRoute() {
 
     if (ok && profile?.isAdmin) {
       try {
-        const session = await fetchAuthSession();
-        const idToken = session.tokens?.idToken?.toString();
+        const idToken = await getCurrentIdToken();
         if (idToken) {
           await fetch("/api/cognito/group", {
             method: "POST",
