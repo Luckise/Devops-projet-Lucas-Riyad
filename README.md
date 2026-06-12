@@ -2,7 +2,7 @@
 
 Projet d'infrastructure et déploiement — 4e année EFREI.
 
-On déploie une app TanStack Start (full-stack SSR) sur 2 EC2 derrière un ALB, avec RDS PostgreSQL, Cognito pour l'auth, S3 pour les assets et backups, le tout provisionné en Terraform, configuré avec Ansible et livré en CI/CD via GitHub Actions.
+On déploie une app TanStack Start (full-stack SSR) sur 2 EC2 derrière un ALB, avec RDS PostgreSQL, Cognito pour l'auth, S3 pour les assets et backups, le tout provisionné en Terraform, configuré avec Ansible et livré en CI/CD via GitHub Actions. HTTPS via DuckDNS + certificat ACM (gratuit).
 
 ---
 
@@ -27,7 +27,7 @@ On déploie une app TanStack Start (full-stack SSR) sur 2 EC2 derrière un ALB, 
 
 ## Pré-requis
 
-- **AWS account** avec les permissions pour créer VPC, EC2, RDS, ALB, S3, Cognito, ECR, Route 53
+- **AWS account** avec les permissions pour créer VPC, EC2, RDS, ALB, S3, Cognito, ECR
 - **Terraform** ≥ 1.6
 - **Ansible** ≥ 2.15
 - **Python 3** + `molecule` et `docker` (pour les tests)
@@ -43,10 +43,10 @@ On déploie une app TanStack Start (full-stack SSR) sur 2 EC2 derrière un ALB, 
 ```
                           Internet
                              |
-                      [Route 53]
-                     app-lucas-riyad.com
+                       [DuckDNS]
+                    app-lucas.duckdns.org
                              |
-                          [ALB] (port 443 HTTPS → redirige 80→443)
+                           [ALB] (port 443 HTTPS → redirige 80→443)
                          /        \
                    [EC2 app]    [EC2 app]        ← N=2, port 3000, Docker
                         |            |
@@ -59,7 +59,7 @@ On déploie une app TanStack Start (full-stack SSR) sur 2 EC2 derrière un ALB, 
   [Cognito]                    ← auth gérée par AWS
   [S3 assets]                  ← uploads de l'application
   [ECR]                        ← registry Docker
-  [Route 53]                   ← DNS : app-lucas-riyad.com
+  [DuckDNS]                    ← DNS gratuit : app-lucas.duckdns.org
 ```
 
 ### Détail des machines
@@ -112,9 +112,9 @@ On déploie une app TanStack Start (full-stack SSR) sur 2 EC2 derrière un ALB, 
 ### Flux réseau
 
 ```
-1. User → https://app-lucas-riyad.com (port 443)
+1. User → https://app-lucas.duckdns.org (port 443)
        ↓
-2. Route 53 résout → ALB DNS (IP publique)
+2. DuckDNS résout → ALB DNS (IP publique)
        ↓
 3. ALB reçoit, termine TLS (certificat ACM)
        ↓
@@ -232,10 +232,11 @@ Dans `ansible/inventory/group_vars/` :
 
 ### Playbooks
 
-| Playbook      | Description                                         |
-| ------------- | --------------------------------------------------- |
-| `site.yml`    | Configure les instances app (common → app → backup) |
-| `restore.yml` | Récupère le dernier backup S3 et restaure la BDD    |
+| Playbook      | Description                                                  |
+| ------------- | ------------------------------------------------------------ |
+| `site.yml`    | Configuration complète des instances (common → app → backup) |
+| `deploy.yml`  | Pull dernière image Docker + restart + health check          |
+| `restore.yml` | Récupère le dernier backup S3 et restaure la BDD             |
 
 ---
 
@@ -288,18 +289,18 @@ Deux workflows :
 ### `ci.yml` — Sur push et PR
 
 ```
-Push sur main / PR
+Push sur main
        ↓
-  [Lint + Format]    ← oxlint + oxfmt --check
+  [Lint + Format]    ← oxfmt --check + oxlint
        ↓ (si main)
-  [Build Docker]     ← docker build -t <ecr_url>:sha-<sha> -t <ecr_url>:latest
+  [Build Docker]     ← docker build (avec build-args pour Cognito, DB, S3)
        ↓
-  [Push ECR]        ← docker push (sha + latest)
+  [Push ECR]        ← docker push (latest)
        ↓
-  [Deploy]          ← ansible-playbook site.yml -e app_image_tag=sha-<sha>
+  [Ansible Deploy]  ← ansible-playbook deploy.yml (pull + restart + health check)
 ```
 
-Le tag `sha-<git_sha>` permet de tracer exactement quelle version tourne sur chaque EC2. Le tag `latest` est mis à jour à chaque push sur main pour le bootstrap des nouvelles instances.
+Le workflow CI build et push l'image vers ECR (tag `latest`). Le déploiement Ansible est déclenché manuellement via `ansible-playbook deploy.yml` — il pull la dernière image et redémarre les conteneurs.
 
 ## Stratégie de backup
 
@@ -354,9 +355,11 @@ ansible-playbook ansible/playbooks/restore.yml -i ansible/inventory/hosts.yml
 
 - **Credentials AWS** : jamais en clair. Les EC2 utilisent une IAM Role (pas de clés statiques). L'Ansible Vault est utilisé pour le mot de passe RDS.
 - **Secrets dans le repo** : `.gitignore` exclut `*.tfstate`, `*.tfvars`, `vault.yml`, `*.pem`, `.env`. Toute credential commitée en clair par erreur est une pénalité automatique.
+- **GitHub Actions Secrets** : `VITE_COGNITO_USER_POOL_ID`, `VITE_COGNITO_CLIENT_ID`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `RDS_PASSWORD`, `S3_BUCKET_NAME` — tous requis pour le build CI et le déploiement.
 - **Réseau** : RDS dans subnet privé, pas d'IP publique. EC2 accessibles uniquement sur le port 22 (SSH) et seulement depuis une IP admin, ou via SSM Session Manager.
 - **ALB** : seul point d'entrée, TLS terminé au niveau de l'ALB. Les EC2 reçoivent le trafic en HTTP clair.
 - **Bucket S3** : blocs d'accès public activés, chiffrement AES256 côté serveur.
+- **Cognito** : App Client sans client secret pour les appels browser. Les opérations sensibles (AdminAddUserToGroup) passent par des API routes serveur.
 
 ---
 
@@ -394,7 +397,8 @@ ansible-playbook ansible/playbooks/restore.yml -i ansible/inventory/hosts.yml
 │   │   ├── app/                  # Pull image + systemd
 │   │   └── backup/               # pg_dump + cron + S3
 │   ├── playbooks/
-│   │   ├── site.yml              # Déploiement principal
+│   │   ├── site.yml              # Configuration complète des instances
+│   │   ├── deploy.yml            # Pull image + restart + health check
 │   │   └── restore.yml           # Restauration depuis S3 (bonus)
 │   ├── molecule/                 # Tests Molecule
 │   │   └── default/
@@ -412,11 +416,27 @@ ansible-playbook ansible/playbooks/restore.yml -i ansible/inventory/hosts.yml
 
 ---
 
+## Accès
+
+| Ressource   | URL / Endpoint                                                                                |
+| ----------- | --------------------------------------------------------------------------------------------- |
+| Application | https://app-lucas.duckdns.org                                                                 |
+| Cognito     | User Pool `eu-west-3_lVGeXq3XV`, App Client `6o96ffav0fggnv1hpaihik38d9`                      |
+| RDS         | `devops-projet-lucas-riyad-dev-db-72f9c285.cvgqemogmgnt.eu-west-3.rds.amazonaws.com:5432/app` |
+| ECR         | `697359331837.dkr.ecr.eu-west-3.amazonaws.com/devops-projet-lucas-riyad-dev-app`              |
+| S3 assets   | `devops-projet-lucas-riyad-dev-assets-e5f3e56b`                                               |
+| S3 backups  | `devops-projet-lucas-riyad-dev-backups-e5f3e56b`                                              |
+| EC2 1       | `i-0a8987c4ea7c4188b` (15.224.19.226)                                                         |
+| EC2 2       | `i-09e51ec0c58363c14` (51.44.250.124)                                                         |
+| ACM cert    | `arn:aws:acm:eu-west-3:697359331837:certificate/abdae829-fe52-489d-8a92-925f72c24922`         |
+
+---
+
 ## Galères rencontrées
 
-- **ALB ne forwarde pas automatiquement le chemin** : il faut bien configurer le target group sur le bon port et un health check qui répond 200 (`/health`).
+- **ALB ne forward pas automatiquement le chemin** : il faut bien configurer le target group sur le bon port et un health check qui répond 200 (`/events`).
 - **ECR login expire toutes les 12h** : Ansible doit refaire `aws ecr get-login-password` à chaque déploiement.
 - **Security groups chaînés** : on référence le SG par son ID (`aws_security_group.app.id`), pas par son nom — sinon Terraform ne détecte pas les changements.
-- **Route 53 + Duck DNS** : on ne peut pas faire un alias Route 53 vers un nom de domaine externe directement. La solution est une délégation NS.
+- **DNS gratuit via DuckDNS** : on utilise `app-lucas.duckdns.org` au lieu de Route 53 (payant). DuckDNS pointe vers l'ALB. Le certificat ACM est valide pour le domaine.
 - **Docker restart** : sans `force_source: true`, Docker ne re-pull pas l'image si le tag existe déjà en cache. On a utilisé `ansible.builtin.shell` avec `docker pull` pour forcer.
 - **oxlint/oxfmt** : ce sont des outils Rust distribués via npm. Installation avec `npm i -g oxlint` ou via les devDependencies du projet.
