@@ -1,8 +1,3 @@
-import { Buffer } from "buffer";
-if (typeof globalThis.Buffer === "undefined") {
-  globalThis.Buffer = Buffer;
-}
-
 import { CognitoUserPool } from "amazon-cognito-identity-js";
 
 const userPoolId =
