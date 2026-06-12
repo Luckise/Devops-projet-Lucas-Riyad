@@ -7,14 +7,14 @@ export default function SaveButton({ eventId, compact }: { eventId: string; comp
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    getServices().eventService.isSaved(eventId).then(setSaved);
+    getServices().then((svc) => svc.eventService.isSaved(eventId).then(setSaved));
     setReady(true);
   }, [eventId]);
 
   const handleClick = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    const next = await getServices().eventService.toggleSaved(eventId);
+    const next = await (await getServices()).eventService.toggleSaved(eventId);
     setSaved(next);
     toast(next ? "Added to watchlist" : "Removed from watchlist");
   };

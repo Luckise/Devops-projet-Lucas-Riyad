@@ -8,7 +8,7 @@ import { toast } from "../lib/toast";
 export const Route = createFileRoute("/tips/new")({
   beforeLoad: async () => {
     try {
-      await getServices().authService.getCurrentUser();
+      await (await getServices()).authService.getCurrentUser();
     } catch {
       throw redirect({ to: "/login" });
     }
@@ -58,7 +58,7 @@ function TipCreate() {
       tip.address = address;
     }
 
-    await getServices().tipService.create(tip as any);
+    await (await getServices()).tipService.create(tip as any);
     setSubmitting(false);
     toast("Tip created successfully");
     navigate({ to: "/tips" });

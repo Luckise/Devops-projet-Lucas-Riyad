@@ -10,14 +10,14 @@ type ContentBlock = { type: "text" | "image"; value: string };
 export const Route = createFileRoute("/posts/$postId/modify")({
   beforeLoad: async () => {
     try {
-      await getServices().authService.getCurrentUser();
+      await (await getServices()).authService.getCurrentUser();
     } catch {
       throw redirect({ to: "/login" });
     }
   },
   component: PostEditRoute,
   loader: async ({ params }) => {
-    const post = await getServices().postService.getById(params.postId);
+    const post = await (await getServices()).postService.getById(params.postId);
     if (!post) throw new Error("Post not found");
     return { post };
   },
@@ -38,7 +38,7 @@ function PostEditRoute() {
     if (!hasText) return;
     setSubmitting(true);
 
-    await getServices().postService.update(post.id, { content: filledContent } as any);
+    await (await getServices()).postService.update(post.id, { content: filledContent } as any);
     setSubmitting(false);
     toast("Post updated");
     navigate({ to: "/feed" });

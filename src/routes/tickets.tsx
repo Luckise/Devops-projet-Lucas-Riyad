@@ -8,7 +8,7 @@ import type { Ticket as TicketModel } from "../types/models";
 export const Route = createFileRoute("/tickets")({
   beforeLoad: async () => {
     try {
-      await getServices().authService.getCurrentUser();
+      await (await getServices()).authService.getCurrentUser();
     } catch {
       throw redirect({ to: "/login" });
     }
@@ -55,7 +55,7 @@ function TicketsRoute() {
   const [dynamicTickets, setDynamicTickets] = useState<TicketModel[]>([]);
 
   useEffect(() => {
-    getServices().ticketService.getAll().then(setDynamicTickets);
+    getServices().then((svc) => svc.ticketService.getAll().then(setDynamicTickets));
   }, []);
 
   const allTickets = [...dynamicTickets, ...MOCK_TICKETS];

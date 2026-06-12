@@ -33,7 +33,7 @@ import { getServices } from "../di/container";
 export const Route = createFileRoute("/profile/groups")({
   beforeLoad: async () => {
     try {
-      const profile = await getServices().authService.getCurrentUser();
+      const profile = await (await getServices()).authService.getCurrentUser();
       if (!profile.isAdmin) throw redirect({ to: "/profile" });
     } catch (err) {
       if (err instanceof redirect) throw err;

@@ -14,7 +14,7 @@ function TipsRoute() {
   const [allTips, setAllTips] = useState<Tip[]>([]);
 
   useEffect(() => {
-    getServices().tipService.getAll().then(setAllTips);
+    getServices().then((svc) => svc.tipService.getAll().then(setAllTips));
   }, []);
 
   const filteredTips = allTips.filter(

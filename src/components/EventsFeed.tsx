@@ -11,12 +11,12 @@ export default function EventsFeed() {
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
-    getServices()
-      .eventService.getAll()
-      .then((all) => {
+    getServices().then((svc) =>
+      svc.eventService.getAll().then((all) => {
         const upcoming = all.filter((e) => !e.hidden && !isEventPast(e));
         setEvents(upcoming);
-      });
+      }),
+    );
   }, []);
 
   const filtered = searchQuery

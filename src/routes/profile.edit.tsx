@@ -7,7 +7,7 @@ import { getServices } from "../di/container";
 export const Route = createFileRoute("/profile/edit")({
   beforeLoad: async () => {
     try {
-      await getServices().authService.getCurrentUser();
+      await (await getServices()).authService.getCurrentUser();
     } catch {
       throw redirect({ to: "/login" });
     }

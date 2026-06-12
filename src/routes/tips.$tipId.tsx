@@ -5,7 +5,7 @@ import { ArrowLeft, Clock, ChefHat, MapPin } from "lucide-react";
 export const Route = createFileRoute("/tips/$tipId")({
   component: TipDetailsRoute,
   loader: async ({ params }) => {
-    const tip = await getServices().tipService.getById(params.tipId);
+    const tip = await (await getServices()).tipService.getById(params.tipId);
     if (!tip) throw new Error("Tip not found");
     return { tip };
   },

@@ -96,8 +96,10 @@ function FeedRoute() {
     if (saved) setDeletedPostIds(JSON.parse(saved));
     const stored = localStorage.getItem("eat_user_profile");
     if (stored) setProfile(JSON.parse(stored));
-    getServices().eventService.getMyEventIds().then(setMyEventIds);
-    getServices().eventService.getAll().then(setEvents);
+    getServices().then((svc) => {
+      svc.eventService.getMyEventIds().then(setMyEventIds);
+      svc.eventService.getAll().then(setEvents);
+    });
   }, []);
 
   const userEmail = profile.email || "";

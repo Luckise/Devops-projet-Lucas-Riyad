@@ -11,13 +11,7 @@ import { LocalStorageGroupRepository } from "../repositories/implementations/loc
 import { LocalStorageTipRepository } from "../repositories/implementations/local-storage/LocalStorageTipRepository";
 import { LocalStoragePostRepository } from "../repositories/implementations/local-storage/LocalStoragePostRepository";
 import { LocalStorageTicketRepository } from "../repositories/implementations/local-storage/LocalStorageTicketRepository";
-import { DatabaseEventRepository } from "../repositories/implementations/database/DatabaseEventRepository";
-import { DatabaseGroupRepository } from "../repositories/implementations/database/DatabaseGroupRepository";
-import { DatabaseTipRepository } from "../repositories/implementations/database/DatabaseTipRepository";
-import { DatabasePostRepository } from "../repositories/implementations/database/DatabasePostRepository";
-import { DatabaseTicketRepository } from "../repositories/implementations/database/DatabaseTicketRepository";
 import { CognitoUserRepository } from "../repositories/implementations/cognito/CognitoUserRepository";
-import { S3ImageRepository } from "../repositories/implementations/s3/S3ImageRepository";
 
 import { EventService } from "../services/implementations/EventService";
 import { GroupService } from "../services/implementations/GroupService";
@@ -57,28 +51,75 @@ function hasDatabaseUrl(): boolean {
   return false;
 }
 
-function createEventRepo(): IEventRepository {
-  if (hasDatabaseUrl()) return new DatabaseEventRepository();
+let _dbEventRepo: IEventRepository | null = null;
+let _dbGroupRepo: IGroupRepository | null = null;
+let _dbTipRepo: ITipRepository | null = null;
+let _dbPostRepo: IPostRepository | null = null;
+let _dbTicketRepo: ITicketRepository | null = null;
+let _s3ImageRepo: IImageRepository | null = null;
+
+async function createEventRepo(): Promise<IEventRepository> {
+  if (hasDatabaseUrl()) {
+    if (!_dbEventRepo) {
+      const { DatabaseEventRepository } = await import(
+        "../repositories/implementations/database/DatabaseEventRepository"
+      );
+      _dbEventRepo = new DatabaseEventRepository();
+    }
+    return _dbEventRepo;
+  }
   return new LocalStorageEventRepository();
 }
 
-function createGroupRepo(): IGroupRepository {
-  if (hasDatabaseUrl()) return new DatabaseGroupRepository();
+async function createGroupRepo(): Promise<IGroupRepository> {
+  if (hasDatabaseUrl()) {
+    if (!_dbGroupRepo) {
+      const { DatabaseGroupRepository } = await import(
+        "../repositories/implementations/database/DatabaseGroupRepository"
+      );
+      _dbGroupRepo = new DatabaseGroupRepository();
+    }
+    return _dbGroupRepo;
+  }
   return new LocalStorageGroupRepository();
 }
 
-function createTipRepo(): ITipRepository {
-  if (hasDatabaseUrl()) return new DatabaseTipRepository();
+async function createTipRepo(): Promise<ITipRepository> {
+  if (hasDatabaseUrl()) {
+    if (!_dbTipRepo) {
+      const { DatabaseTipRepository } = await import(
+        "../repositories/implementations/database/DatabaseTipRepository"
+      );
+      _dbTipRepo = new DatabaseTipRepository();
+    }
+    return _dbTipRepo;
+  }
   return new LocalStorageTipRepository();
 }
 
-function createPostRepo(): IPostRepository {
-  if (hasDatabaseUrl()) return new DatabasePostRepository();
+async function createPostRepo(): Promise<IPostRepository> {
+  if (hasDatabaseUrl()) {
+    if (!_dbPostRepo) {
+      const { DatabasePostRepository } = await import(
+        "../repositories/implementations/database/DatabasePostRepository"
+      );
+      _dbPostRepo = new DatabasePostRepository();
+    }
+    return _dbPostRepo;
+  }
   return new LocalStoragePostRepository();
 }
 
-function createTicketRepo(): ITicketRepository {
-  if (hasDatabaseUrl()) return new DatabaseTicketRepository();
+async function createTicketRepo(): Promise<ITicketRepository> {
+  if (hasDatabaseUrl()) {
+    if (!_dbTicketRepo) {
+      const { DatabaseTicketRepository } = await import(
+        "../repositories/implementations/database/DatabaseTicketRepository"
+      );
+      _dbTicketRepo = new DatabaseTicketRepository();
+    }
+    return _dbTicketRepo;
+  }
   return new LocalStorageTicketRepository();
 }
 
@@ -86,9 +127,15 @@ function createUserRepo(): IUserRepository {
   return new CognitoUserRepository();
 }
 
-function createImageRepo(): IImageRepository {
+async function createImageRepo(): Promise<IImageRepository> {
   if (hasS3Credentials()) {
-    return new S3ImageRepository();
+    if (!_s3ImageRepo) {
+      const { S3ImageRepository } = await import(
+        "../repositories/implementations/s3/S3ImageRepository"
+      );
+      _s3ImageRepo = new S3ImageRepository();
+    }
+    return _s3ImageRepo;
   }
   return {
     upload: async (file: File): Promise<string> => {
@@ -114,16 +161,19 @@ interface Services {
 
 let instance: Services | null = null;
 
-export function getServices(): Services {
+export async function getServices(): Promise<Services> {
   if (instance) return instance;
 
-  const eventRepo = createEventRepo();
-  const groupRepo = createGroupRepo();
-  const tipRepo = createTipRepo();
-  const postRepo = createPostRepo();
-  const ticketRepo = createTicketRepo();
+  const [eventRepo, groupRepo, tipRepo, postRepo, ticketRepo, imageRepo] =
+    await Promise.all([
+      createEventRepo(),
+      createGroupRepo(),
+      createTipRepo(),
+      createPostRepo(),
+      createTicketRepo(),
+      createImageRepo(),
+    ]);
   const userRepo = createUserRepo();
-  const imageRepo = createImageRepo();
 
   instance = {
     eventService: new EventService(eventRepo),

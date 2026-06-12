@@ -8,14 +8,14 @@ import { toast } from "../lib/toast";
 export const Route = createFileRoute("/profile/tips/$tipId/modify")({
   beforeLoad: async () => {
     try {
-      await getServices().authService.getCurrentUser();
+      await (await getServices()).authService.getCurrentUser();
     } catch {
       throw redirect({ to: "/login" });
     }
   },
   component: ProfileTipEditRoute,
   loader: async ({ params }) => {
-    const tip = await getServices().tipService.getById(params.tipId);
+    const tip = await (await getServices()).tipService.getById(params.tipId);
     if (!tip) throw new Error("Tip not found");
     return { tip };
   },
@@ -68,7 +68,7 @@ function ProfileTipEditRoute() {
       updates.address = address;
     }
 
-    await getServices().tipService.update(tip.id, updates as any);
+    await (await getServices()).tipService.update(tip.id, updates as any);
     setSubmitting(false);
     toast("Tip updated");
     navigate({ to: "/profile/tips" });
@@ -77,14 +77,14 @@ function ProfileTipEditRoute() {
   const handleHide = () => setShowDeleteConfirm(true);
 
   const confirmHide = async () => {
-    await getServices().tipService.hide(tip.id);
+    await (await getServices()).tipService.hide(tip.id);
     setShowDeleteConfirm(false);
     toast("Tip hidden from feed");
     navigate({ to: "/profile/tips" });
   };
 
   const handleUnhide = async () => {
-    await getServices().tipService.unhide(tip.id);
+    await (await getServices()).tipService.unhide(tip.id);
     toast("Tip is now visible");
     navigate({ to: "/profile/tips" });
   };

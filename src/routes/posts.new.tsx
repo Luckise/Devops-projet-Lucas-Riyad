@@ -9,7 +9,7 @@ import type { Event } from "../types/models";
 export const Route = createFileRoute("/posts/new")({
   beforeLoad: async () => {
     try {
-      await getServices().authService.getCurrentUser();
+      await (await getServices()).authService.getCurrentUser();
     } catch {
       throw redirect({ to: "/login" });
     }
@@ -27,7 +27,7 @@ function PostCreate() {
   const [allEvents, setAllEvents] = useState<Event[]>([]);
 
   useEffect(() => {
-    getServices().eventService.getAll().then(setAllEvents);
+    getServices().then((svc) => svc.eventService.getAll().then(setAllEvents));
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -48,7 +48,7 @@ function PostCreate() {
       authorEmail: profile.email || "",
     };
 
-    await getServices().postService.create(post as any);
+    await (await getServices()).postService.create(post as any);
     setSubmitting(false);
     toast("Post published successfully");
     navigate({ to: "/feed" });

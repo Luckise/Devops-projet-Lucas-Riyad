@@ -49,7 +49,7 @@ function SignupRoute() {
   useEffect(() => {
     const checkSession = async () => {
       try {
-        await getServices().authService.getCurrentUser();
+        await (await getServices()).authService.getCurrentUser();
         navigate({ to: "/" });
       } catch {
         // not authenticated, stay on signup
@@ -138,7 +138,7 @@ function SignupRoute() {
     setIsSubmitting(true);
 
     try {
-      await getServices().authService.signUp({ email, password, firstName, lastName });
+      await (await getServices()).authService.signUp({ email, password, firstName, lastName });
       setIsSubmitting(false);
       setStep("verify");
     } catch (err: any) {
@@ -161,7 +161,7 @@ function SignupRoute() {
     setVerifyError("");
 
     try {
-      await getServices().authService.confirmSignUp(email, code);
+      await (await getServices()).authService.confirmSignUp(email, code);
       const profile = {
         firstName,
         lastName: lastName || "User",
@@ -182,7 +182,7 @@ function SignupRoute() {
   const handleResend = async () => {
     setResending(true);
     try {
-      await getServices().authService.resendSignUpCode(email);
+      await (await getServices()).authService.resendSignUpCode(email);
     } catch {
       // silently fail
     }

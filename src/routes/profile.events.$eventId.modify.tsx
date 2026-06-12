@@ -8,7 +8,7 @@ import { toast } from "../lib/toast";
 export const Route = createFileRoute("/profile/events/$eventId/modify")({
   beforeLoad: async () => {
     try {
-      const profile = await getServices().authService.getCurrentUser();
+      const profile = await (await getServices()).authService.getCurrentUser();
       if (!profile.isAdmin) throw redirect({ to: "/profile" });
     } catch (err) {
       if (err instanceof redirect) throw err;
@@ -17,7 +17,7 @@ export const Route = createFileRoute("/profile/events/$eventId/modify")({
   },
   component: ProfileEventEditRoute,
   loader: async ({ params }) => {
-    const event = await getServices().eventService.findEvent(params.eventId);
+    const event = await (await getServices()).eventService.findEvent(params.eventId);
     if (!event) throw new Error("Event not found");
     return { event };
   },
@@ -46,9 +46,9 @@ function ProfileEventEditRoute() {
     const stored = localStorage.getItem("eat_user_profile");
     if (stored) {
       const profile = JSON.parse(stored);
-      getServices()
-        .groupService.getUserGroups(profile.email || "")
-        .then(setUserGroups);
+      getServices().then((svc) =>
+        svc.groupService.getUserGroups(profile.email || "").then(setUserGroups),
+      );
     }
   }, []);
 
@@ -62,7 +62,7 @@ function ProfileEventEditRoute() {
     if (!title || !date || !time || !location || !selectedGroup) return;
     setSubmitting(true);
 
-    await getServices().eventService.update(event.id, {
+    await (await getServices()).eventService.update(event.id, {
       title,
       image,
       date,
@@ -83,14 +83,14 @@ function ProfileEventEditRoute() {
   const handleHide = () => setShowDeleteConfirm(true);
 
   const confirmHide = async () => {
-    await getServices().eventService.hide(event.id);
+    await (await getServices()).eventService.hide(event.id);
     setShowDeleteConfirm(false);
     toast("Event hidden from feed");
     navigate({ to: "/profile/events" });
   };
 
   const handleUnhide = async () => {
-    await getServices().eventService.unhide(event.id);
+    await (await getServices()).eventService.unhide(event.id);
     toast("Event is now visible");
     navigate({ to: "/profile/events" });
   };

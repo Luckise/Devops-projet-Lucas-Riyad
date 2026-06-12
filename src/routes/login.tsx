@@ -32,7 +32,7 @@ function LoginRoute() {
   useEffect(() => {
     const checkSession = async () => {
       try {
-        await getServices().authService.getCurrentUser();
+        await (await getServices()).authService.getCurrentUser();
         navigate({ to: "/" });
       } catch {
         // not authenticated, stay on login
@@ -81,7 +81,7 @@ function LoginRoute() {
     setLoginError("");
 
     try {
-      const profile = await getServices().authService.signIn({ email, password });
+      const profile = await (await getServices()).authService.signIn({ email, password });
       localStorage.setItem("eat_user_profile", JSON.stringify(profile));
       window.dispatchEvent(new Event("user-updated"));
       navigate({ to: "/" });

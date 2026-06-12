@@ -8,7 +8,7 @@ import { toast } from "../lib/toast";
 export const Route = createFileRoute("/events/new")({
   beforeLoad: async () => {
     try {
-      const profile = await getServices().authService.getCurrentUser();
+      const profile = await (await getServices()).authService.getCurrentUser();
       if (!profile.isAdmin) throw redirect({ to: "/" });
     } catch (err) {
       if (err instanceof redirect) throw err;
@@ -37,9 +37,9 @@ function EventCreate() {
     const stored = localStorage.getItem("eat_user_profile");
     if (stored) {
       const profile = JSON.parse(stored);
-      getServices()
-        .groupService.getUserGroups(profile.email || "")
-        .then(setUserGroups);
+      getServices().then((svc) =>
+        svc.groupService.getUserGroups(profile.email || "").then(setUserGroups),
+      );
     }
   }, []);
 
@@ -48,7 +48,7 @@ function EventCreate() {
     if (!title || !date || !time || !location || !selectedGroup) return;
     setSubmitting(true);
 
-    await getServices().eventService.create({
+    await (await getServices()).eventService.create({
       title,
       image,
       date,

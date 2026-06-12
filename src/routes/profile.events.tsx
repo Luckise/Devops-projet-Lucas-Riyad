@@ -7,7 +7,7 @@ import { formatDate, formatTime } from "../lib/date-utils";
 export const Route = createFileRoute("/profile/events")({
   beforeLoad: async () => {
     try {
-      const profile = await getServices().authService.getCurrentUser();
+      const profile = await (await getServices()).authService.getCurrentUser();
       if (!profile.isAdmin) throw redirect({ to: "/profile" });
     } catch (err) {
       if (err instanceof redirect) throw err;
@@ -28,17 +28,15 @@ function ProfileEventsRoute() {
     if (!stored) return;
     const profile = JSON.parse(stored);
     const email = profile?.email || "";
-    getServices()
-      .groupService.getUserGroups(email)
-      .then((groups) => {
+    getServices().then((svc) =>
+      svc.groupService.getUserGroups(email).then((groups) => {
         const userGroupIds = groups.map((g) => g.id);
-        getServices()
-          .eventService.getAll()
-          .then((all) => {
-            const filtered = all.filter((e) => e.groupId && userGroupIds.includes(e.groupId));
-            setEvents(filtered);
-          });
-      });
+        svc.eventService.getAll().then((all) => {
+          const filtered = all.filter((e) => e.groupId && userGroupIds.includes(e.groupId));
+          setEvents(filtered);
+        });
+      }),
+    );
   }, [hasChild]);
 
   if (hasChild) return <Outlet />;

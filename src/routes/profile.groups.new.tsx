@@ -11,7 +11,7 @@ type ContentBlock = { type: "text" | "image"; value: string };
 export const Route = createFileRoute("/profile/groups/new")({
   beforeLoad: async () => {
     try {
-      await getServices().authService.getCurrentUser();
+      await (await getServices()).authService.getCurrentUser();
     } catch {
       throw redirect({ to: "/login" });
     }

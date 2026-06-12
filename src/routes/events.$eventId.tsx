@@ -18,7 +18,7 @@ import { toast } from "../lib/toast";
 export const Route = createFileRoute("/events/$eventId")({
   component: EventDetailsRoute,
   loader: async ({ params }) => {
-    const event = await getServices().eventService.findEvent(params.eventId);
+    const event = await (await getServices()).eventService.findEvent(params.eventId);
     if (!event) throw new Error("Event not found");
     return { event };
   },
@@ -36,7 +36,7 @@ function EventDetailsRoute() {
 
   const handleJoin = async () => {
     try {
-      await getServices().authService.getCurrentUser();
+      await (await getServices()).authService.getCurrentUser();
     } catch {
       navigate({ to: "/login" });
       return;
@@ -54,7 +54,7 @@ function EventDetailsRoute() {
     const newJoined = joined + 1;
     setJoined(newJoined);
 
-    const services = getServices();
+    const services = await getServices();
     await services.eventService.update(event.id, {
       joined: newJoined,
       attendees: [...(event.attendees || []), profile.email].filter(Boolean),

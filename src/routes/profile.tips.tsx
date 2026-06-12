@@ -6,7 +6,7 @@ import { getServices } from "../di/container";
 export const Route = createFileRoute("/profile/tips")({
   beforeLoad: async () => {
     try {
-      await getServices().authService.getCurrentUser();
+      await (await getServices()).authService.getCurrentUser();
     } catch {
       throw redirect({ to: "/login" });
     }
@@ -25,12 +25,12 @@ function ProfileTipsRoute() {
 
   useEffect(() => {
     if (hasChild) return;
-    getServices()
-      .tipService.getAll()
-      .then((all) => {
+    getServices().then((svc) =>
+      svc.tipService.getAll().then((all) => {
         const mine = all.filter((t) => t.authorEmail === email);
         setTips(mine);
-      });
+      }),
+    );
   }, [hasChild, email]);
 
   if (hasChild) return <Outlet />;
