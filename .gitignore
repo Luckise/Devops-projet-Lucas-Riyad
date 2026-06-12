@@ -21,6 +21,7 @@ todos.json
 terraform.tfvars
 terraform.tfvars.json
 terraform/.terraform.lock.hcl
+*.zip
 
 # Ansible secrets
 ansible/group_vars/all/vault.yml
