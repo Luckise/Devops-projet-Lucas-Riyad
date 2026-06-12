@@ -40,7 +40,8 @@ export default function CreateFAB() {
 
   if (!stored) return null;
 
-  const isEventPage = typeof window !== "undefined" &&
+  const isEventPage =
+    typeof window !== "undefined" &&
     (window.location.pathname === "/events" || window.location.pathname.startsWith("/events/"));
   if (!isAdmin && isEventPage) return null;
 
