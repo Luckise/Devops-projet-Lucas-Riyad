@@ -31,7 +31,10 @@ export class LocalStoragePostRepository implements IPostRepository {
 
   async delete(id: string): Promise<void> {
     const items = this.getItems<Post>(this.postsKey);
-    this.setItems(this.postsKey, items.filter((i) => i.id !== id));
+    this.setItems(
+      this.postsKey,
+      items.filter((i) => i.id !== id),
+    );
   }
 
   private getItems<T>(key: string): T[] {

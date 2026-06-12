@@ -31,7 +31,7 @@ function ClubEditRoute() {
   const [name] = useState(group.name || "");
   const [image, setImage] = useState(group.image || "");
   const [content, setContent] = useState<ContentBlock[]>(
-    group.content?.length ? group.content.map((b) => ({ type: b.type, value: b.value })) : []
+    group.content?.length ? group.content.map((b) => ({ type: b.type, value: b.value })) : [],
   );
   const [submitting, setSubmitting] = useState(false);
 
@@ -45,14 +45,20 @@ function ClubEditRoute() {
       return;
     }
 
-    saveClubPage(group.id, image, content.filter((b) => b.value.trim()));
+    saveClubPage(
+      group.id,
+      image,
+      content.filter((b) => b.value.trim()),
+    );
     setSubmitting(false);
     toast("Club page saved");
     navigate({ to: "/profile/groups" });
   };
 
-  const addContentBlock = (type: "text" | "image") => setContent((prev) => [...prev, { type, value: "" }]);
-  const removeContentBlock = (i: number) => setContent((prev) => prev.filter((_, idx) => idx !== i));
+  const addContentBlock = (type: "text" | "image") =>
+    setContent((prev) => [...prev, { type, value: "" }]);
+  const removeContentBlock = (i: number) =>
+    setContent((prev) => prev.filter((_, idx) => idx !== i));
   const updateContentBlock = (i: number, v: string) => {
     setContent((prev) => {
       const next = [...prev];
@@ -73,8 +79,12 @@ function ClubEditRoute() {
             <ArrowLeft className="w-5 h-5 text-zinc-700 dark:text-zinc-300" />
           </button>
           <div>
-            <h1 className="text-2xl font-serif font-medium text-zinc-900 dark:text-white">Edit Club</h1>
-            <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--ember)] mt-0.5">{name}</p>
+            <h1 className="text-2xl font-serif font-medium text-zinc-900 dark:text-white">
+              Edit Club
+            </h1>
+            <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--ember)] mt-0.5">
+              {name}
+            </p>
           </div>
         </div>
 
@@ -118,7 +128,11 @@ function ClubEditRoute() {
                     />
                   ) : (
                     <div className="flex-1">
-                      <ImageUpload value={block.value} onChange={(v) => updateContentBlock(idx, v)} compact />
+                      <ImageUpload
+                        value={block.value}
+                        onChange={(v) => updateContentBlock(idx, v)}
+                        compact
+                      />
                     </div>
                   )}
                   <button

@@ -103,18 +103,21 @@ function SignupRoute() {
     return true;
   }, []);
 
-  const validateConfirmPassword = useCallback((value: string) => {
-    if (!value) {
-      setConfirmPasswordError("Please confirm your password");
-      return false;
-    }
-    if (value !== password) {
-      setConfirmPasswordError("Passwords do not match");
-      return false;
-    }
-    setConfirmPasswordError("");
-    return true;
-  }, [password]);
+  const validateConfirmPassword = useCallback(
+    (value: string) => {
+      if (!value) {
+        setConfirmPasswordError("Please confirm your password");
+        return false;
+      }
+      if (value !== password) {
+        setConfirmPasswordError("Passwords do not match");
+        return false;
+      }
+      setConfirmPasswordError("");
+      return true;
+    },
+    [password],
+  );
 
   const handleEmailContinue = () => {
     if (!validateEmail(email)) return;
@@ -235,17 +238,22 @@ function SignupRoute() {
               </p>
             </div>
 
-              <div className="mb-2 h-2" />
+            <div className="mb-2 h-2" />
 
             <div>
               <div className="flex items-center gap-2 mb-3 ml-1">
                 <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[var(--ember)]/10 border border-[var(--ember)]/20">
                   <GraduationCap className="w-3 h-3 text-[var(--ember)]" />
-                  <span className="text-[11px] font-bold text-[var(--ember)] tracking-wide">EFREI</span>
+                  <span className="text-[11px] font-bold text-[var(--ember)] tracking-wide">
+                    EFREI
+                  </span>
                 </div>
                 <span className="text-xs text-zinc-400 dark:text-zinc-500">students only</span>
               </div>
-              <label htmlFor="signup-email" className="block text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2 ml-1">
+              <label
+                htmlFor="signup-email"
+                className="block text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2 ml-1"
+              >
                 Email address
               </label>
               <div className="relative">
@@ -288,9 +296,14 @@ function SignupRoute() {
 
             <p className="text-center text-xs text-zinc-400 dark:text-zinc-500 mt-8 leading-relaxed">
               By continuing, you agree to our{" "}
-              <a href="#" className="text-[var(--ember)] hover:underline">Terms</a>{" "}
+              <a href="#" className="text-[var(--ember)] hover:underline">
+                Terms
+              </a>{" "}
               and{" "}
-              <a href="#" className="text-[var(--ember)] hover:underline">Privacy Policy</a>.
+              <a href="#" className="text-[var(--ember)] hover:underline">
+                Privacy Policy
+              </a>
+              .
             </p>
           </div>
         )}
@@ -323,7 +336,10 @@ function SignupRoute() {
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label htmlFor="first-name" className="block text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2 ml-1">
+                <label
+                  htmlFor="first-name"
+                  className="block text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2 ml-1"
+                >
                   First name
                 </label>
                 <input
@@ -349,7 +365,10 @@ function SignupRoute() {
               </div>
 
               <div>
-                <label htmlFor="last-name" className="block text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2 ml-1">
+                <label
+                  htmlFor="last-name"
+                  className="block text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2 ml-1"
+                >
                   Surname
                 </label>
                 <input
@@ -375,7 +394,10 @@ function SignupRoute() {
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2 ml-1">
+                <label
+                  htmlFor="password"
+                  className="block text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2 ml-1"
+                >
                   Password
                 </label>
                 <div className="relative">
@@ -441,7 +463,10 @@ function SignupRoute() {
               </div>
 
               <div>
-                <label htmlFor="confirm-password" className="block text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2 ml-1">
+                <label
+                  htmlFor="confirm-password"
+                  className="block text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2 ml-1"
+                >
                   Confirm password
                 </label>
                 <div className="relative">
@@ -466,11 +491,19 @@ function SignupRoute() {
                     className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
                     aria-label={showConfirmPassword ? "Hide password" : "Show password"}
                   >
-                    {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    {showConfirmPassword ? (
+                      <EyeOff className="w-4 h-4" />
+                    ) : (
+                      <Eye className="w-4 h-4" />
+                    )}
                   </button>
                 </div>
                 {confirmPasswordError && (
-                  <p id="confirm-password-error" className="text-xs text-red-500 mt-2 ml-1" role="alert">
+                  <p
+                    id="confirm-password-error"
+                    className="text-xs text-red-500 mt-2 ml-1"
+                    role="alert"
+                  >
                     {confirmPasswordError}
                   </p>
                 )}
@@ -518,9 +551,7 @@ function SignupRoute() {
               <p className="text-zinc-500 dark:text-zinc-400 text-sm leading-relaxed">
                 We sent a 6-digit verification code to
               </p>
-              <p className="text-zinc-900 dark:text-white font-medium text-sm mt-1">
-                {email}
-              </p>
+              <p className="text-zinc-900 dark:text-white font-medium text-sm mt-1">{email}</p>
               <button
                 onClick={() => setStep("email")}
                 className="text-[var(--ember)] hover:underline text-xs font-medium mt-2"

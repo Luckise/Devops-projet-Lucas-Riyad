@@ -42,15 +42,21 @@ function ClubCreate() {
     }
 
     const group = createGroup(name.trim(), email);
-    saveClubPage(group.id, image, content.filter((b) => b.value.trim()));
+    saveClubPage(
+      group.id,
+      image,
+      content.filter((b) => b.value.trim()),
+    );
 
     setSubmitting(false);
     toast("Club created");
     navigate({ to: "/profile/groups" });
   };
 
-  const addContentBlock = (type: "text" | "image") => setContent((prev) => [...prev, { type, value: "" }]);
-  const removeContentBlock = (i: number) => setContent((prev) => prev.filter((_, idx) => idx !== i));
+  const addContentBlock = (type: "text" | "image") =>
+    setContent((prev) => [...prev, { type, value: "" }]);
+  const removeContentBlock = (i: number) =>
+    setContent((prev) => prev.filter((_, idx) => idx !== i));
   const updateContentBlock = (i: number, v: string) => {
     setContent((prev) => {
       const next = [...prev];
@@ -70,7 +76,9 @@ function ClubCreate() {
           >
             <ArrowLeft className="w-5 h-5 text-zinc-700 dark:text-zinc-300" />
           </button>
-          <h1 className="text-2xl font-serif font-medium text-zinc-900 dark:text-white">New Club</h1>
+          <h1 className="text-2xl font-serif font-medium text-zinc-900 dark:text-white">
+            New Club
+          </h1>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -126,7 +134,11 @@ function ClubCreate() {
                     />
                   ) : (
                     <div className="flex-1">
-                      <ImageUpload value={block.value} onChange={(v) => updateContentBlock(idx, v)} compact />
+                      <ImageUpload
+                        value={block.value}
+                        onChange={(v) => updateContentBlock(idx, v)}
+                        compact
+                      />
                     </div>
                   )}
                   <button

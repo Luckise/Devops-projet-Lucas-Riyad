@@ -2,7 +2,14 @@ import { useState, useEffect, useCallback } from "react";
 import { getServices } from "../di/container";
 import type { UserProfile } from "../types/models";
 
-const emptyUser: UserProfile = { firstName: "", lastName: "", nickname: "", email: "", avatar: "", isAdmin: false };
+const emptyUser: UserProfile = {
+  firstName: "",
+  lastName: "",
+  nickname: "",
+  email: "",
+  avatar: "",
+  isAdmin: false,
+};
 
 export function useUser() {
   const [user, setUserState] = useState<UserProfile>(emptyUser);

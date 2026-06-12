@@ -25,11 +25,19 @@ function TipsRoute() {
     <main className="min-h-screen pb-24 pt-[80px]">
       <div className="max-w-md mx-auto px-4 md:pt-4">
         <header className="mb-4">
-          <h1 className="text-[2.5rem] font-serif font-medium tracking-tight leading-none" style={{ color: "var(--ember)" }}>Tips</h1>
+          <h1
+            className="text-[2.5rem] font-serif font-medium tracking-tight leading-none"
+            style={{ color: "var(--ember)" }}
+          >
+            Tips
+          </h1>
         </header>
 
         <div className="sticky top-[4rem] z-30 -mx-4 px-4 mb-6 bg-white/80 dark:bg-black/80 backdrop-blur-xl border-b border-black/10 dark:border-white/10">
-          <div className="flex gap-2 overflow-x-auto py-3 scrollbar-none snap-x" style={{ scrollbarWidth: "none" }}>
+          <div
+            className="flex gap-2 overflow-x-auto py-3 scrollbar-none snap-x"
+            style={{ scrollbarWidth: "none" }}
+          >
             {CATEGORIES.map((cat) => (
               <button
                 key={cat}
@@ -48,7 +56,12 @@ function TipsRoute() {
 
         <div className="columns-2 gap-3 space-y-3">
           {filteredTips.map((tip) => (
-            <Link to="/tips/$tipId" params={{ tipId: tip.id }} key={tip.id} className="block break-inside-avoid group cursor-pointer">
+            <Link
+              to="/tips/$tipId"
+              params={{ tipId: tip.id }}
+              key={tip.id}
+              className="block break-inside-avoid group cursor-pointer"
+            >
               <article>
                 <div className="relative rounded-[1.5rem] overflow-hidden bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 transform transition-transform duration-[400ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.02] active:scale-[0.98]">
                   <div className={`w-full ${tip.height}`}>
@@ -77,7 +90,9 @@ function TipsRoute() {
 
         {filteredTips.length === 0 && (
           <div className="text-center py-16 px-6 mt-8 rounded-[2rem] border border-black/5 dark:border-white/5 bg-black/[0.02] dark:bg-white/[0.02]">
-            <p className="text-black/60 dark:text-white/60 text-lg font-serif font-medium">No tips found.</p>
+            <p className="text-black/60 dark:text-white/60 text-lg font-serif font-medium">
+              No tips found.
+            </p>
             <p className="text-black/40 dark:text-white/40 text-sm mt-2 font-medium">
               We're still gathering recommendations for this category.
             </p>

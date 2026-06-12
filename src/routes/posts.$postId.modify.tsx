@@ -44,7 +44,8 @@ function PostEditRoute() {
     navigate({ to: "/feed" });
   };
 
-  const addContentBlock = (type: "text" | "image") => setContent((prev) => [...prev, { type, value: "" }]);
+  const addContentBlock = (type: "text" | "image") =>
+    setContent((prev) => [...prev, { type, value: "" }]);
   const removeContentBlock = (i: number) => {
     if (content.length > 1) setContent(content.filter((_, idx) => idx !== i));
   };
@@ -68,7 +69,9 @@ function PostEditRoute() {
             <ArrowLeft className="w-5 h-5 text-zinc-700 dark:text-zinc-300" />
           </button>
           <div>
-            <h1 className="text-2xl font-serif font-medium text-zinc-900 dark:text-white">Edit Post</h1>
+            <h1 className="text-2xl font-serif font-medium text-zinc-900 dark:text-white">
+              Edit Post
+            </h1>
           </div>
         </div>
 
@@ -110,7 +113,11 @@ function PostEditRoute() {
                     />
                   ) : (
                     <div className="flex-1">
-                      <ImageUpload value={block.value} onChange={(v) => updateContentBlock(idx, v)} compact />
+                      <ImageUpload
+                        value={block.value}
+                        onChange={(v) => updateContentBlock(idx, v)}
+                        compact
+                      />
                     </div>
                   )}
                   {content.length > 1 && (

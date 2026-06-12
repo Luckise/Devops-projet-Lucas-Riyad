@@ -34,20 +34,10 @@ export default function ImageUpload({
           {label}
         </label>
       )}
-      <input
-        ref={inputRef}
-        type="file"
-        accept="image/*"
-        onChange={handleFile}
-        className="hidden"
-      />
+      <input ref={inputRef} type="file" accept="image/*" onChange={handleFile} className="hidden" />
       {value ? (
         <div className="relative rounded-2xl overflow-hidden bg-zinc-100 dark:bg-zinc-900">
-          <img
-            src={value}
-            alt=""
-            className={`w-full object-cover ${compact ? "h-32" : "h-48"}`}
-          />
+          <img src={value} alt="" className={`w-full object-cover ${compact ? "h-32" : "h-48"}`} />
           <button
             type="button"
             onClick={handleRemove}

@@ -40,9 +40,7 @@ export default function CreateFAB() {
   const isEventPage = path === "/events" || path.startsWith("/events/");
   if (!isAdmin && isEventPage) return null;
 
-  const OPTIONS = OPTIONS_ALL.filter((opt) =>
-    opt.label === "Event" ? isAdmin : true
-  );
+  const OPTIONS = OPTIONS_ALL.filter((opt) => (opt.label === "Event" ? isAdmin : true));
 
   return (
     <div ref={ref} className="fixed bottom-24 right-5 z-40 flex flex-col items-end gap-3">

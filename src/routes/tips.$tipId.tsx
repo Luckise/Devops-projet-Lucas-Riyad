@@ -56,9 +56,7 @@ function TipDetailsRoute() {
                   <p className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1">
                     Cooking Time
                   </p>
-                  <p className="font-medium text-zinc-900 dark:text-zinc-100">
-                    {tip.cookingTime}
-                  </p>
+                  <p className="font-medium text-zinc-900 dark:text-zinc-100">{tip.cookingTime}</p>
                 </div>
               </div>
               <div className="flex items-start gap-3 p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50">
@@ -76,7 +74,10 @@ function TipDetailsRoute() {
             <div className="p-5 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50">
               <ul className="space-y-3">
                 {tip.ingredients?.map((ingredient, idx) => (
-                  <li key={idx} className="flex items-start gap-3 text-[15px] text-zinc-700 dark:text-zinc-300">
+                  <li
+                    key={idx}
+                    className="flex items-start gap-3 text-[15px] text-zinc-700 dark:text-zinc-300"
+                  >
                     <span className="w-1.5 h-1.5 rounded-full bg-[var(--ember)]/50 mt-2 shrink-0" />
                     <span>{ingredient}</span>
                   </li>
@@ -94,9 +95,7 @@ function TipDetailsRoute() {
                 <p className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1">
                   Location
                 </p>
-                <p className="font-medium text-zinc-900 dark:text-zinc-100">
-                  {tip.address}
-                </p>
+                <p className="font-medium text-zinc-900 dark:text-zinc-100">{tip.address}</p>
               </div>
             </div>
           </div>
@@ -106,13 +105,19 @@ function TipDetailsRoute() {
           {tip.content?.map((block, idx) => {
             if (block.type === "text") {
               return (
-                <p key={idx} className="text-[16px] leading-relaxed text-zinc-700 dark:text-zinc-300">
+                <p
+                  key={idx}
+                  className="text-[16px] leading-relaxed text-zinc-700 dark:text-zinc-300"
+                >
                   {block.value}
                 </p>
               );
             } else if (block.type === "image") {
               return (
-                <div key={idx} className="rounded-2xl overflow-hidden border border-zinc-100 dark:border-zinc-800 shadow-sm">
+                <div
+                  key={idx}
+                  className="rounded-2xl overflow-hidden border border-zinc-100 dark:border-zinc-800 shadow-sm"
+                >
                   <img
                     src={block.value}
                     alt=""

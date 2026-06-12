@@ -59,9 +59,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         {children}
         <BottomNav />
         <CreateFAB />
-        {import.meta.env.DEV && (
-          <TanStackDevtoolsProxy />
-        )}
+        {import.meta.env.DEV && <TanStackDevtoolsProxy />}
         <Scripts />
       </body>
     </html>
@@ -75,9 +73,9 @@ function TanStackDevtoolsProxy() {
 
   React.useEffect(() => {
     Promise.all([
-      import("@tanstack/react-devtools").then(m => m.TanStackDevtools),
-      import("@tanstack/react-router-devtools").then(m => m.TanStackRouterDevtoolsPanel),
-      import("../integrations/tanstack-query/devtools").then(m => m.default),
+      import("@tanstack/react-devtools").then((m) => m.TanStackDevtools),
+      import("@tanstack/react-router-devtools").then((m) => m.TanStackRouterDevtoolsPanel),
+      import("../integrations/tanstack-query/devtools").then((m) => m.default),
     ]).then(([Devtools, Router, Query]) => {
       setTanStackDevtools(() => Devtools);
       setRouterPanel(() => Router);
@@ -90,10 +88,7 @@ function TanStackDevtoolsProxy() {
   return (
     <TanStackDevtools
       config={{ position: "bottom-right" }}
-      plugins={[
-        { name: "Tanstack Router", render: <RouterPanel /> },
-        QueryPanel,
-      ]}
+      plugins={[{ name: "Tanstack Router", render: <RouterPanel /> }, QueryPanel]}
     />
   );
 }

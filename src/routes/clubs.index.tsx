@@ -14,16 +14,17 @@ function ClubsRoute() {
   const clubs: Group[] = getAllClubs().filter((c) => c.image);
 
   const filtered = searchQuery
-    ? clubs.filter((c) =>
-        c.name.toLowerCase().includes(searchQuery.toLowerCase())
-      )
+    ? clubs.filter((c) => c.name.toLowerCase().includes(searchQuery.toLowerCase()))
     : clubs;
 
   return (
     <main className="min-h-screen pb-24 pt-[80px]">
       <div className="max-w-md mx-auto px-4 pt-4 md:pt-8">
         <header className="mb-6">
-          <h1 className="text-[2.5rem] font-serif font-medium tracking-tight leading-none" style={{ color: "var(--ember)" }}>
+          <h1
+            className="text-[2.5rem] font-serif font-medium tracking-tight leading-none"
+            style={{ color: "var(--ember)" }}
+          >
             Clubs
           </h1>
         </header>

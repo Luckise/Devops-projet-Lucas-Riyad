@@ -37,7 +37,9 @@ function EventCreate() {
     const stored = localStorage.getItem("eat_user_profile");
     if (stored) {
       const profile = JSON.parse(stored);
-      getServices().groupService.getUserGroups(profile.email || "").then(setUserGroups);
+      getServices()
+        .groupService.getUserGroups(profile.email || "")
+        .then(setUserGroups);
     }
   }, []);
 
@@ -70,7 +72,7 @@ function EventCreate() {
 
   const addTag = () => setTags((prev) => [...prev, ""]);
   const removeTag = (i: number) => {
-    setTags((prev) => prev.length > 1 ? prev.filter((_, idx) => idx !== i) : prev);
+    setTags((prev) => (prev.length > 1 ? prev.filter((_, idx) => idx !== i) : prev));
   };
   const updateTag = (i: number, v: string) => {
     setTags((prev) => {
@@ -92,8 +94,12 @@ function EventCreate() {
             <ArrowLeft className="w-5 h-5 text-zinc-700 dark:text-zinc-300" />
           </button>
           <div>
-            <h1 className="text-2xl font-serif font-medium text-zinc-900 dark:text-white">New Event</h1>
-            <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--ember)] mt-0.5">Admin</p>
+            <h1 className="text-2xl font-serif font-medium text-zinc-900 dark:text-white">
+              New Event
+            </h1>
+            <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--ember)] mt-0.5">
+              Admin
+            </p>
           </div>
         </div>
 
@@ -193,7 +199,9 @@ function EventCreate() {
               >
                 <option value="">Select a group</option>
                 {userGroups.map((g: any) => (
-                  <option key={g.id} value={g.id}>{g.name}</option>
+                  <option key={g.id} value={g.id}>
+                    {g.name}
+                  </option>
                 ))}
               </select>
               <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 pointer-events-none" />

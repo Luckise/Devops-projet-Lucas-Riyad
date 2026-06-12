@@ -34,7 +34,7 @@ function ProfileEventEditRoute() {
   const [price, setPrice] = useState(event.price?.toString() || "");
   const [maxParticipants, setMaxParticipants] = useState(event.maxParticipants?.toString() || "");
   const [description, setDescription] = useState(event.description || "");
-  const [tags, setTags] = useState<string[]>((event.tags?.length ? event.tags : [""]));
+  const [tags, setTags] = useState<string[]>(event.tags?.length ? event.tags : [""]);
   const [selectedGroup, setSelectedGroup] = useState(event.groupId || "");
   const [submitting, setSubmitting] = useState(false);
   const [showAttendees, setShowAttendees] = useState(false);
@@ -46,7 +46,9 @@ function ProfileEventEditRoute() {
     const stored = localStorage.getItem("eat_user_profile");
     if (stored) {
       const profile = JSON.parse(stored);
-      getServices().groupService.getUserGroups(profile.email || "").then(setUserGroups);
+      getServices()
+        .groupService.getUserGroups(profile.email || "")
+        .then(setUserGroups);
     }
   }, []);
 
@@ -61,7 +63,11 @@ function ProfileEventEditRoute() {
     setSubmitting(true);
 
     await getServices().eventService.update(event.id, {
-      title, image, date, time, location,
+      title,
+      image,
+      date,
+      time,
+      location,
       price: price ? parseFloat(price) : 0,
       description,
       tags: tags.filter(Boolean),
@@ -91,7 +97,7 @@ function ProfileEventEditRoute() {
 
   const addTag = () => setTags((prev) => [...prev, ""]);
   const removeTag = (i: number) => {
-    setTags((prev) => prev.length > 1 ? prev.filter((_, idx) => idx !== i) : prev);
+    setTags((prev) => (prev.length > 1 ? prev.filter((_, idx) => idx !== i) : prev));
   };
   const updateTag = (i: number, v: string) => {
     setTags((prev) => {
@@ -113,15 +119,21 @@ function ProfileEventEditRoute() {
             <ArrowLeft className="w-5 h-5 text-zinc-700 dark:text-zinc-300" />
           </button>
           <div>
-            <h1 className="text-2xl font-serif font-medium text-zinc-900 dark:text-white">Edit Event</h1>
-            <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--ember)] mt-0.5">Admin</p>
+            <h1 className="text-2xl font-serif font-medium text-zinc-900 dark:text-white">
+              Edit Event
+            </h1>
+            <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--ember)] mt-0.5">
+              Admin
+            </p>
           </div>
         </div>
 
         {event.hidden && (
           <div className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900/30 mb-6">
             <EyeOff className="w-4 h-4 text-red-500 shrink-0" />
-            <span className="text-sm text-red-600 dark:text-red-400 font-medium">This event is hidden from the feed</span>
+            <span className="text-sm text-red-600 dark:text-red-400 font-medium">
+              This event is hidden from the feed
+            </span>
           </div>
         )}
 
@@ -184,7 +196,9 @@ function ProfileEventEditRoute() {
                     <div className="w-8 h-8 rounded-full bg-[var(--ember)]/10 flex items-center justify-center shrink-0">
                       <Users className="w-3.5 h-3.5 text-[var(--ember)]" />
                     </div>
-                    <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{a}</span>
+                    <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+                      {a}
+                    </span>
                   </div>
                 ))
               )}
@@ -195,66 +209,132 @@ function ProfileEventEditRoute() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <ImageUpload value={image} onChange={setImage} label="Image" />
           <div>
-            <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2.5 block">Title</label>
-            <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Event name"
-              className="w-full px-4 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-[var(--ember)]/30 transition-shadow" />
+            <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2.5 block">
+              Title
+            </label>
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Event name"
+              className="w-full px-4 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-[var(--ember)]/30 transition-shadow"
+            />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2.5 block">Date</label>
-              <input type="date" value={date} onChange={(e) => setDate(e.target.value)}
-                className="w-full px-4 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--ember)]/30 transition-shadow [color-scheme:light] dark:[color-scheme:dark]" />
+              <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2.5 block">
+                Date
+              </label>
+              <input
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                className="w-full px-4 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--ember)]/30 transition-shadow [color-scheme:light] dark:[color-scheme:dark]"
+              />
             </div>
             <div>
-              <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2.5 block">Time</label>
-              <input type="time" value={time} onChange={(e) => setTime(e.target.value)}
-                className="w-full px-4 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--ember)]/30 transition-shadow [color-scheme:light] dark:[color-scheme:dark]" />
+              <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2.5 block">
+                Time
+              </label>
+              <input
+                type="time"
+                value={time}
+                onChange={(e) => setTime(e.target.value)}
+                className="w-full px-4 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--ember)]/30 transition-shadow [color-scheme:light] dark:[color-scheme:dark]"
+              />
             </div>
           </div>
           <div>
-            <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2.5 block">Location</label>
-            <input type="text" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="e.g., Central Plaza"
-              className="w-full px-4 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-[var(--ember)]/30 transition-shadow" />
+            <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2.5 block">
+              Location
+            </label>
+            <input
+              type="text"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              placeholder="e.g., Central Plaza"
+              className="w-full px-4 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-[var(--ember)]/30 transition-shadow"
+            />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2.5 block">Price (EUR)</label>
-              <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="0 = Free" min="0" step="0.5"
-                className="w-full px-4 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-[var(--ember)]/30 transition-shadow" />
+              <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2.5 block">
+                Price (EUR)
+              </label>
+              <input
+                type="number"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                placeholder="0 = Free"
+                min="0"
+                step="0.5"
+                className="w-full px-4 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-[var(--ember)]/30 transition-shadow"
+              />
             </div>
             <div>
-              <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2.5 block">Max Participants</label>
-              <input type="number" value={maxParticipants} onChange={(e) => setMaxParticipants(e.target.value)} placeholder="e.g. 500" min="1"
-                className="w-full px-4 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-[var(--ember)]/30 transition-shadow" />
+              <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2.5 block">
+                Max Participants
+              </label>
+              <input
+                type="number"
+                value={maxParticipants}
+                onChange={(e) => setMaxParticipants(e.target.value)}
+                placeholder="e.g. 500"
+                min="1"
+                className="w-full px-4 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-[var(--ember)]/30 transition-shadow"
+              />
             </div>
           </div>
           <div>
-            <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2.5 block">Group</label>
+            <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2.5 block">
+              Group
+            </label>
             <div className="relative">
-              <select value={selectedGroup} onChange={(e) => setSelectedGroup(e.target.value)}
-                className="w-full px-4 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--ember)]/30 transition-shadow appearance-none">
+              <select
+                value={selectedGroup}
+                onChange={(e) => setSelectedGroup(e.target.value)}
+                className="w-full px-4 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--ember)]/30 transition-shadow appearance-none"
+              >
                 <option value="">Select a group</option>
-                {userGroups.map((g: any) => (<option key={g.id} value={g.id}>{g.name}</option>))}
+                {userGroups.map((g: any) => (
+                  <option key={g.id} value={g.id}>
+                    {g.name}
+                  </option>
+                ))}
               </select>
               <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 pointer-events-none" />
             </div>
           </div>
           <div>
             <div className="flex items-center justify-between mb-2.5">
-              <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Tags</label>
-              <button type="button" onClick={addTag}
-                className="flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-[var(--ember)] hover:text-[var(--ember)]/80 transition-colors">
-                <Plus className="w-3.5 h-3.5" />Add
+              <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                Tags
+              </label>
+              <button
+                type="button"
+                onClick={addTag}
+                className="flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-[var(--ember)] hover:text-[var(--ember)]/80 transition-colors"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                Add
               </button>
             </div>
             <div className="space-y-2.5">
               {tags.map((tag, idx) => (
                 <div key={idx} className="flex gap-2">
-                  <input type="text" value={tag} onChange={(e) => updateTag(idx, e.target.value)} placeholder={`Tag ${idx + 1}`}
-                    className="flex-1 px-4 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-[var(--ember)]/30 transition-shadow" />
+                  <input
+                    type="text"
+                    value={tag}
+                    onChange={(e) => updateTag(idx, e.target.value)}
+                    placeholder={`Tag ${idx + 1}`}
+                    className="flex-1 px-4 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-[var(--ember)]/30 transition-shadow"
+                  />
                   {tags.length > 1 && (
-                    <button type="button" onClick={() => removeTag(idx)}
-                      className="w-11 h-11 rounded-2xl bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => removeTag(idx)}
+                      className="w-11 h-11 rounded-2xl bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors shrink-0"
+                    >
                       <X className="w-4 h-4 text-zinc-500" />
                     </button>
                   )}
@@ -263,13 +343,23 @@ function ProfileEventEditRoute() {
             </div>
           </div>
           <div>
-            <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2.5 block">Description</label>
-            <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Describe the event..." rows={5}
-              className="w-full px-4 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-[var(--ember)]/30 transition-shadow resize-none" />
+            <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2.5 block">
+              Description
+            </label>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Describe the event..."
+              rows={5}
+              className="w-full px-4 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-[var(--ember)]/30 transition-shadow resize-none"
+            />
           </div>
           <div className="flex gap-3">
-            <button type="submit" disabled={submitting || !title || !date || !time || !location || !selectedGroup}
-              className="flex-1 py-4 px-6 rounded-full bg-[var(--ember)] text-white font-bold text-[15px] hover:bg-[var(--ember)]/90 disabled:opacity-50 transition-all shadow-lg shadow-[var(--ember)]/20">
+            <button
+              type="submit"
+              disabled={submitting || !title || !date || !time || !location || !selectedGroup}
+              className="flex-1 py-4 px-6 rounded-full bg-[var(--ember)] text-white font-bold text-[15px] hover:bg-[var(--ember)]/90 disabled:opacity-50 transition-all shadow-lg shadow-[var(--ember)]/20"
+            >
               {submitting ? "Saving..." : "Save Changes"}
             </button>
           </div>
@@ -282,15 +372,27 @@ function ProfileEventEditRoute() {
             <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mx-auto mb-4">
               <Trash2 className="w-6 h-6 text-red-600 dark:text-red-400" />
             </div>
-            <h3 className="text-lg font-bold text-center text-zinc-900 dark:text-white mb-2">Hide this event?</h3>
+            <h3 className="text-lg font-bold text-center text-zinc-900 dark:text-white mb-2">
+              Hide this event?
+            </h3>
             <p className="text-sm text-center text-zinc-500 dark:text-zinc-400 mb-6">
               The event will be hidden from the public feed.
             </p>
             <div className="flex gap-3">
-              <button type="button" onClick={() => setShowDeleteConfirm(false)}
-                className="flex-1 py-3 px-4 rounded-full border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 font-bold text-[13px] hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors">Cancel</button>
-              <button type="button" onClick={confirmHide}
-                className="flex-1 py-3 px-4 rounded-full bg-red-600 text-white font-bold text-[13px] hover:bg-red-700 transition-colors">Hide Event</button>
+              <button
+                type="button"
+                onClick={() => setShowDeleteConfirm(false)}
+                className="flex-1 py-3 px-4 rounded-full border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 font-bold text-[13px] hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirmHide}
+                className="flex-1 py-3 px-4 rounded-full bg-red-600 text-white font-bold text-[13px] hover:bg-red-700 transition-colors"
+              >
+                Hide Event
+              </button>
             </div>
           </div>
         </div>

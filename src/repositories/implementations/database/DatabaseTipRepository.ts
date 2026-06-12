@@ -32,18 +32,21 @@ export class DatabaseTipRepository implements ITipRepository {
   }
 
   async create(tip: Omit<Tip, "id">): Promise<Tip> {
-    const [row] = await getDb().insert(tips).values({
-      title: tip.title,
-      category: tip.category,
-      image: tip.image,
-      height: tip.height ?? null,
-      cookingTime: tip.cookingTime ?? null,
-      ingredients: tip.ingredients ?? null,
-      address: tip.address ?? null,
-      hidden: tip.hidden ?? false,
-      authorEmail: tip.authorEmail ?? null,
-      content: tip.content,
-    }).returning();
+    const [row] = await getDb()
+      .insert(tips)
+      .values({
+        title: tip.title,
+        category: tip.category,
+        image: tip.image,
+        height: tip.height ?? null,
+        cookingTime: tip.cookingTime ?? null,
+        ingredients: tip.ingredients ?? null,
+        address: tip.address ?? null,
+        hidden: tip.hidden ?? false,
+        authorEmail: tip.authorEmail ?? null,
+        content: tip.content,
+      })
+      .returning();
     return rowToTip(row);
   }
 

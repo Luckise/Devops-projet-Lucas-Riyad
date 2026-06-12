@@ -36,7 +36,7 @@ export class S3ImageRepository implements IImageRepository {
         Key: key,
         Body: new Uint8Array(buffer),
         ContentType: file.type,
-      })
+      }),
     );
 
     if (this.cloudfrontDomain) {
@@ -54,7 +54,7 @@ export class S3ImageRepository implements IImageRepository {
       new DeleteObjectCommand({
         Bucket: this.bucket,
         Key: key,
-      })
+      }),
     );
   }
 

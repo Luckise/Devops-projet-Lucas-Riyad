@@ -64,16 +64,16 @@ On déploie une app TanStack Start (full-stack SSR) sur 2 EC2 derrière un ALB, 
 
 ### Détail des machines
 
-| Machine         | Type        | Rôle                                      | Ports ouverts         | Accès depuis                |
-|-----------------|-------------|-------------------------------------------|-----------------------|-----------------------------|
-| EC2 app 1       | `t3.micro`  | Application (TanStack Start dans Docker)  | 3000 (SG ALB), 22 (admin) | ALB seulement pour le 3000 |
-| EC2 app 2       | `t3.micro`  | Application (TanStack Start dans Docker)  | 3000 (SG ALB), 22 (admin) | ALB seulement pour le 3000 |
-| RDS PostgreSQL  | `db.t3.micro` | Base de données                        | 5432 (SG app)         | EC2 app seulement           |
-| ALB             | -           | Load balancer HTTPS, terminaison TLS      | 443, 80               | 0.0.0.0/0                   |
-| S3 assets       | -           | Stockage fichiers uploadés                | -                     | EC2 app (via IAM role)      |
-| S3 backups      | -           | Stockage des backups BDD                  | -                     | EC2 app (via IAM role)      |
-| Cognito         | -           | Auth utilisateurs (User Pool + App Client)| -                     | Application                 |
-| ECR             | -           | Registry d'images Docker                  | -                     | GitHub Actions + EC2        |
+| Machine        | Type          | Rôle                                       | Ports ouverts             | Accès depuis               |
+| -------------- | ------------- | ------------------------------------------ | ------------------------- | -------------------------- |
+| EC2 app 1      | `t3.micro`    | Application (TanStack Start dans Docker)   | 3000 (SG ALB), 22 (admin) | ALB seulement pour le 3000 |
+| EC2 app 2      | `t3.micro`    | Application (TanStack Start dans Docker)   | 3000 (SG ALB), 22 (admin) | ALB seulement pour le 3000 |
+| RDS PostgreSQL | `db.t3.micro` | Base de données                            | 5432 (SG app)             | EC2 app seulement          |
+| ALB            | -             | Load balancer HTTPS, terminaison TLS       | 443, 80                   | 0.0.0.0/0                  |
+| S3 assets      | -             | Stockage fichiers uploadés                 | -                         | EC2 app (via IAM role)     |
+| S3 backups     | -             | Stockage des backups BDD                   | -                         | EC2 app (via IAM role)     |
+| Cognito        | -             | Auth utilisateurs (User Pool + App Client) | -                         | Application                |
+| ECR            | -             | Registry d'images Docker                   | -                         | GitHub Actions + EC2       |
 
 ### Schéma réseau
 
@@ -184,26 +184,26 @@ ansible-playbook ansible/playbooks/restore.yml -i ansible/inventory/hosts.yml
 
 Tout le cloud est défini dans `terraform/`. Modules par responsabilité :
 
-| Module       | Ressources principales                                  |
-|--------------|--------------------------------------------------------|
-| `vpc`        | VPC 10.0.0.0/16, 2 publics + 2 privés, IGW, route table |
-| `security-groups` | SG ALB → SG App → SG DB (chaînés)                |
-| `ec2`        | 2 instances Ubuntu 22.04, IAM role (ECR + S3)          |
-| `alb`        | ALB internet-facing, HTTPS (ACM), target group port 3000 |
-| `rds`        | PostgreSQL 16, subnet privé, backup 1 jour, encrypted |
-| `s3`         | 2 buckets (assets + backups), AES256, versioning       |
-| `ecr`        | Docker registry, lifecycle policy (garder 5 images)    |
-| `cognito`    | User pool, app client, password policy                 |
+| Module            | Ressources principales                                   |
+| ----------------- | -------------------------------------------------------- |
+| `vpc`             | VPC 10.0.0.0/16, 2 publics + 2 privés, IGW, route table  |
+| `security-groups` | SG ALB → SG App → SG DB (chaînés)                        |
+| `ec2`             | 2 instances Ubuntu 22.04, IAM role (ECR + S3)            |
+| `alb`             | ALB internet-facing, HTTPS (ACM), target group port 3000 |
+| `rds`             | PostgreSQL 16, subnet privé, backup 1 jour, encrypted    |
+| `s3`              | 2 buckets (assets + backups), AES256, versioning         |
+| `ecr`             | Docker registry, lifecycle policy (garder 5 images)      |
+| `cognito`         | User pool, app client, password policy                   |
 
 **Outputs clés** (utilisés par Ansible) : `ec2_instance_ids`, `alb_dns_name`, `rds_endpoint`, `buckets`, `ecr`, `cognito_user_pool_id`, `cognito_app_client_id`.
 
 ### Règles réseau (Security Groups)
 
-| SG   | Inbound                                    | Outbound |
-|------|--------------------------------------------|----------|
-| ALB  | 443 + 80 depuis `0.0.0.0/0`               | all      |
-| App  | 3000 depuis SG ALB, 22 depuis IP admin     | all      |
-| DB   | 5432 depuis SG App                         | all      |
+| SG  | Inbound                                | Outbound |
+| --- | -------------------------------------- | -------- |
+| ALB | 443 + 80 depuis `0.0.0.0/0`            | all      |
+| App | 3000 depuis SG ALB, 22 depuis IP admin | all      |
+| DB  | 5432 depuis SG App                     | all      |
 
 ---
 
@@ -215,16 +215,16 @@ Généré dynamiquement depuis les outputs Terraform via `ansible/generate_inven
 
 ### Rôles
 
-| Rôle      | Actions principales                                                                 |
-|-----------|-------------------------------------------------------------------------------------|
-| **common**  | Installation Docker + AWS CLI, création user/groupe système, credentials AWS       |
-| **app**     | Login ECR, pull image Docker, installation service systemd, démarrage conteneur    |
-| **backup**  | Installation script pg_dump, configuration cron quotidien (2h00), upload S3         |
-
+| Rôle       | Actions principales                                                             |
+| ---------- | ------------------------------------------------------------------------------- |
+| **common** | Installation Docker + AWS CLI, création user/groupe système, credentials AWS    |
+| **app**    | Login ECR, pull image Docker, installation service systemd, démarrage conteneur |
+| **backup** | Installation script pg_dump, configuration cron quotidien (2h00), upload S3     |
 
 ### Variables
 
 Dans `ansible/inventory/group_vars/` :
+
 - `all/main.yml` : variables communes (région, endpoints, noms de buckets...)
 - `all/vault.yml` : secrets chiffrés avec Ansible Vault (db_password, tokens...)
 - `all/ecr.yml` : généré automatiquement par `generate_inventory.sh`
@@ -232,10 +232,10 @@ Dans `ansible/inventory/group_vars/` :
 
 ### Playbooks
 
-| Playbook       | Description                                      |
-|----------------|--------------------------------------------------|
-| `site.yml`     | Configure les instances app (common → app → backup) |
-| `restore.yml`  | Récupère le dernier backup S3 et restaure la BDD |
+| Playbook      | Description                                         |
+| ------------- | --------------------------------------------------- |
+| `site.yml`    | Configure les instances app (common → app → backup) |
+| `restore.yml` | Récupère le dernier backup S3 et restaure la BDD    |
 
 ---
 
@@ -301,7 +301,6 @@ Push sur main / PR
 
 Le tag `sha-<git_sha>` permet de tracer exactement quelle version tourne sur chaque EC2. Le tag `latest` est mis à jour à chaque push sur main pour le bootstrap des nouvelles instances.
 
-
 ## Stratégie de backup
 
 ### Base de données
@@ -350,7 +349,6 @@ ansible-playbook ansible/playbooks/restore.yml -i ansible/inventory/hosts.yml
 - La base de destination doit exister (créée par Terraform)
 
 ---
-
 
 ## Sécurité
 

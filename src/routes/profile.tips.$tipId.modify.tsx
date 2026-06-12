@@ -32,14 +32,20 @@ function ProfileTipEditRoute() {
   const [category] = useState<string>(tip.category || "");
   const parseCookingTime = (val: string) => {
     const match = val.match(/^(\d+)\s*(min|hour)$/);
-    return match ? { value: match[1], unit: match[2] as "min" | "hour" } : { value: "", unit: "min" as const };
+    return match
+      ? { value: match[1], unit: match[2] as "min" | "hour" }
+      : { value: "", unit: "min" as const };
   };
   const parsed = parseCookingTime(tip.cookingTime || "");
   const [cookingTimeValue, setCookingTimeValue] = useState(parsed.value);
   const [cookingTimeUnit, setCookingTimeUnit] = useState<"min" | "hour">(parsed.unit);
-  const [ingredients, setIngredients] = useState<string[]>(tip.ingredients?.length ? [...tip.ingredients] : [""]);
+  const [ingredients, setIngredients] = useState<string[]>(
+    tip.ingredients?.length ? [...tip.ingredients] : [""],
+  );
   const [address, setAddress] = useState(tip.address || "");
-  const [content, setContent] = useState<ContentBlock[]>(tip.content?.length ? tip.content.map((b: any) => ({ type: b.type, value: b.value })) : []);
+  const [content, setContent] = useState<ContentBlock[]>(
+    tip.content?.length ? tip.content.map((b: any) => ({ type: b.type, value: b.value })) : [],
+  );
   const [submitting, setSubmitting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
@@ -85,7 +91,7 @@ function ProfileTipEditRoute() {
 
   const addIngredient = () => setIngredients((prev) => [...prev, ""]);
   const removeIngredient = (i: number) => {
-    setIngredients((prev) => prev.length > 1 ? prev.filter((_, idx) => idx !== i) : prev);
+    setIngredients((prev) => (prev.length > 1 ? prev.filter((_, idx) => idx !== i) : prev));
   };
   const updateIngredient = (i: number, v: string) => {
     setIngredients((prev) => {
@@ -95,8 +101,10 @@ function ProfileTipEditRoute() {
     });
   };
 
-  const addContentBlock = (type: "text" | "image") => setContent((prev) => [...prev, { type, value: "" }]);
-  const removeContentBlock = (i: number) => setContent((prev) => prev.filter((_, idx) => idx !== i));
+  const addContentBlock = (type: "text" | "image") =>
+    setContent((prev) => [...prev, { type, value: "" }]);
+  const removeContentBlock = (i: number) =>
+    setContent((prev) => prev.filter((_, idx) => idx !== i));
   const updateContentBlock = (i: number, v: string) => {
     setContent((prev) => {
       const next = [...prev];
@@ -117,15 +125,21 @@ function ProfileTipEditRoute() {
             <ArrowLeft className="w-5 h-5 text-zinc-700 dark:text-zinc-300" />
           </button>
           <div>
-            <h1 className="text-2xl font-serif font-medium text-zinc-900 dark:text-white">Edit Tip</h1>
-            <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--ember)] mt-0.5">{category}</p>
+            <h1 className="text-2xl font-serif font-medium text-zinc-900 dark:text-white">
+              Edit Tip
+            </h1>
+            <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--ember)] mt-0.5">
+              {category}
+            </p>
           </div>
         </div>
 
         {tip.hidden && (
           <div className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900/30 mb-6">
             <EyeOff className="w-4 h-4 text-red-500 shrink-0" />
-            <span className="text-sm text-red-600 dark:text-red-400 font-medium">This tip is hidden from the feed</span>
+            <span className="text-sm text-red-600 dark:text-red-400 font-medium">
+              This tip is hidden from the feed
+            </span>
           </div>
         )}
 
@@ -285,7 +299,11 @@ function ProfileTipEditRoute() {
                     />
                   ) : (
                     <div className="flex-1">
-                      <ImageUpload value={block.value} onChange={(v) => updateContentBlock(idx, v)} compact />
+                      <ImageUpload
+                        value={block.value}
+                        onChange={(v) => updateContentBlock(idx, v)}
+                        compact
+                      />
                     </div>
                   )}
                   <button
@@ -316,9 +334,12 @@ function ProfileTipEditRoute() {
             <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mx-auto mb-4">
               <Trash2 className="w-6 h-6 text-red-600 dark:text-red-400" />
             </div>
-            <h3 className="text-lg font-bold text-center text-zinc-900 dark:text-white mb-2">Hide this tip?</h3>
+            <h3 className="text-lg font-bold text-center text-zinc-900 dark:text-white mb-2">
+              Hide this tip?
+            </h3>
             <p className="text-sm text-center text-zinc-500 dark:text-zinc-400 mb-6">
-              The tip will be hidden from the public feed. You can still edit and manage it from My Tips.
+              The tip will be hidden from the public feed. You can still edit and manage it from My
+              Tips.
             </p>
             <div className="flex gap-3">
               <button

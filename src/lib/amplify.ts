@@ -10,8 +10,8 @@ const userPoolClientId =
 if (!userPoolId || !userPoolClientId) {
   throw new Error(
     "Cognito is not configured. Set VITE_COGNITO_USER_POOL_ID and VITE_COGNITO_CLIENT_ID " +
-    "environment variables. Example: VITE_COGNITO_USER_POOL_ID=eu-west-3_XXXXXXXXX " +
-    "VITE_COGNITO_CLIENT_ID=xxxxxxxxxxxxxxxxxxxxxxxxxx"
+      "environment variables. Example: VITE_COGNITO_USER_POOL_ID=eu-west-3_XXXXXXXXX " +
+      "VITE_COGNITO_CLIENT_ID=xxxxxxxxxxxxxxxxxxxxxxxxxx",
   );
 }
 

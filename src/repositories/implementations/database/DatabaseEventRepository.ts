@@ -36,22 +36,25 @@ export class DatabaseEventRepository implements IEventRepository {
   }
 
   async create(event: Omit<Event, "id">): Promise<Event> {
-    const [row] = await getDb().insert(events).values({
-      title: event.title,
-      date: event.date,
-      time: event.time,
-      location: event.location,
-      price: String(event.price),
-      joined: String(event.joined),
-      maxParticipants: String(event.maxParticipants),
-      isPast: event.isPast,
-      hidden: event.hidden ?? false,
-      attendees: event.attendees,
-      image: event.image,
-      tags: event.tags,
-      groupId: event.groupId,
-      description: event.description,
-    }).returning();
+    const [row] = await getDb()
+      .insert(events)
+      .values({
+        title: event.title,
+        date: event.date,
+        time: event.time,
+        location: event.location,
+        price: String(event.price),
+        joined: String(event.joined),
+        maxParticipants: String(event.maxParticipants),
+        isPast: event.isPast,
+        hidden: event.hidden ?? false,
+        attendees: event.attendees,
+        image: event.image,
+        tags: event.tags,
+        groupId: event.groupId,
+        description: event.description,
+      })
+      .returning();
     return rowToEvent(row);
   }
 
@@ -63,7 +66,8 @@ export class DatabaseEventRepository implements IEventRepository {
     if (updates.location !== undefined) values.location = updates.location;
     if (updates.price !== undefined) values.price = String(updates.price);
     if (updates.joined !== undefined) values.joined = String(updates.joined);
-    if (updates.maxParticipants !== undefined) values.maxParticipants = String(updates.maxParticipants);
+    if (updates.maxParticipants !== undefined)
+      values.maxParticipants = String(updates.maxParticipants);
     if (updates.isPast !== undefined) values.isPast = updates.isPast;
     if (updates.hidden !== undefined) values.hidden = updates.hidden;
     if (updates.attendees !== undefined) values.attendees = updates.attendees;

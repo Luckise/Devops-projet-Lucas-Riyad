@@ -41,7 +41,11 @@ export class GroupService implements IGroupService {
     return this.repo.transferOwnership(groupId, newOwnerEmail);
   }
 
-  async savePage(groupId: string, image: string, content: ContentBlock[] | undefined): Promise<boolean> {
+  async savePage(
+    groupId: string,
+    image: string,
+    content: ContentBlock[] | undefined,
+  ): Promise<boolean> {
     return this.repo.savePage(groupId, image, content);
   }
 

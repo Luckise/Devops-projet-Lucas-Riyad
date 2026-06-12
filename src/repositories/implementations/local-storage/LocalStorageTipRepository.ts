@@ -31,7 +31,10 @@ export class LocalStorageTipRepository implements ITipRepository {
 
   async delete(id: string): Promise<void> {
     const items = this.getItems<Tip>(this.tipsKey);
-    this.setItems(this.tipsKey, items.filter((i) => i.id !== id));
+    this.setItems(
+      this.tipsKey,
+      items.filter((i) => i.id !== id),
+    );
   }
 
   async hide(id: string): Promise<void> {

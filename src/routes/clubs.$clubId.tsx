@@ -44,7 +44,9 @@ function ClubDetailRoute() {
 
         <div className="flex items-center gap-2 text-[13px] text-zinc-500 dark:text-zinc-400 mb-8">
           <Users className="w-4 h-4" />
-          <span>{club.members.length} {club.members.length === 1 ? "member" : "members"}</span>
+          <span>
+            {club.members.length} {club.members.length === 1 ? "member" : "members"}
+          </span>
         </div>
 
         {club.content && club.content.length > 0 && (
@@ -52,13 +54,19 @@ function ClubDetailRoute() {
             {club.content.map((block, idx) => {
               if (block.type === "text") {
                 return (
-                  <p key={idx} className="text-[16px] leading-relaxed text-zinc-700 dark:text-zinc-300">
+                  <p
+                    key={idx}
+                    className="text-[16px] leading-relaxed text-zinc-700 dark:text-zinc-300"
+                  >
                     {block.value}
                   </p>
                 );
               } else if (block.type === "image") {
                 return (
-                  <div key={idx} className="rounded-2xl overflow-hidden border border-zinc-100 dark:border-zinc-800 shadow-sm">
+                  <div
+                    key={idx}
+                    className="rounded-2xl overflow-hidden border border-zinc-100 dark:border-zinc-800 shadow-sm"
+                  >
                     <img
                       src={block.value}
                       alt=""

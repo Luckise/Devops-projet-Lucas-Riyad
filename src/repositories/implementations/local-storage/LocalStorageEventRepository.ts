@@ -33,7 +33,10 @@ export class LocalStorageEventRepository implements IEventRepository {
 
   async delete(id: string): Promise<void> {
     const items = this.getItems<Event>(this.eventsKey);
-    this.setItems(this.eventsKey, items.filter((i) => i.id !== id));
+    this.setItems(
+      this.eventsKey,
+      items.filter((i) => i.id !== id),
+    );
   }
 
   async getSavedEventIds(): Promise<string[]> {

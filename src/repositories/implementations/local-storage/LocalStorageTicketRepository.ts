@@ -41,7 +41,9 @@ export class LocalStorageTicketRepository implements ITicketRepository {
       qrDataUrl,
       type: event.price > 0 ? "General Admission" : "Free Entry",
       purchaseDate: new Date().toLocaleDateString("en-US", {
-        month: "short", day: "numeric", year: "numeric",
+        month: "short",
+        day: "numeric",
+        year: "numeric",
       }),
       event: {
         title: event.title,

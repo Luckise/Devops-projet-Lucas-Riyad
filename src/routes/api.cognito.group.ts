@@ -1,5 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { CognitoIdentityProviderClient, AdminAddUserToGroupCommand } from "@aws-sdk/client-cognito-identity-provider";
+import {
+  CognitoIdentityProviderClient,
+  AdminAddUserToGroupCommand,
+} from "@aws-sdk/client-cognito-identity-provider";
 
 const client = new CognitoIdentityProviderClient({ region: "eu-west-3" });
 
@@ -51,11 +54,13 @@ async function handle({ request }: { request: Request }) {
       });
     }
 
-    await client.send(new AdminAddUserToGroupCommand({
-      UserPoolId: userPoolId,
-      Username: email,
-      GroupName: "Admin",
-    }));
+    await client.send(
+      new AdminAddUserToGroupCommand({
+        UserPoolId: userPoolId,
+        Username: email,
+        GroupName: "Admin",
+      }),
+    );
 
     return new Response(JSON.stringify({ success: true }), {
       status: 200,

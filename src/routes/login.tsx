@@ -123,11 +123,16 @@ function LoginRoute() {
               <div className="flex items-center gap-2 mb-3 ml-1">
                 <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[var(--ember)]/10 border border-[var(--ember)]/20">
                   <GraduationCap className="w-3 h-3 text-[var(--ember)]" />
-                  <span className="text-[11px] font-bold text-[var(--ember)] tracking-wide">EFREI</span>
+                  <span className="text-[11px] font-bold text-[var(--ember)] tracking-wide">
+                    EFREI
+                  </span>
                 </div>
                 <span className="text-xs text-zinc-400 dark:text-zinc-500">students only</span>
               </div>
-              <label htmlFor="login-email" className="block text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2 ml-1">
+              <label
+                htmlFor="login-email"
+                className="block text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2 ml-1"
+              >
                 Email address
               </label>
               <div className="relative">
@@ -170,9 +175,14 @@ function LoginRoute() {
 
             <p className="text-center text-xs text-zinc-400 dark:text-zinc-500 mt-8 leading-relaxed">
               By continuing, you agree to our{" "}
-              <a href="#" className="text-[var(--ember)] hover:underline">Terms</a>{" "}
+              <a href="#" className="text-[var(--ember)] hover:underline">
+                Terms
+              </a>{" "}
               and{" "}
-              <a href="#" className="text-[var(--ember)] hover:underline">Privacy Policy</a>.
+              <a href="#" className="text-[var(--ember)] hover:underline">
+                Privacy Policy
+              </a>
+              .
             </p>
 
             <p className="text-center text-xs text-zinc-400 dark:text-zinc-500 mt-4">
@@ -213,13 +223,19 @@ function LoginRoute() {
             <form onSubmit={handleSubmit} className="space-y-4">
               {loginError && (
                 <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl px-4 py-3">
-                  <p className="text-xs text-red-600 dark:text-red-400 text-center font-medium" role="alert">
+                  <p
+                    className="text-xs text-red-600 dark:text-red-400 text-center font-medium"
+                    role="alert"
+                  >
                     {loginError}
                   </p>
                 </div>
               )}
               <div>
-                <label htmlFor="login-password" className="block text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2 ml-1">
+                <label
+                  htmlFor="login-password"
+                  className="block text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2 ml-1"
+                >
                   Password
                 </label>
                 <div className="relative">
@@ -234,7 +250,9 @@ function LoginRoute() {
                     onBlur={() => validatePassword(password)}
                     autoComplete="current-password"
                     aria-invalid={!!passwordError || !!loginError}
-                    aria-describedby={passwordError ? "password-error" : loginError ? "login-error" : undefined}
+                    aria-describedby={
+                      passwordError ? "password-error" : loginError ? "login-error" : undefined
+                    }
                     className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-2xl px-4 py-3.5 pr-12 text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-[var(--ember)] focus:border-transparent transition-all shadow-sm"
                     placeholder="Enter your password"
                   />

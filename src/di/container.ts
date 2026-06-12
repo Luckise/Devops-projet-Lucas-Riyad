@@ -28,8 +28,13 @@ import { PostService } from "../services/implementations/PostService";
 import { TicketService } from "../services/implementations/TicketService";
 
 import type {
-  IEventService, IGroupService, IAuthService,
-  IImageService, ITipService, IPostService, ITicketService,
+  IEventService,
+  IGroupService,
+  IAuthService,
+  IImageService,
+  ITipService,
+  IPostService,
+  ITicketService,
 } from "../services/interfaces";
 
 function hasS3Credentials(): boolean {

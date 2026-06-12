@@ -27,7 +27,7 @@ async function getUserIsAdmin(): Promise<boolean> {
 function deriveProfile(
   attrs: Record<string, string | undefined>,
   email: string,
-  isAdmin: boolean
+  isAdmin: boolean,
 ): UserProfile {
   return {
     firstName: attrs.given_name || "",

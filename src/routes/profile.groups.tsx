@@ -1,7 +1,31 @@
-import { createFileRoute, useNavigate, Link, Outlet, redirect, useRouterState } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  useNavigate,
+  Link,
+  Outlet,
+  redirect,
+  useRouterState,
+} from "@tanstack/react-router";
 import { useState, useEffect } from "react";
-import { ChevronLeft, Plus, Users, Shield, Crown, UserPlus, UserMinus, Send, ExternalLink } from "lucide-react";
-import { getUserGroups, addMember, removeMember, transferOwnership, renameGroup, userRole } from "../lib/groups";
+import {
+  ChevronLeft,
+  Plus,
+  Users,
+  Shield,
+  Crown,
+  UserPlus,
+  UserMinus,
+  Send,
+  ExternalLink,
+} from "lucide-react";
+import {
+  getUserGroups,
+  addMember,
+  removeMember,
+  transferOwnership,
+  renameGroup,
+  userRole,
+} from "../lib/groups";
 import type { Group } from "../lib/groups";
 import { fetchAuthSession } from "aws-amplify/auth";
 import { getServices } from "../di/container";
@@ -21,9 +45,7 @@ export const Route = createFileRoute("/profile/groups")({
 
 function ProfileGroupsRoute() {
   const matches = useRouterState({ select: (s) => s.matches });
-  const hasChild = matches.some(
-    (m) => m.routeId !== "__root__" && m.routeId !== "/profile/groups"
-  );
+  const hasChild = matches.some((m) => m.routeId !== "__root__" && m.routeId !== "/profile/groups");
   const navigate = useNavigate();
   const stored = typeof window !== "undefined" ? localStorage.getItem("eat_user_profile") : null;
   const profile = stored ? JSON.parse(stored) : null;
@@ -35,12 +57,20 @@ function ProfileGroupsRoute() {
   const [message, setMessage] = useState("");
   const [editingName, setEditingName] = useState<string | null>(null);
   const [editingNameValue, setEditingNameValue] = useState("");
-  const [confirmRemove, setConfirmRemove] = useState<{ groupId: string; memberEmail: string } | null>(null);
-  const [confirmTransfer, setConfirmTransfer] = useState<{ groupId: string; memberEmail: string } | null>(null);
+  const [confirmRemove, setConfirmRemove] = useState<{
+    groupId: string;
+    memberEmail: string;
+  } | null>(null);
+  const [confirmTransfer, setConfirmTransfer] = useState<{
+    groupId: string;
+    memberEmail: string;
+  } | null>(null);
 
   const refresh = () => setGroups(getUserGroups(email));
 
-  useEffect(() => { refresh(); }, [email]);
+  useEffect(() => {
+    refresh();
+  }, [email]);
 
   const handleAddMember = async (groupId: string) => {
     if (!memberInput.trim()) return;
@@ -87,12 +117,19 @@ function ProfileGroupsRoute() {
     <main className="min-h-screen pb-24 pt-[80px]">
       <div className="max-w-md mx-auto px-4 pt-4 md:pt-8">
         <header className="mb-8 flex items-center gap-4">
-          <button onClick={() => window.history.back()} className="w-11 h-11 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 flex items-center justify-center shadow-sm hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors">
+          <button
+            onClick={() => window.history.back()}
+            className="w-11 h-11 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 flex items-center justify-center shadow-sm hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+          >
             <ChevronLeft className="w-5 h-5 text-zinc-700 dark:text-zinc-300" />
           </button>
           <div>
-            <p className="text-zinc-500 text-xs font-bold uppercase tracking-[0.2em] mb-0.5">Clubs</p>
-            <h1 className="text-[2rem] font-serif font-medium tracking-tight leading-none text-zinc-900 dark:text-white">My Clubs</h1>
+            <p className="text-zinc-500 text-xs font-bold uppercase tracking-[0.2em] mb-0.5">
+              Clubs
+            </p>
+            <h1 className="text-[2rem] font-serif font-medium tracking-tight leading-none text-zinc-900 dark:text-white">
+              My Clubs
+            </h1>
           </div>
         </header>
 
@@ -106,14 +143,19 @@ function ProfileGroupsRoute() {
           {groups.length === 0 && (
             <div className="text-center py-12">
               <Users className="w-10 h-10 text-zinc-300 dark:text-zinc-700 mx-auto mb-3" />
-              <p className="text-zinc-500 dark:text-zinc-400 text-sm">You are not part of any club yet.</p>
+              <p className="text-zinc-500 dark:text-zinc-400 text-sm">
+                You are not part of any club yet.
+              </p>
             </div>
           )}
 
           {groups.map((group) => {
             const role = userRole(group, email);
             return (
-              <div key={group.id} className="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-white/10 shadow-sm overflow-hidden">
+              <div
+                key={group.id}
+                className="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-white/10 shadow-sm overflow-hidden"
+              >
                 <button
                   onClick={() => {
                     setManaging(managing === group.id ? null : group.id);
@@ -133,7 +175,10 @@ function ProfileGroupsRoute() {
                             value={editingNameValue}
                             onChange={(e) => setEditingNameValue(e.target.value)}
                             onBlur={() => {
-                              if (editingNameValue.trim() && editingNameValue.trim() !== group.name) {
+                              if (
+                                editingNameValue.trim() &&
+                                editingNameValue.trim() !== group.name
+                              ) {
                                 renameGroup(group.id, editingNameValue.trim());
                                 refresh();
                               }
@@ -169,7 +214,10 @@ function ProfileGroupsRoute() {
                               <Users className="w-3 h-3" /> Member
                             </span>
                           )}
-                          <span className="text-[11px] text-zinc-400">· {group.members.length} {group.members.length === 1 ? "member" : "members"}</span>
+                          <span className="text-[11px] text-zinc-400">
+                            · {group.members.length}{" "}
+                            {group.members.length === 1 ? "member" : "members"}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -184,7 +232,9 @@ function ProfileGroupsRoute() {
                 {managing === group.id && role === "Owner" && (
                   <div className="border-t border-zinc-200 dark:border-white/10 p-5 space-y-4 bg-zinc-50/50 dark:bg-zinc-800/30">
                     <div>
-                      <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2 block">Add Member</label>
+                      <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2 block">
+                        Add Member
+                      </label>
                       <div className="flex gap-2">
                         <input
                           type="email"
@@ -203,23 +253,36 @@ function ProfileGroupsRoute() {
                     </div>
 
                     <div>
-                      <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2 block">Members</label>
+                      <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2 block">
+                        Members
+                      </label>
                       <div className="space-y-2">
                         {group.members.map((m) => {
                           const isOwner = m === group.owner;
                           return (
-                            <div key={m} className="flex items-center justify-between px-3 py-2 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800">
+                            <div
+                              key={m}
+                              className="flex items-center justify-between px-3 py-2 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800"
+                            >
                               <div className="flex items-center gap-2.5 min-w-0">
                                 <div className="w-7 h-7 rounded-full bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center flex-shrink-0">
-                                  <span className="text-[11px] font-bold text-zinc-600 dark:text-zinc-300">{m.charAt(0).toUpperCase()}</span>
+                                  <span className="text-[11px] font-bold text-zinc-600 dark:text-zinc-300">
+                                    {m.charAt(0).toUpperCase()}
+                                  </span>
                                 </div>
-                                <span className="text-sm text-zinc-900 dark:text-white truncate">{m}</span>
-                                {isOwner && <Crown className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />}
+                                <span className="text-sm text-zinc-900 dark:text-white truncate">
+                                  {m}
+                                </span>
+                                {isOwner && (
+                                  <Crown className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />
+                                )}
                               </div>
                               <div className="flex items-center gap-1">
                                 {!isOwner && m !== email && (
                                   <button
-                                    onClick={() => setConfirmRemove({ groupId: group.id, memberEmail: m })}
+                                    onClick={() =>
+                                      setConfirmRemove({ groupId: group.id, memberEmail: m })
+                                    }
                                     className="w-11 h-11 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-500 flex items-center justify-center hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors"
                                   >
                                     <UserMinus className="w-4 h-4" />
@@ -227,7 +290,9 @@ function ProfileGroupsRoute() {
                                 )}
                                 {!isOwner && (
                                   <button
-                                    onClick={() => setConfirmTransfer({ groupId: group.id, memberEmail: m })}
+                                    onClick={() =>
+                                      setConfirmTransfer({ groupId: group.id, memberEmail: m })
+                                    }
                                     className="w-11 h-11 rounded-lg bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 flex items-center justify-center hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-colors"
                                     title="Transfer ownership"
                                   >
@@ -252,8 +317,12 @@ function ProfileGroupsRoute() {
                             <ExternalLink className="w-4 h-4 text-[var(--ember)]" />
                           </div>
                           <div className="text-left">
-                            <p className="text-sm font-bold text-zinc-900 dark:text-white">Club Page</p>
-                            <p className="text-[11px] text-zinc-500">{group.image ? "Edit cover and content" : "Create public page"}</p>
+                            <p className="text-sm font-bold text-zinc-900 dark:text-white">
+                              Club Page
+                            </p>
+                            <p className="text-[11px] text-zinc-500">
+                              {group.image ? "Edit cover and content" : "Create public page"}
+                            </p>
                           </div>
                         </div>
                         <ChevronLeft className="w-4 h-4 text-zinc-400 -rotate-180" />
@@ -264,18 +333,29 @@ function ProfileGroupsRoute() {
 
                 {managing === group.id && role === "Member" && (
                   <div className="border-t border-zinc-200 dark:border-white/10 p-5 space-y-3 bg-zinc-50/50 dark:bg-zinc-800/30">
-                    <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 block">Members</label>
+                    <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 block">
+                      Members
+                    </label>
                     <div className="space-y-2">
                       {group.members.map((m) => {
                         const isOwner = m === group.owner;
                         return (
-                          <div key={m} className="flex items-center justify-between px-3 py-2 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800">
+                          <div
+                            key={m}
+                            className="flex items-center justify-between px-3 py-2 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800"
+                          >
                             <div className="flex items-center gap-2.5 min-w-0">
                               <div className="w-7 h-7 rounded-full bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center flex-shrink-0">
-                                <span className="text-[11px] font-bold text-zinc-600 dark:text-zinc-300">{m.charAt(0).toUpperCase()}</span>
+                                <span className="text-[11px] font-bold text-zinc-600 dark:text-zinc-300">
+                                  {m.charAt(0).toUpperCase()}
+                                </span>
                               </div>
-                              <span className="text-sm text-zinc-900 dark:text-white truncate">{m}</span>
-                              {isOwner && <Crown className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />}
+                              <span className="text-sm text-zinc-900 dark:text-white truncate">
+                                {m}
+                              </span>
+                              {isOwner && (
+                                <Crown className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />
+                              )}
                             </div>
                           </div>
                         );
@@ -303,9 +383,15 @@ function ProfileGroupsRoute() {
             <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mx-auto mb-4">
               <UserMinus className="w-6 h-6 text-red-600 dark:text-red-400" />
             </div>
-            <h3 className="text-lg font-bold text-center text-zinc-900 dark:text-white mb-2">Remove member?</h3>
+            <h3 className="text-lg font-bold text-center text-zinc-900 dark:text-white mb-2">
+              Remove member?
+            </h3>
             <p className="text-sm text-center text-zinc-500 dark:text-zinc-400 mb-6">
-              Are you sure you want to remove <strong className="text-zinc-700 dark:text-zinc-300">{confirmRemove.memberEmail}</strong> from this group?
+              Are you sure you want to remove{" "}
+              <strong className="text-zinc-700 dark:text-zinc-300">
+                {confirmRemove.memberEmail}
+              </strong>{" "}
+              from this group?
             </p>
             <div className="flex gap-3">
               <button
@@ -336,9 +422,15 @@ function ProfileGroupsRoute() {
             <div className="w-12 h-12 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center mx-auto mb-4">
               <Send className="w-6 h-6 text-amber-600 dark:text-amber-400" />
             </div>
-            <h3 className="text-lg font-bold text-center text-zinc-900 dark:text-white mb-2">Transfer ownership?</h3>
+            <h3 className="text-lg font-bold text-center text-zinc-900 dark:text-white mb-2">
+              Transfer ownership?
+            </h3>
             <p className="text-sm text-center text-zinc-500 dark:text-zinc-400 mb-6">
-              You are about to transfer ownership to <strong className="text-zinc-700 dark:text-zinc-300">{confirmTransfer.memberEmail}</strong>. You will become a regular member and will not be able to undo this.
+              You are about to transfer ownership to{" "}
+              <strong className="text-zinc-700 dark:text-zinc-300">
+                {confirmTransfer.memberEmail}
+              </strong>
+              . You will become a regular member and will not be able to undo this.
             </p>
             <div className="flex gap-3">
               <button

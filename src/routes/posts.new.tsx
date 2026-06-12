@@ -37,7 +37,10 @@ function PostCreate() {
     if (!selectedEventId || !hasText) return;
     setSubmitting(true);
 
-    const profile = typeof window !== "undefined" ? JSON.parse(localStorage.getItem("eat_user_profile") || "{}") : {};
+    const profile =
+      typeof window !== "undefined"
+        ? JSON.parse(localStorage.getItem("eat_user_profile") || "{}")
+        : {};
     const post = {
       content: filledContent,
       eventId: selectedEventId,
@@ -73,7 +76,9 @@ function PostCreate() {
             <ArrowLeft className="w-5 h-5 text-zinc-700 dark:text-zinc-300" />
           </button>
           <div>
-            <h1 className="text-2xl font-serif font-medium text-zinc-900 dark:text-white">New Post</h1>
+            <h1 className="text-2xl font-serif font-medium text-zinc-900 dark:text-white">
+              New Post
+            </h1>
           </div>
         </div>
 
@@ -115,7 +120,11 @@ function PostCreate() {
                     />
                   ) : (
                     <div className="flex-1">
-                      <ImageUpload value={block.value} onChange={(v) => updateContentBlock(idx, v)} compact />
+                      <ImageUpload
+                        value={block.value}
+                        onChange={(v) => updateContentBlock(idx, v)}
+                        compact
+                      />
                     </div>
                   )}
                   {content.length > 1 && (
@@ -177,7 +186,11 @@ function PostCreate() {
 
           <button
             type="submit"
-            disabled={submitting || !selectedEventId || content.every((b) => b.type !== "text" || !b.value.trim())}
+            disabled={
+              submitting ||
+              !selectedEventId ||
+              content.every((b) => b.type !== "text" || !b.value.trim())
+            }
             className="w-full py-4 px-6 rounded-full bg-[var(--ember)] text-white font-bold text-[15px] hover:bg-[var(--ember)]/90 disabled:opacity-50 transition-all shadow-lg shadow-[var(--ember)]/20"
           >
             {submitting ? "Publishing..." : "Publish Post"}

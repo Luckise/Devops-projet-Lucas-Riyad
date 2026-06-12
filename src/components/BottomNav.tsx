@@ -7,7 +7,10 @@ const BottomNav = memo(function BottomNav() {
   const { user } = useUser();
 
   return (
-    <nav className="fixed bottom-0 w-full z-50 pb-safe" style={{ backgroundColor: "var(--header-bg)", borderTop: "1px solid var(--line)" }}>
+    <nav
+      className="fixed bottom-0 w-full z-50 pb-safe"
+      style={{ backgroundColor: "var(--header-bg)", borderTop: "1px solid var(--line)" }}
+    >
       <div className="max-w-md mx-auto flex items-center justify-around h-[4.5rem] px-2">
         <Link
           to="/"
@@ -63,7 +66,11 @@ const BottomNav = memo(function BottomNav() {
         >
           {user.avatar ? (
             <div className="w-6 h-6 rounded-full overflow-hidden transition-all">
-              <img src={user.avatar} alt="Profile" className="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-[.active]:opacity-100 transition-opacity" />
+              <img
+                src={user.avatar}
+                alt="Profile"
+                className="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-[.active]:opacity-100 transition-opacity"
+              />
             </div>
           ) : (
             <User className="w-6 h-6" />

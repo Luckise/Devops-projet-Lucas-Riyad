@@ -5,9 +5,7 @@ import { Moon, Sun } from "lucide-react";
 
 const Header = memo(function Header() {
   const [dark, setDark] = useState(() =>
-    typeof document !== "undefined"
-      ? document.documentElement.classList.contains("dark")
-      : false
+    typeof document !== "undefined" ? document.documentElement.classList.contains("dark") : false,
   );
 
   useEffect(() => {
@@ -23,7 +21,11 @@ const Header = memo(function Header() {
   return (
     <header className="fixed top-0 w-full z-50" style={{ backgroundColor: "var(--header-bg)" }}>
       <div className="max-w-md mx-auto flex items-center justify-between h-[4rem] px-4">
-        <Link to="/" className="text-2xl font-serif font-bold tracking-tighter" style={{ color: "var(--charcoal)" }}>
+        <Link
+          to="/"
+          className="text-2xl font-serif font-bold tracking-tighter"
+          style={{ color: "var(--charcoal)" }}
+        >
           EAT.
         </Link>
         <button

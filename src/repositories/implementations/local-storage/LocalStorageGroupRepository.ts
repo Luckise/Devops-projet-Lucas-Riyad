@@ -74,7 +74,11 @@ export class LocalStorageGroupRepository implements IGroupRepository {
     return true;
   }
 
-  async savePage(groupId: string, image: string, content: ContentBlock[] | undefined): Promise<boolean> {
+  async savePage(
+    groupId: string,
+    image: string,
+    content: ContentBlock[] | undefined,
+  ): Promise<boolean> {
     const groups = await this.getAll();
     const group = groups[groupId];
     if (!group) return false;

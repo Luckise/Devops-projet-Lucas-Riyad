@@ -37,17 +37,18 @@ export class DatabaseGroupRepository implements IGroupRepository {
 
   async getUserGroups(email: string): Promise<Group[]> {
     const rows = await getDb().select().from(groups);
-    return rows
-      .map(rowToGroup)
-      .filter((g) => g.members.includes(email));
+    return rows.map(rowToGroup).filter((g) => g.members.includes(email));
   }
 
   async create(name: string, ownerEmail: string): Promise<Group> {
-    const [row] = await getDb().insert(groups).values({
-      name,
-      owner: ownerEmail,
-      members: [ownerEmail],
-    }).returning();
+    const [row] = await getDb()
+      .insert(groups)
+      .values({
+        name,
+        owner: ownerEmail,
+        members: [ownerEmail],
+      })
+      .returning();
     return rowToGroup(row);
   }
 
@@ -55,22 +56,27 @@ export class DatabaseGroupRepository implements IGroupRepository {
     for (const group of Object.values(allGroups)) {
       const existing = await this.getById(group.id);
       if (existing) {
-        await getDb().update(groups).set({
-          name: group.name,
-          owner: group.owner,
-          members: group.members,
-          image: group.image ?? null,
-          content: group.content ?? null,
-        }).where(eq(groups.id, group.id));
+        await getDb()
+          .update(groups)
+          .set({
+            name: group.name,
+            owner: group.owner,
+            members: group.members,
+            image: group.image ?? null,
+            content: group.content ?? null,
+          })
+          .where(eq(groups.id, group.id));
       } else {
-        await getDb().insert(groups).values({
-          id: group.id,
-          name: group.name,
-          owner: group.owner,
-          members: group.members,
-          image: group.image ?? null,
-          content: group.content ?? null,
-        });
+        await getDb()
+          .insert(groups)
+          .values({
+            id: group.id,
+            name: group.name,
+            owner: group.owner,
+            members: group.members,
+            image: group.image ?? null,
+            content: group.content ?? null,
+          });
       }
     }
   }
@@ -106,10 +112,17 @@ export class DatabaseGroupRepository implements IGroupRepository {
     return true;
   }
 
-  async savePage(groupId: string, image: string, content: ContentBlock[] | undefined): Promise<boolean> {
+  async savePage(
+    groupId: string,
+    image: string,
+    content: ContentBlock[] | undefined,
+  ): Promise<boolean> {
     const group = await this.getById(groupId);
     if (!group) return false;
-    await getDb().update(groups).set({ image, content: content ?? null }).where(eq(groups.id, groupId));
+    await getDb()
+      .update(groups)
+      .set({ image, content: content ?? null })
+      .where(eq(groups.id, groupId));
     return true;
   }
 

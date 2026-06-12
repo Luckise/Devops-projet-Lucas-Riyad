@@ -19,12 +19,12 @@ function ProfileEditRoute() {
   const navigate = useNavigate();
   const { user, setUser } = useUser();
   const [isSaving, setIsSaving] = useState(false);
-  
+
   const [formData, setFormData] = useState({
     firstName: user.firstName,
     lastName: user.lastName,
     nickname: user.nickname,
-    avatar: user.avatar
+    avatar: user.avatar,
   });
 
   const initialised = useRef(false);
@@ -35,13 +35,13 @@ function ProfileEditRoute() {
       firstName: user.firstName,
       lastName: user.lastName,
       nickname: user.nickname,
-      avatar: user.avatar
+      avatar: user.avatar,
     });
   }, [user]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -49,7 +49,7 @@ function ProfileEditRoute() {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setFormData(prev => ({ ...prev, avatar: reader.result as string }));
+        setFormData((prev) => ({ ...prev, avatar: reader.result as string }));
       };
       reader.readAsDataURL(file);
     }
@@ -63,7 +63,7 @@ function ProfileEditRoute() {
       firstName: formData.firstName,
       lastName: formData.lastName,
       nickname: formData.nickname,
-      avatar: formData.avatar
+      avatar: formData.avatar,
     });
     setIsSaving(false);
     navigate({ to: "/profile" });
@@ -100,12 +100,22 @@ function ProfileEditRoute() {
               </div>
               <label className="absolute inset-0 bg-black/40 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity">
                 <Camera className="w-8 h-8 text-white" />
-                <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleImageUpload}
+                />
               </label>
               {/* Always visible small badge for mobile discoverability */}
               <label className="absolute bottom-0 right-0 w-9 h-9 bg-[var(--ember)] rounded-full flex items-center justify-center text-white border-2 border-white dark:border-zinc-950 cursor-pointer shadow-md transition-transform active:scale-95">
                 <Camera className="w-4 h-4" />
-                <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleImageUpload}
+                />
               </label>
             </div>
           </div>
@@ -113,7 +123,10 @@ function ProfileEditRoute() {
           <div className="space-y-4">
             {/* First Name */}
             <div>
-              <label htmlFor="firstName" className="block text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2 ml-1">
+              <label
+                htmlFor="firstName"
+                className="block text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2 ml-1"
+              >
                 First Name
               </label>
               <input
@@ -129,7 +142,10 @@ function ProfileEditRoute() {
 
             {/* Last Name */}
             <div>
-              <label htmlFor="lastName" className="block text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2 ml-1">
+              <label
+                htmlFor="lastName"
+                className="block text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2 ml-1"
+              >
                 Surname
               </label>
               <input
@@ -145,7 +161,10 @@ function ProfileEditRoute() {
 
             {/* Nickname */}
             <div>
-              <label htmlFor="nickname" className="block text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2 ml-1">
+              <label
+                htmlFor="nickname"
+                className="block text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2 ml-1"
+              >
                 Nickname
               </label>
               <input
@@ -161,7 +180,10 @@ function ProfileEditRoute() {
 
             {/* Email (Disabled) */}
             <div>
-              <label htmlFor="email" className="block text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2 ml-1">
+              <label
+                htmlFor="email"
+                className="block text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2 ml-1"
+              >
                 Email Address
               </label>
               <div className="relative">
@@ -173,10 +195,14 @@ function ProfileEditRoute() {
                   className="w-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-transparent rounded-2xl px-4 py-3.5 text-zinc-500 dark:text-zinc-400 cursor-not-allowed shadow-inner"
                 />
                 <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 bg-zinc-200 dark:bg-zinc-700 px-2 py-0.5 rounded">Uneditable</span>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 bg-zinc-200 dark:bg-zinc-700 px-2 py-0.5 rounded">
+                    Uneditable
+                  </span>
                 </div>
               </div>
-              <p className="text-xs text-zinc-500 mt-2 ml-1">Your email is linked to your account identity and cannot be changed here.</p>
+              <p className="text-xs text-zinc-500 mt-2 ml-1">
+                Your email is linked to your account identity and cannot be changed here.
+              </p>
             </div>
           </div>
 

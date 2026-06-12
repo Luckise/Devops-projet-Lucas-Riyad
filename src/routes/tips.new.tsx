@@ -21,7 +21,7 @@ const CATEGORIES = ["Recipes", "Promotions", "Addresses", "Guides"] as const;
 
 function TipCreate() {
   const navigate = useNavigate();
-  const [category, setCategory] = useState<typeof CATEGORIES[number] | "">("");
+  const [category, setCategory] = useState<(typeof CATEGORIES)[number] | "">("");
   const [title, setTitle] = useState("");
   const [image, setImage] = useState("");
   const [cookingTimeValue, setCookingTimeValue] = useState("");
@@ -36,7 +36,10 @@ function TipCreate() {
     if (!title) return;
     setSubmitting(true);
 
-    const profile = typeof window !== "undefined" ? JSON.parse(localStorage.getItem("eat_user_profile") || "{}") : {};
+    const profile =
+      typeof window !== "undefined"
+        ? JSON.parse(localStorage.getItem("eat_user_profile") || "{}")
+        : {};
 
     const tip: Record<string, unknown> = {
       title,
@@ -63,7 +66,7 @@ function TipCreate() {
 
   const addIngredient = () => setIngredients((prev) => [...prev, ""]);
   const removeIngredient = (i: number) => {
-    setIngredients((prev) => prev.length > 1 ? prev.filter((_, idx) => idx !== i) : prev);
+    setIngredients((prev) => (prev.length > 1 ? prev.filter((_, idx) => idx !== i) : prev));
   };
   const updateIngredient = (i: number, v: string) => {
     setIngredients((prev) => {
@@ -73,8 +76,10 @@ function TipCreate() {
     });
   };
 
-  const addContentBlock = (type: "text" | "image") => setContent((prev) => [...prev, { type, value: "" }]);
-  const removeContentBlock = (i: number) => setContent((prev) => prev.filter((_, idx) => idx !== i));
+  const addContentBlock = (type: "text" | "image") =>
+    setContent((prev) => [...prev, { type, value: "" }]);
+  const removeContentBlock = (i: number) =>
+    setContent((prev) => prev.filter((_, idx) => idx !== i));
   const updateContentBlock = (i: number, v: string) => {
     setContent((prev) => {
       const next = [...prev];
@@ -253,7 +258,11 @@ function TipCreate() {
                     />
                   ) : (
                     <div className="flex-1">
-                      <ImageUpload value={block.value} onChange={(v) => updateContentBlock(idx, v)} compact />
+                      <ImageUpload
+                        value={block.value}
+                        onChange={(v) => updateContentBlock(idx, v)}
+                        compact
+                      />
                     </div>
                   )}
                   <button

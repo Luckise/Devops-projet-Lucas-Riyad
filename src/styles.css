@@ -7,8 +7,8 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --ember: #7A3302;
-  --ember-deep: #7A3302;
+  --ember: #7a3302;
+  --ember-deep: #7a3302;
   --ember-surface: oklch(6.72% 0.00001 271.152);
   --charcoal: #1a1a1a;
   --charcoal-soft: #4a4a4a;
@@ -172,8 +172,6 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-
-
 
 a {
   color: var(--ember-deep);

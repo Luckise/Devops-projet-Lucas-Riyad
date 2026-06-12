@@ -1,7 +1,16 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { getServices } from "../di/container";
 import { formatDate, formatTime, isEventPast } from "../lib/date-utils";
-import { ArrowLeft, Calendar, Clock, MapPin, Ticket, CheckCircle2, Users, XCircle } from "lucide-react";
+import {
+  ArrowLeft,
+  Calendar,
+  Clock,
+  MapPin,
+  Ticket,
+  CheckCircle2,
+  Users,
+  XCircle,
+} from "lucide-react";
 import { useState } from "react";
 import SaveButton from "../components/SaveButton";
 import { toast } from "../lib/toast";
@@ -35,9 +44,10 @@ function EventDetailsRoute() {
     if (isEventFull) return;
     setIsProcessing(true);
 
-    const profile = typeof window !== "undefined"
-      ? JSON.parse(localStorage.getItem("eat_user_profile") || "{}")
-      : {};
+    const profile =
+      typeof window !== "undefined"
+        ? JSON.parse(localStorage.getItem("eat_user_profile") || "{}")
+        : {};
 
     await new Promise((resolve) => setTimeout(resolve, 1500));
 
@@ -53,7 +63,7 @@ function EventDetailsRoute() {
     await services.ticketService.create(event, profile);
 
     if (event.price > 0) {
-      window.open('https://www.helloasso.com/', '_blank');
+      window.open("https://www.helloasso.com/", "_blank");
       setPaymentSuccess(true);
       setIsProcessing(false);
       toast("Redirected to HelloAsso for payment");
@@ -79,7 +89,7 @@ function EventDetailsRoute() {
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60" />
         <div className="absolute inset-0 bg-gradient-to-t from-white dark:from-zinc-950 via-transparent to-transparent h-full w-full" />
-        
+
         {/* Top Nav (Back Button) */}
         <div className="absolute top-0 left-0 w-full p-4 pt-[4.5rem] flex justify-between items-center z-10">
           <button
@@ -109,7 +119,7 @@ function EventDetailsRoute() {
             </span>
           ))}
         </div>
-        
+
         <h1 className="text-4xl md:text-5xl font-serif font-medium leading-[1.1] text-zinc-900 dark:text-white mb-6 tracking-tight">
           {event.title}
         </h1>
@@ -119,21 +129,31 @@ function EventDetailsRoute() {
           <div className="flex items-start gap-3 p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50">
             <Calendar className="w-5 h-5 text-[var(--ember)] mt-0.5" />
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1">Date</p>
-              <p className="font-medium text-zinc-900 dark:text-zinc-100">{formatDate(event.date)}</p>
+              <p className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1">
+                Date
+              </p>
+              <p className="font-medium text-zinc-900 dark:text-zinc-100">
+                {formatDate(event.date)}
+              </p>
             </div>
           </div>
           <div className="flex items-start gap-3 p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50">
             <Clock className="w-5 h-5 text-[var(--ember)] mt-0.5" />
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1">Time</p>
-              <p className="font-medium text-zinc-900 dark:text-zinc-100">{formatTime(event.time)}</p>
+              <p className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1">
+                Time
+              </p>
+              <p className="font-medium text-zinc-900 dark:text-zinc-100">
+                {formatTime(event.time)}
+              </p>
             </div>
           </div>
           <div className="flex items-start gap-3 p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 col-span-2">
             <MapPin className="w-5 h-5 text-[var(--ember)] mt-0.5" />
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1">Location</p>
+              <p className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1">
+                Location
+              </p>
               <p className="font-medium text-zinc-900 dark:text-zinc-100">{event.location}</p>
             </div>
           </div>
@@ -155,19 +175,25 @@ function EventDetailsRoute() {
             <div className="flex items-center gap-4">
               <SaveButton eventId={event.id} />
               <div className="flex flex-col">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Price</span>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                  Price
+                </span>
                 <span className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">
                   {event.price === 0 ? "Free" : `€${event.price}`}
                 </span>
               </div>
               {event.maxParticipants > 0 && (
                 <div className="flex flex-col">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Capacity</span>
-                  <span className="text-base font-bold tracking-tight text-zinc-900 dark:text-white">{joined}/{event.maxParticipants}</span>
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                    Capacity
+                  </span>
+                  <span className="text-base font-bold tracking-tight text-zinc-900 dark:text-white">
+                    {joined}/{event.maxParticipants}
+                  </span>
                 </div>
               )}
             </div>
-            
+
             {isEventFull ? (
               <div className="flex-1 flex items-center justify-center gap-2 py-4 px-6 rounded-full font-bold text-[15px] bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-900/50">
                 <XCircle className="w-5 h-5" />
@@ -178,15 +204,17 @@ function EventDetailsRoute() {
                 onClick={handleJoin}
                 disabled={isProcessing || paymentSuccess}
                 className={`flex-1 flex items-center justify-center gap-2 py-4 px-6 rounded-full font-bold text-[15px] transition-all duration-300 ${
-                  paymentSuccess 
-                    ? "bg-green-500 text-white" 
+                  paymentSuccess
+                    ? "bg-green-500 text-white"
                     : "bg-[var(--ember)] hover:bg-[var(--ember)]/90 text-white shadow-lg shadow-[var(--ember)]/20"
                 } disabled:opacity-80`}
               >
                 {isProcessing ? (
                   <div className="flex items-center gap-2">
                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    <span>{event.price > 0 ? "Redirecting to HelloAsso..." : "Generating Ticket..."}</span>
+                    <span>
+                      {event.price > 0 ? "Redirecting to HelloAsso..." : "Generating Ticket..."}
+                    </span>
                   </div>
                 ) : paymentSuccess ? (
                   <>

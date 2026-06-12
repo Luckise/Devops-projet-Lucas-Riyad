@@ -26,11 +26,14 @@ export class DatabasePostRepository implements IPostRepository {
   }
 
   async create(post: Omit<Post, "id">): Promise<Post> {
-    const [row] = await getDb().insert(posts).values({
-      content: typeof post.content === "string" ? post.content : post.content,
-      eventId: post.eventId ?? null,
-      authorEmail: post.authorEmail ?? null,
-    }).returning();
+    const [row] = await getDb()
+      .insert(posts)
+      .values({
+        content: typeof post.content === "string" ? post.content : post.content,
+        eventId: post.eventId ?? null,
+        authorEmail: post.authorEmail ?? null,
+      })
+      .returning();
     return rowToPost(row);
   }
 
