@@ -48,7 +48,9 @@ function EventCreate() {
     if (!title || !date || !time || !location || !selectedGroup) return;
     setSubmitting(true);
 
-    await (await getServices()).eventService.create({
+    await (
+      await getServices()
+    ).eventService.create({
       title,
       image,
       date,

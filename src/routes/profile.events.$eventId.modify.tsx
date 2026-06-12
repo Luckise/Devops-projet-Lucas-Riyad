@@ -62,7 +62,9 @@ function ProfileEventEditRoute() {
     if (!title || !date || !time || !location || !selectedGroup) return;
     setSubmitting(true);
 
-    await (await getServices()).eventService.update(event.id, {
+    await (
+      await getServices()
+    ).eventService.update(event.id, {
       title,
       image,
       date,
