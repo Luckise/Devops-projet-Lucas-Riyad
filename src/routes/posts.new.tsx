@@ -146,6 +146,11 @@ function PostCreate() {
               Link to Event
             </label>
             <div className="max-h-[280px] overflow-y-auto space-y-2 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 p-2 border border-zinc-200 dark:border-zinc-800">
+              {allEvents.length === 0 && (
+                <p className="text-sm text-zinc-400 dark:text-zinc-500 text-center py-6">
+                  Aucun événement pour le moment disponible
+                </p>
+              )}
               {allEvents.map((event) => (
                 <button
                   key={event.id}
