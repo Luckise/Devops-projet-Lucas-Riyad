@@ -1,0 +1,35 @@
+---
+- name: Deploy application
+  hosts: app
+  become: true
+
+  tasks:
+    - name: Log in to ECR
+      ansible.builtin.shell: >-
+        {{ aws_cli_bin }} ecr get-login-password --region {{ aws_region }}
+        | {{ docker_bin }} login --username AWS --password-stdin {{ ecr_registry }}
+      changed_when: false
+
+    - name: Pull latest image
+      ansible.builtin.shell: >-
+        {{ docker_bin }} pull {{ app_image_repository }}:{{ app_image_tag }}
+      changed_when: false
+
+    - name: Restart app service
+      ansible.builtin.systemd:
+        name: "{{ app_container_name }}"
+        state: restarted
+
+    - name: Wait for app to start
+      ansible.builtin.pause:
+        seconds: 5
+
+    - name: Verify app is running
+      ansible.builtin.uri:
+        url: "http://localhost:{{ app_container_port }}{{ app_health_check_path }}"
+        status_code: [200, 307]
+      register: health_check
+
+    - name: Show health check result
+      ansible.builtin.debug:
+        var: health_check.status

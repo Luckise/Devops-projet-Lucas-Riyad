@@ -1,0 +1,4 @@
+---
+ansible_aws_ssm_region: "eu-west-3"
+ansible_aws_ssm_bucket_name: "devops-projet-lucas-riyad-dev-assets-e5f3e56b"
+ansible_remote_tmp: /tmp/ansible

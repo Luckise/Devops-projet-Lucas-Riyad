@@ -1,0 +1,55 @@
+---
+# Fill these values before the first deployment.
+
+# Inventory / connection
+ssh_user: ubuntu
+app_user_shell: /usr/sbin/nologin
+
+# Application identity
+app_user: app
+app_group: "{{ app_user }}"
+app_install_dir: "/opt/{{ app_container_name }}"
+app_backup_dir: "{{ app_install_dir }}/backup"
+app_container_name: app
+app_container_port: 3000
+app_health_check_path: /health
+app_node_env: production
+app_restart_policy: always
+app_backup_cron_minute: "0"
+app_backup_cron_hour: "2"
+app_backup_cron_user: root
+
+# AWS / ECR
+aws_region: eu-west-3
+aws_profile: ""
+ecr_registry: "697359331837.dkr.ecr.eu-west-3.amazonaws.com"
+ecr_repository_name: "devops-projet-lucas-riyad-dev-app"
+app_image_repository: "{{ ecr_registry }}/{{ ecr_repository_name }}"
+aws_credentials_mode: role
+aws_credentials_dir: "/home/{{ app_user }}/.aws"
+aws_credentials_file: "{{ aws_credentials_dir }}/credentials"
+aws_cli_bin: /usr/local/bin/aws
+docker_bin: /usr/bin/docker
+pg_dump_bin: /usr/bin/pg_dump
+common_packages:
+  - curl
+  - unzip
+  - ca-certificates
+docker_packages:
+  - docker.io
+  - docker-compose
+aws_access_key_id: ""
+aws_secret_access_key: ""
+aws_session_token: ""
+
+# Application runtime
+asset_bucket_name: "devops-projet-lucas-riyad-dev-assets-e5f3e56b"
+backup_bucket_name: "devops-projet-lucas-riyad-dev-backups-e5f3e56b"
+backup_s3_prefix: "{{ app_container_name }}"
+backup_local_dir: /tmp
+backup_file_prefix: "{{ app_container_name }}"
+backup_file_extension: sql
+db_host: "devops-projet-lucas-riyad-dev-db-72f9c285.cvgqemogmgnt.eu-west-3.rds.amazonaws.com"
+db_name: app
+db_user: app
+# db_password, cognito_user_pool_id, cognito_client_id → vault.yml
