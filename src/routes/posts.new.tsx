@@ -37,7 +37,7 @@ function PostCreate() {
     if (!selectedEventId || !hasText) return;
     setSubmitting(true);
 
-    const profile = JSON.parse(localStorage.getItem("eat_user_profile") || "{}");
+    const profile = typeof window !== "undefined" ? JSON.parse(localStorage.getItem("eat_user_profile") || "{}") : {};
     const post = {
       content: filledContent,
       eventId: selectedEventId,

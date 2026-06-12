@@ -32,7 +32,6 @@ import { Route as EventsNewRouteImport } from './routes/events.new'
 import { Route as EventsEventIdRouteImport } from './routes/events.$eventId'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
 import { Route as DemoOrpcTodoRouteImport } from './routes/demo/orpc-todo'
-import { Route as DemoDrizzleRouteImport } from './routes/demo/drizzle'
 import { Route as ClubsClubIdRouteImport } from './routes/clubs.$clubId'
 import { Route as ApiSplatRouteImport } from './routes/api.$'
 import { Route as ProfileGroupsNewRouteImport } from './routes/profile.groups.new'
@@ -40,6 +39,7 @@ import { Route as PostsPostIdModifyRouteImport } from './routes/posts.$postId.mo
 import { Route as DemoFormSimpleRouteImport } from './routes/demo/form.simple'
 import { Route as DemoFormAddressRouteImport } from './routes/demo/form.address'
 import { Route as ApiRpcSplatRouteImport } from './routes/api.rpc.$'
+import { Route as ApiCognitoGroupRouteImport } from './routes/api.cognito.group'
 import { Route as ProfileTipsTipIdModifyRouteImport } from './routes/profile.tips.$tipId.modify'
 import { Route as ProfileGroupsGroupIdModifyRouteImport } from './routes/profile.groups.$groupId.modify'
 import { Route as ProfileEventsEventIdModifyRouteImport } from './routes/profile.events.$eventId.modify'
@@ -159,11 +159,6 @@ const DemoOrpcTodoRoute = DemoOrpcTodoRouteImport.update({
   path: '/demo/orpc-todo',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DemoDrizzleRoute = DemoDrizzleRouteImport.update({
-  id: '/demo/drizzle',
-  path: '/demo/drizzle',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ClubsClubIdRoute = ClubsClubIdRouteImport.update({
   id: '/$clubId',
   path: '/$clubId',
@@ -199,6 +194,11 @@ const ApiRpcSplatRoute = ApiRpcSplatRouteImport.update({
   path: '/api/rpc/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiCognitoGroupRoute = ApiCognitoGroupRouteImport.update({
+  id: '/api/cognito/group',
+  path: '/api/cognito/group',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProfileTipsTipIdModifyRoute = ProfileTipsTipIdModifyRouteImport.update({
   id: '/$tipId/modify',
   path: '/$tipId/modify',
@@ -229,7 +229,6 @@ export interface FileRoutesByFullPath {
   '/tips': typeof TipsRouteWithChildren
   '/api/$': typeof ApiSplatRoute
   '/clubs/$clubId': typeof ClubsClubIdRoute
-  '/demo/drizzle': typeof DemoDrizzleRoute
   '/demo/orpc-todo': typeof DemoOrpcTodoRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/events/$eventId': typeof EventsEventIdRoute
@@ -244,6 +243,7 @@ export interface FileRoutesByFullPath {
   '/clubs/': typeof ClubsIndexRoute
   '/profile/': typeof ProfileIndexRoute
   '/tips/': typeof TipsIndexRoute
+  '/api/cognito/group': typeof ApiCognitoGroupRoute
   '/api/rpc/$': typeof ApiRpcSplatRoute
   '/demo/form/address': typeof DemoFormAddressRoute
   '/demo/form/simple': typeof DemoFormSimpleRoute
@@ -263,7 +263,6 @@ export interface FileRoutesByTo {
   '/tickets': typeof TicketsRoute
   '/api/$': typeof ApiSplatRoute
   '/clubs/$clubId': typeof ClubsClubIdRoute
-  '/demo/drizzle': typeof DemoDrizzleRoute
   '/demo/orpc-todo': typeof DemoOrpcTodoRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/events/$eventId': typeof EventsEventIdRoute
@@ -278,6 +277,7 @@ export interface FileRoutesByTo {
   '/clubs': typeof ClubsIndexRoute
   '/profile': typeof ProfileIndexRoute
   '/tips': typeof TipsIndexRoute
+  '/api/cognito/group': typeof ApiCognitoGroupRoute
   '/api/rpc/$': typeof ApiRpcSplatRoute
   '/demo/form/address': typeof DemoFormAddressRoute
   '/demo/form/simple': typeof DemoFormSimpleRoute
@@ -300,7 +300,6 @@ export interface FileRoutesById {
   '/tips': typeof TipsRouteWithChildren
   '/api/$': typeof ApiSplatRoute
   '/clubs/$clubId': typeof ClubsClubIdRoute
-  '/demo/drizzle': typeof DemoDrizzleRoute
   '/demo/orpc-todo': typeof DemoOrpcTodoRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/events/$eventId': typeof EventsEventIdRoute
@@ -315,6 +314,7 @@ export interface FileRoutesById {
   '/clubs/': typeof ClubsIndexRoute
   '/profile/': typeof ProfileIndexRoute
   '/tips/': typeof TipsIndexRoute
+  '/api/cognito/group': typeof ApiCognitoGroupRoute
   '/api/rpc/$': typeof ApiRpcSplatRoute
   '/demo/form/address': typeof DemoFormAddressRoute
   '/demo/form/simple': typeof DemoFormSimpleRoute
@@ -338,7 +338,6 @@ export interface FileRouteTypes {
     | '/tips'
     | '/api/$'
     | '/clubs/$clubId'
-    | '/demo/drizzle'
     | '/demo/orpc-todo'
     | '/demo/tanstack-query'
     | '/events/$eventId'
@@ -353,6 +352,7 @@ export interface FileRouteTypes {
     | '/clubs/'
     | '/profile/'
     | '/tips/'
+    | '/api/cognito/group'
     | '/api/rpc/$'
     | '/demo/form/address'
     | '/demo/form/simple'
@@ -372,7 +372,6 @@ export interface FileRouteTypes {
     | '/tickets'
     | '/api/$'
     | '/clubs/$clubId'
-    | '/demo/drizzle'
     | '/demo/orpc-todo'
     | '/demo/tanstack-query'
     | '/events/$eventId'
@@ -387,6 +386,7 @@ export interface FileRouteTypes {
     | '/clubs'
     | '/profile'
     | '/tips'
+    | '/api/cognito/group'
     | '/api/rpc/$'
     | '/demo/form/address'
     | '/demo/form/simple'
@@ -408,7 +408,6 @@ export interface FileRouteTypes {
     | '/tips'
     | '/api/$'
     | '/clubs/$clubId'
-    | '/demo/drizzle'
     | '/demo/orpc-todo'
     | '/demo/tanstack-query'
     | '/events/$eventId'
@@ -423,6 +422,7 @@ export interface FileRouteTypes {
     | '/clubs/'
     | '/profile/'
     | '/tips/'
+    | '/api/cognito/group'
     | '/api/rpc/$'
     | '/demo/form/address'
     | '/demo/form/simple'
@@ -444,7 +444,6 @@ export interface RootRouteChildren {
   TicketsRoute: typeof TicketsRoute
   TipsRoute: typeof TipsRouteWithChildren
   ApiSplatRoute: typeof ApiSplatRoute
-  DemoDrizzleRoute: typeof DemoDrizzleRoute
   DemoOrpcTodoRoute: typeof DemoOrpcTodoRoute
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
   PostsNewRoute: typeof PostsNewRoute
@@ -453,6 +452,7 @@ export interface RootRouteChildren {
   ProfileGroupsRoute: typeof ProfileGroupsRouteWithChildren
   ProfileTipsRoute: typeof ProfileTipsRouteWithChildren
   ProfileIndexRoute: typeof ProfileIndexRoute
+  ApiCognitoGroupRoute: typeof ApiCognitoGroupRoute
   ApiRpcSplatRoute: typeof ApiRpcSplatRoute
   DemoFormAddressRoute: typeof DemoFormAddressRoute
   DemoFormSimpleRoute: typeof DemoFormSimpleRoute
@@ -622,13 +622,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoOrpcTodoRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/demo/drizzle': {
-      id: '/demo/drizzle'
-      path: '/demo/drizzle'
-      fullPath: '/demo/drizzle'
-      preLoaderRoute: typeof DemoDrizzleRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/clubs/$clubId': {
       id: '/clubs/$clubId'
       path: '/$clubId'
@@ -676,6 +669,13 @@ declare module '@tanstack/react-router' {
       path: '/api/rpc/$'
       fullPath: '/api/rpc/$'
       preLoaderRoute: typeof ApiRpcSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/cognito/group': {
+      id: '/api/cognito/group'
+      path: '/api/cognito/group'
+      fullPath: '/api/cognito/group'
+      preLoaderRoute: typeof ApiCognitoGroupRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/profile/tips/$tipId/modify': {
@@ -790,7 +790,6 @@ const rootRouteChildren: RootRouteChildren = {
   TicketsRoute: TicketsRoute,
   TipsRoute: TipsRouteWithChildren,
   ApiSplatRoute: ApiSplatRoute,
-  DemoDrizzleRoute: DemoDrizzleRoute,
   DemoOrpcTodoRoute: DemoOrpcTodoRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
   PostsNewRoute: PostsNewRoute,
@@ -799,6 +798,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProfileGroupsRoute: ProfileGroupsRouteWithChildren,
   ProfileTipsRoute: ProfileTipsRouteWithChildren,
   ProfileIndexRoute: ProfileIndexRoute,
+  ApiCognitoGroupRoute: ApiCognitoGroupRoute,
   ApiRpcSplatRoute: ApiRpcSplatRoute,
   DemoFormAddressRoute: DemoFormAddressRoute,
   DemoFormSimpleRoute: DemoFormSimpleRoute,

@@ -21,6 +21,7 @@ todos.json
 terraform.tfvars
 terraform.tfvars.json
 terraform/.terraform.lock.hcl
+*.zip
 
 # Ansible secrets
 ansible/group_vars/all/vault.yml
@@ -40,3 +41,6 @@ ansible/run_tests.sh
 # State backup files
 terraform/terraform.tfstate.*.backup
 terraform/terraform.tfstate.backup
+.impeccable
+.vscode
+.idea

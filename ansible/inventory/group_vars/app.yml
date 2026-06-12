@@ -7,7 +7,7 @@ app_environment:
 app_install_dir: "/opt/app"
 app_container_name: "app"
 app_container_port: 3000
-app_image_tag: "efrei-a-table-latest"
+app_image_tag: "latest"
 app_backup_dir: "{{ app_install_dir }}/backup"
 app_backup_cron_minute: "0"
 app_backup_cron_hour: "2"
@@ -15,8 +15,7 @@ app_backup_cron_user: root
 
 # Database configuration
 db_user: app
-db_password: ""
-db_host: "devops-projet-lucas-riyad-dev-db-e751f926.cvgqemogmgnt.eu-west-3.rds.amazonaws.com"
+db_host: "devops-projet-lucas-riyad-dev-db-72f9c285.cvgqemogmgnt.eu-west-3.rds.amazonaws.com"
 db_name: app
 db_port: 5432
 db_engine: postgres
@@ -29,7 +28,7 @@ db_backup_retention_days: 1
 backup_local_dir: "/tmp"
 backup_file_prefix: "{{ app_container_name }}"
 backup_file_extension: "sql"
-backup_bucket_name: "devops-projet-lucas-riyad-dev-backups-f5f844a5"
+backup_bucket_name: "devops-projet-lucas-riyad-dev-backups-e5f3e56b"
 backup_s3_prefix: "{{ app_container_name }}"
 
 # AWS configuration

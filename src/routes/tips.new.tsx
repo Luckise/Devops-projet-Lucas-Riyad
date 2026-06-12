@@ -36,7 +36,7 @@ function TipCreate() {
     if (!title) return;
     setSubmitting(true);
 
-    const profile = JSON.parse(localStorage.getItem("eat_user_profile") || "{}");
+    const profile = typeof window !== "undefined" ? JSON.parse(localStorage.getItem("eat_user_profile") || "{}") : {};
 
     const tip: Record<string, unknown> = {
       title,

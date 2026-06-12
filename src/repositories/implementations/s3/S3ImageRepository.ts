@@ -9,16 +9,21 @@ export class S3ImageRepository implements IImageRepository {
 
   constructor() {
     this.region = import.meta.env.VITE_AWS_REGION || "eu-west-3";
-    this.bucket = import.meta.env.VITE_S3_BUCKET || "eat-app-assets";
+    this.bucket = import.meta.env.VITE_S3_BUCKET || "devops-projet-lucas-riyad-dev-assets-e5f3e56b";
     this.cloudfrontDomain = import.meta.env.VITE_CLOUDFRONT_DOMAIN;
 
-    this.client = new S3Client({
+    const accessKeyId = import.meta.env.VITE_AWS_ACCESS_KEY_ID;
+    const secretAccessKey = import.meta.env.VITE_AWS_SECRET_ACCESS_KEY;
+
+    const clientConfig: ConstructorParameters<typeof S3Client>[0] = {
       region: this.region,
-      credentials: {
-        accessKeyId: import.meta.env.VITE_AWS_ACCESS_KEY_ID || "",
-        secretAccessKey: import.meta.env.VITE_AWS_SECRET_ACCESS_KEY || "",
-      },
-    });
+    };
+
+    if (accessKeyId && secretAccessKey) {
+      clientConfig.credentials = { accessKeyId, secretAccessKey };
+    }
+
+    this.client = new S3Client(clientConfig);
   }
 
   async upload(file: File, path?: string): Promise<string> {

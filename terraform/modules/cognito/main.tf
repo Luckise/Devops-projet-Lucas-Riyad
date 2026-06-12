@@ -1,21 +1,7 @@
 locals {
   user_pool_name  = "devops-projet-lucas-riyad-dev-cognito-a05b9012"
   app_client_name = "devops-projet-lucas-riyad-dev-client-a05b9012"
-}
-
-resource "aws_cognito_user_pool_client" "this" {
-  name                                 = local.app_client_name
-  user_pool_id                         = aws_cognito_user_pool.this.id
-  generate_secret                      = false
-  allowed_oauth_flows_user_pool_client = false
-  prevent_user_existence_errors        = "ENABLED"
-  supported_identity_providers         = ["COGNITO"]
-  explicit_auth_flows = [
-    "ALLOW_REFRESH_TOKEN_AUTH",
-    "ALLOW_USER_SRP_AUTH"
-  ]
-  callback_urls = var.callback_urls
-  logout_urls   = var.logout_urls
+  domain_prefix   = ""
 }
 
 resource "aws_cognito_user_group" "admin" {
@@ -28,12 +14,6 @@ resource "aws_cognito_user_group" "non_admin" {
   name         = "Non-admin"
   user_pool_id = aws_cognito_user_pool.this.id
   description  = "Regular users without administrative privileges"
-}
-
-resource "aws_cognito_user_pool_domain" "this" {
-  count        = local.domain_prefix != "" ? 1 : 0
-  domain       = local.domain_prefix
-  user_pool_id = aws_cognito_user_pool.this.id
 }
 
 data "archive_file" "post_confirmation_lambda" {

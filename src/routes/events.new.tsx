@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ArrowLeft, X, Plus, ChevronDown } from "lucide-react";
 import ImageUpload from "../components/ImageUpload";
 import { getServices } from "../di/container";
@@ -33,13 +33,13 @@ function EventCreate() {
   const [submitting, setSubmitting] = useState(false);
   const [userGroups, setUserGroups] = useState<any[]>([]);
 
-  useState(() => {
+  useEffect(() => {
     const stored = localStorage.getItem("eat_user_profile");
     if (stored) {
       const profile = JSON.parse(stored);
       getServices().groupService.getUserGroups(profile.email || "").then(setUserGroups);
     }
-  });
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -11,6 +11,11 @@ import { LocalStorageGroupRepository } from "../repositories/implementations/loc
 import { LocalStorageTipRepository } from "../repositories/implementations/local-storage/LocalStorageTipRepository";
 import { LocalStoragePostRepository } from "../repositories/implementations/local-storage/LocalStoragePostRepository";
 import { LocalStorageTicketRepository } from "../repositories/implementations/local-storage/LocalStorageTicketRepository";
+import { DatabaseEventRepository } from "../repositories/implementations/database/DatabaseEventRepository";
+import { DatabaseGroupRepository } from "../repositories/implementations/database/DatabaseGroupRepository";
+import { DatabaseTipRepository } from "../repositories/implementations/database/DatabaseTipRepository";
+import { DatabasePostRepository } from "../repositories/implementations/database/DatabasePostRepository";
+import { DatabaseTicketRepository } from "../repositories/implementations/database/DatabaseTicketRepository";
 import { CognitoUserRepository } from "../repositories/implementations/cognito/CognitoUserRepository";
 import { S3ImageRepository } from "../repositories/implementations/s3/S3ImageRepository";
 
@@ -28,29 +33,47 @@ import type {
 } from "../services/interfaces";
 
 function hasS3Credentials(): boolean {
+  if (typeof process !== "undefined" && process.env?.AWS_ACCESS_KEY_ID) {
+    return true;
+  }
   if (typeof import.meta !== "undefined" && import.meta.env) {
     return !!import.meta.env.VITE_AWS_ACCESS_KEY_ID;
   }
   return false;
 }
 
+function hasDatabaseUrl(): boolean {
+  if (typeof process !== "undefined" && process.env?.DATABASE_URL) {
+    return true;
+  }
+  if (typeof import.meta !== "undefined" && import.meta.env) {
+    return !!import.meta.env.VITE_DATABASE_URL;
+  }
+  return false;
+}
+
 function createEventRepo(): IEventRepository {
+  if (hasDatabaseUrl()) return new DatabaseEventRepository();
   return new LocalStorageEventRepository();
 }
 
 function createGroupRepo(): IGroupRepository {
+  if (hasDatabaseUrl()) return new DatabaseGroupRepository();
   return new LocalStorageGroupRepository();
 }
 
 function createTipRepo(): ITipRepository {
+  if (hasDatabaseUrl()) return new DatabaseTipRepository();
   return new LocalStorageTipRepository();
 }
 
 function createPostRepo(): IPostRepository {
+  if (hasDatabaseUrl()) return new DatabasePostRepository();
   return new LocalStoragePostRepository();
 }
 
 function createTicketRepo(): ITicketRepository {
+  if (hasDatabaseUrl()) return new DatabaseTicketRepository();
   return new LocalStorageTicketRepository();
 }
 

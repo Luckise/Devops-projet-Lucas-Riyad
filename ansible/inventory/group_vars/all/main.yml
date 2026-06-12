@@ -10,7 +10,6 @@ app_user: app
 app_group: "{{ app_user }}"
 app_install_dir: "/opt/{{ app_container_name }}"
 app_backup_dir: "{{ app_install_dir }}/backup"
-app_image_tag: efrei-a-table-latest
 app_container_name: app
 app_container_port: 3000
 app_health_check_path: /health
@@ -53,6 +52,4 @@ backup_file_extension: sql
 db_host: "devops-projet-lucas-riyad-dev-db-72f9c285.cvgqemogmgnt.eu-west-3.rds.amazonaws.com"
 db_name: app
 db_user: app
-db_password: ""
-cognito_user_pool_id: "{{ vault_cognito_user_pool_id }}"
-cognito_client_id: "{{ vault_cognito_client_id }}"
+# db_password, cognito_user_pool_id, cognito_client_id → vault.yml
