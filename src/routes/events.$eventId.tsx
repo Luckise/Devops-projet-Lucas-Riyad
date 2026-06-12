@@ -5,7 +5,6 @@ import { ArrowLeft, Calendar, Clock, MapPin, Ticket, CheckCircle2, Users, XCircl
 import { useState } from "react";
 import SaveButton from "../components/SaveButton";
 import { toast } from "../lib/toast";
-import { getCurrentUser } from "aws-amplify/auth";
 
 export const Route = createFileRoute("/events/$eventId")({
   component: EventDetailsRoute,
@@ -28,7 +27,7 @@ function EventDetailsRoute() {
 
   const handleJoin = async () => {
     try {
-      await getCurrentUser();
+      await getServices().authService.getCurrentUser();
     } catch {
       navigate({ to: "/login" });
       return;

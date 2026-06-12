@@ -74,6 +74,20 @@ resource "aws_iam_role_policy" "s3" {
   })
 }
 
+resource "aws_iam_role_policy" "cognito" {
+  name = "${local.instance_name}-cognito-${random_id.suffix.hex}"
+  role = aws_iam_role.this.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect   = "Allow"
+      Action   = ["cognito-idp:AdminAddUserToGroup", "cognito-idp:AdminListGroupsForUser"]
+      Resource = "*"
+    }]
+  })
+}
+
 resource "aws_instance" "this" {
   count = var.instance_count
 

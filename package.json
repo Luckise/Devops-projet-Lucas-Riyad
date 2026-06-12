@@ -21,6 +21,7 @@
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
+    "@aws-sdk/client-cognito-identity-provider": "^3.1067.0",
     "@aws-sdk/client-s3": "^3.1065.0",
     "@orpc/client": "^1.13.6",
     "@orpc/json-schema": "^1.13.6",

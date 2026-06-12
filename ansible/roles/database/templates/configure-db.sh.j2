@@ -1,0 +1,97 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Configure RDS database with security policies
+RDS_INSTANCE_ID="{{ db_instance_id }}"
+AWS_CLI_BIN="{{ aws_cli_bin }}"
+DB_SECRET_NAME="{{ db_secret_name }}"
+BACKUP_USER="{{ db_backup_user }}"
+BACKUP_PASSWORD="{{ db_backup_password }}"
+DB_HOST="{{ db_host }}"
+DB_NAME="{{ db_name }}"
+DB_BACKUP_RETENTION_DAYS="{{ db_backup_retention_days }}"
+DB_BACKUP_WINDOW="{{ db_backup_window }}"
+DB_IAM_AUTH="{{ db_iam_auth }}"
+DB_ENCRYPTION="{{ db_encryption }}"
+DB_PERFORMANCE_INSIGHTS_KEY_ID="{{ db_performance_insights_key_id }}"
+DB_CLOUDWATCH_LOGS_EXPORTS="{{ db_cloudwatch_logs_exports }}"
+DB_DELETION_PROTECTION="{{ db_deletion_protection }}"
+DB_COPY_TAGS_TO_SNAPSHOT="{{ db_copy_tags_to_snapshot }}"
+DB_ENVIRONMENT="{{ environment }}"
+
+# Enable automated backups
+$AWS_CLI_BIN rds modify-db-instance \
+  --db-instance-identifier "$RDS_INSTANCE_ID" \
+  --backup-retention-period "$DB_BACKUP_RETENTION_DAYS" \
+  --preferred-backup-window "$DB_BACKUP_WINDOW" \
+  --apply-immediately
+
+# Configure IAM authentication
+if [ "$DB_IAM_AUTH" = "true" ]; then
+  $AWS_CLI_BIN rds modify-db-instance \
+    --db-instance-identifier "$RDS_INSTANCE_ID" \
+    --enable-iam-database-authentication \
+    --apply-immediately
+fi
+
+# Enable encryption
+if [ "$DB_ENCRYPTION" = "true" ]; then
+  $AWS_CLI_BIN rds modify-db-instance \
+    --db-instance-identifier "$RDS_INSTANCE_ID" \
+    --storage-encrypted true \
+    --apply-immediately
+fi
+
+# Configure performance insights
+if [ "$DB_PERFORMANCE_INSIGHTS_KEY_ID" != "" ]; then
+  $AWS_CLI_BIN rds modify-db-instance \
+    --db-instance-identifier "$RDS_INSTANCE_ID" \
+    --enable-performance-insights \
+    --performance-insights-key-id "$DB_PERFORMANCE_INSIGHTS_KEY_ID" \
+    --apply-immediately
+fi
+
+# Enable CloudWatch logs export
+if [ "$DB_CLOUDWATCH_LOGS_EXPORTS" != "" ]; then
+  $AWS_CLI_BIN rds modify-db-instance \
+    --db-instance-identifier "$RDS_INSTANCE_ID" \
+    --enable-cloudwatch-logs-exports "$DB_CLOUDWATCH_LOGS_EXPORTS" \
+    --apply-immediately
+fi
+
+# Set deletion protection
+if [ "$DB_DELETION_PROTECTION" = "true" ]; then
+  $AWS_CLI_BIN rds modify-db-instance \
+    --db-instance-identifier "$RDS_INSTANCE_ID" \
+    --deletion-protection true \
+    --apply-immediately
+fi
+
+# Enable tag copy to snapshot
+if [ "$DB_COPY_TAGS_TO_SNAPSHOT" = "true" ]; then
+  $AWS_CLI_BIN rds modify-db-instance \
+    --db-instance-identifier "$RDS_INSTANCE_ID" \
+    --copy-tags-to-snapshot \
+    --apply-immediately
+fi
+
+# Create backup credentials secret
+$AWS_CLI_BIN secretsmanager create-secret \
+  --name "$DB_SECRET_NAME" \
+  --secret-string "{\"username\": \"$BACKUP_USER\", \"password\": \"$BACKUP_PASSWORD\", \"host\": \"$DB_HOST\", \"port\": 5432, \"dbname\": \"$DB_NAME\"}" \
+  --tags Key=Environment,Value=$DB_ENVIRONMENT
+
+# Set up database parameter groups
+$AWS_CLI_BIN rds modify-db-parameter-group \
+  --db-instance-identifier "$RDS_INSTANCE_ID" \
+  --parameters "ParameterName=archive_mode,ParameterValue=on,ApplyMethod=immediate"
+
+$AWS_CLI_BIN rds modify-db-parameter-group \
+  --db-instance-identifier "$RDS_INSTANCE_ID" \
+  --parameters "ParameterName=custom_autovacuum,ParameterValue=on,ApplyMethod=immediate"
+
+# Add PostgreSQL CloudWatch logs export
+$AWS_CLI_BIN rds modify-db-instance \
+  --db-instance-identifier "$RDS_INSTANCE_ID" \
+  --enable-cloudwatch-logs-exports "postgresql" \
+  --apply-immediately

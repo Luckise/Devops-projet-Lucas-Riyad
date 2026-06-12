@@ -10,8 +10,7 @@ import {
   ChevronLeft,
   GraduationCap,
 } from "lucide-react";
-import { signUp, confirmSignUp, resendSignUpCode, getCurrentUser } from "aws-amplify/auth";
-import "../lib/amplify";
+import { getServices } from "../di/container";
 
 export const Route = createFileRoute("/signup")({
   component: SignupRoute,
@@ -50,7 +49,7 @@ function SignupRoute() {
   useEffect(() => {
     const checkSession = async () => {
       try {
-        await getCurrentUser();
+        await getServices().authService.getCurrentUser();
         navigate({ to: "/" });
       } catch {
         // not authenticated, stay on signup
@@ -136,18 +135,7 @@ function SignupRoute() {
     setIsSubmitting(true);
 
     try {
-      await signUp({
-        username: email,
-        password,
-        options: {
-          userAttributes: {
-            email,
-            given_name: firstName,
-            family_name: lastName || "User",
-            nickname: `@${firstName.toLowerCase()}${lastName ? "_" + lastName.toLowerCase() : ""}`,
-          },
-        },
-      });
+      await getServices().authService.signUp({ email, password, firstName, lastName });
       setIsSubmitting(false);
       setStep("verify");
     } catch (err: any) {
@@ -170,7 +158,7 @@ function SignupRoute() {
     setVerifyError("");
 
     try {
-      await confirmSignUp({ username: email, confirmationCode: code });
+      await getServices().authService.confirmSignUp(email, code);
       const profile = {
         firstName,
         lastName: lastName || "User",
@@ -191,7 +179,7 @@ function SignupRoute() {
   const handleResend = async () => {
     setResending(true);
     try {
-      await resendSignUpCode({ username: email });
+      await getServices().authService.resendSignUpCode(email);
     } catch {
       // silently fail
     }

@@ -10,8 +10,7 @@ import {
   LogIn,
   GraduationCap,
 } from "lucide-react";
-import { signIn, getCurrentUser, fetchUserAttributes } from "aws-amplify/auth";
-import "../lib/amplify";
+import { getServices } from "../di/container";
 
 export const Route = createFileRoute("/login")({
   component: LoginRoute,
@@ -33,7 +32,7 @@ function LoginRoute() {
   useEffect(() => {
     const checkSession = async () => {
       try {
-        await getCurrentUser();
+        await getServices().authService.getCurrentUser();
         navigate({ to: "/" });
       } catch {
         // not authenticated, stay on login
@@ -82,17 +81,7 @@ function LoginRoute() {
     setLoginError("");
 
     try {
-      await signIn({ username: email, password });
-      const user = await getCurrentUser();
-      const attrs = await fetchUserAttributes();
-      const profile = {
-        firstName: attrs.given_name || "",
-        lastName: attrs.family_name || "",
-        nickname: attrs.nickname || "",
-        email: attrs.email || email,
-        avatar: attrs.picture || "",
-        isAdmin: false,
-      };
+      const profile = await getServices().authService.signIn({ email, password });
       localStorage.setItem("eat_user_profile", JSON.stringify(profile));
       window.dispatchEvent(new Event("user-updated"));
       navigate({ to: "/" });

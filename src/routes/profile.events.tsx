@@ -3,16 +3,12 @@ import { useState, useEffect } from "react";
 import { ChevronLeft, Calendar, EyeOff } from "lucide-react";
 import { getServices } from "../di/container";
 import { formatDate, formatTime } from "../lib/date-utils";
-import { getCurrentUser, fetchUserAttributes } from "aws-amplify/auth";
 
 export const Route = createFileRoute("/profile/events")({
   beforeLoad: async () => {
     try {
-      const user = await getCurrentUser();
-      const attrs = await fetchUserAttributes();
-      const email = attrs.email || user.userId;
-      const isAdmin = await getServices().groupService.isUserAdmin(email || "");
-      if (!isAdmin) throw redirect({ to: "/profile" });
+      const profile = await getServices().authService.getCurrentUser();
+      if (!profile.isAdmin) throw redirect({ to: "/profile" });
     } catch (err) {
       if (err instanceof redirect) throw err;
       throw redirect({ to: "/login" });

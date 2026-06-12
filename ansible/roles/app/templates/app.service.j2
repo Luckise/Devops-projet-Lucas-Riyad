@@ -16,8 +16,8 @@ ExecStart={{ docker_bin }} run --rm \
   -e ASSET_BUCKET_NAME={{ asset_bucket_name }} \
   -e BACKUP_BUCKET_NAME={{ backup_bucket_name }} \
   -e DATABASE_URL="postgresql://{{ db_user }}:{{ db_password }}@{{ db_host }}:5432/{{ db_name }}" \
-  -e COGNITO_USER_POOL_ID={{ cognito_user_pool_id }} \
-  -e COGNITO_CLIENT_ID={{ cognito_client_id }} \
+  -e VITE_COGNITO_USER_POOL_ID={{ cognito_user_pool_id }} \
+  -e VITE_COGNITO_CLIENT_ID={{ cognito_client_id }} \
   {{ app_image_repository }}:{{ app_image_tag }}
 ExecStop={{ docker_bin }} stop {{ app_container_name }}
 

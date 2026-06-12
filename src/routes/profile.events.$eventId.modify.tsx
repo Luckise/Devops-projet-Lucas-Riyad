@@ -4,16 +4,12 @@ import { ArrowLeft, X, Plus, ChevronDown, Trash2, Users, Search, EyeOff } from "
 import ImageUpload from "../components/ImageUpload";
 import { getServices } from "../di/container";
 import { toast } from "../lib/toast";
-import { getCurrentUser, fetchUserAttributes } from "aws-amplify/auth";
 
 export const Route = createFileRoute("/profile/events/$eventId/modify")({
   beforeLoad: async () => {
     try {
-      const user = await getCurrentUser();
-      const attrs = await fetchUserAttributes();
-      const email = attrs.email || user.userId;
-      const isAdmin = await getServices().groupService.isUserAdmin(email || "");
-      if (!isAdmin) throw redirect({ to: "/profile" });
+      const profile = await getServices().authService.getCurrentUser();
+      if (!profile.isAdmin) throw redirect({ to: "/profile" });
     } catch (err) {
       if (err instanceof redirect) throw err;
       throw redirect({ to: "/login" });

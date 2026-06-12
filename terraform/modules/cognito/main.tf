@@ -3,6 +3,95 @@ locals {
   app_client_name = "devops-projet-lucas-riyad-dev-client-a05b9012"
 }
 
+resource "aws_cognito_user_pool_client" "this" {
+  name                                 = local.app_client_name
+  user_pool_id                         = aws_cognito_user_pool.this.id
+  generate_secret                      = false
+  allowed_oauth_flows_user_pool_client = false
+  prevent_user_existence_errors        = "ENABLED"
+  supported_identity_providers         = ["COGNITO"]
+  explicit_auth_flows = [
+    "ALLOW_REFRESH_TOKEN_AUTH",
+    "ALLOW_USER_SRP_AUTH"
+  ]
+  callback_urls = var.callback_urls
+  logout_urls   = var.logout_urls
+}
+
+resource "aws_cognito_user_group" "admin" {
+  name         = "Admin"
+  user_pool_id = aws_cognito_user_pool.this.id
+  description  = "Administrator group with event creation privileges"
+}
+
+resource "aws_cognito_user_group" "non_admin" {
+  name         = "Non-admin"
+  user_pool_id = aws_cognito_user_pool.this.id
+  description  = "Regular users without administrative privileges"
+}
+
+resource "aws_cognito_user_pool_domain" "this" {
+  count        = local.domain_prefix != "" ? 1 : 0
+  domain       = local.domain_prefix
+  user_pool_id = aws_cognito_user_pool.this.id
+}
+
+data "archive_file" "post_confirmation_lambda" {
+  type        = "zip"
+  source_file = "${path.module}/lambda/post_confirmation.py"
+  output_path = "${path.module}/lambda/post_confirmation.zip"
+}
+
+resource "aws_iam_role" "post_confirmation" {
+  name = "${var.name_prefix}-post-confirmation"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Principal = {
+        Service = "lambda.amazonaws.com"
+      }
+    }]
+  })
+}
+
+resource "aws_iam_policy" "post_confirmation" {
+  name = "${var.name_prefix}-post-confirmation"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect   = "Allow"
+      Action   = ["cognito-idp:AdminAddUserToGroup"]
+      Resource = aws_cognito_user_pool.this.arn
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "post_confirmation" {
+  role       = aws_iam_role.post_confirmation.name
+  policy_arn = aws_iam_policy.post_confirmation.arn
+}
+
+resource "aws_lambda_function" "post_confirmation" {
+  filename         = data.archive_file.post_confirmation_lambda.output_path
+  source_code_hash = data.archive_file.post_confirmation_lambda.output_base64sha256
+  function_name    = "${var.name_prefix}-post-confirmation"
+  role             = aws_iam_role.post_confirmation.arn
+  handler          = "post_confirmation.handler"
+  runtime          = "python3.12"
+  timeout          = 10
+}
+
+resource "aws_lambda_permission" "post_confirmation" {
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.post_confirmation.function_name
+  principal     = "cognito-idp.amazonaws.com"
+  source_arn    = aws_cognito_user_pool.this.arn
+}
+
 resource "aws_cognito_user_pool" "this" {
   name = local.user_pool_name
 
@@ -51,6 +140,10 @@ resource "aws_cognito_user_pool" "this" {
 
   verification_message_template {
     default_email_option = "CONFIRM_WITH_CODE"
+  }
+
+  lambda_config {
+    post_confirmation = aws_lambda_function.post_confirmation.arn
   }
 
   tags = merge(var.tags, {

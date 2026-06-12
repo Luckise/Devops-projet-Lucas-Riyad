@@ -53,6 +53,6 @@ backup_file_extension: sql
 db_host: "devops-projet-lucas-riyad-dev-db-72f9c285.cvgqemogmgnt.eu-west-3.rds.amazonaws.com"
 db_name: app
 db_user: app
-db_password: "mgP_Ta3okWn+-$Prs$H:"
-cognito_user_pool_id: "eu-west-3_lVGeXq3XV"
-cognito_client_id: "1plgjn41284i5v3gf0nlei58ou"
+db_password: ""
+cognito_user_pool_id: "{{ vault_cognito_user_pool_id }}"
+cognito_client_id: "{{ vault_cognito_client_id }}"

@@ -2,14 +2,13 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { MapPin, Calendar, Clock, Ticket, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import QRCode from "qrcode";
-import { getCurrentUser } from "aws-amplify/auth";
 import { getServices } from "../di/container";
 import type { Ticket as TicketModel } from "../types/models";
 
 export const Route = createFileRoute("/tickets")({
   beforeLoad: async () => {
     try {
-      await getCurrentUser();
+      await getServices().authService.getCurrentUser();
     } catch {
       throw redirect({ to: "/login" });
     }

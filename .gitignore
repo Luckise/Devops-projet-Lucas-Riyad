@@ -24,6 +24,8 @@ terraform/.terraform.lock.hcl
 
 # Ansible secrets
 ansible/group_vars/all/vault.yml
+ansible/inventory/group_vars/all/vault.yml
+.vault_pass
 *.retry
 
 # Terraform private key

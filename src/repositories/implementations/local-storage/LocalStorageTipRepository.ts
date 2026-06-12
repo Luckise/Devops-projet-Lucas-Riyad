@@ -1,13 +1,11 @@
 import type { ITipRepository } from "../../interfaces/ITipRepository";
 import type { Tip } from "../../../types/models";
-import { MOCK_TIPS } from "./seed-data";
 
 export class LocalStorageTipRepository implements ITipRepository {
   private readonly tipsKey = "user_tips";
 
   async getAll(): Promise<Tip[]> {
-    const userTips = this.getItems<Tip>(this.tipsKey);
-    return [...userTips, ...MOCK_TIPS];
+    return this.getItems<Tip>(this.tipsKey);
   }
 
   async getById(id: string): Promise<Tip | undefined> {
@@ -38,14 +36,10 @@ export class LocalStorageTipRepository implements ITipRepository {
 
   async hide(id: string): Promise<void> {
     await this.update(id, { hidden: true } as Partial<Tip>);
-    const mockIdx = MOCK_TIPS.findIndex((t) => t.id === id);
-    if (mockIdx !== -1) MOCK_TIPS[mockIdx].hidden = true;
   }
 
   async unhide(id: string): Promise<void> {
     await this.update(id, { hidden: false } as Partial<Tip>);
-    const mockIdx = MOCK_TIPS.findIndex((t) => t.id === id);
-    if (mockIdx !== -1) MOCK_TIPS[mockIdx].hidden = false;
   }
 
   private getItems<T>(key: string): T[] {

@@ -4,13 +4,12 @@ import { ArrowLeft, Plus, X, Calendar, MapPin, Check } from "lucide-react";
 import ImageUpload from "../components/ImageUpload";
 import { getServices } from "../di/container";
 import { toast } from "../lib/toast";
-import { getCurrentUser } from "aws-amplify/auth";
 import type { Event } from "../types/models";
 
 export const Route = createFileRoute("/posts/new")({
   beforeLoad: async () => {
     try {
-      await getCurrentUser();
+      await getServices().authService.getCurrentUser();
     } catch {
       throw redirect({ to: "/login" });
     }

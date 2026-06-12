@@ -4,14 +4,13 @@ import { ArrowLeft, Plus, X } from "lucide-react";
 import ImageUpload from "../components/ImageUpload";
 import { getServices } from "../di/container";
 import { toast } from "../lib/toast";
-import { getCurrentUser } from "aws-amplify/auth";
 
 type ContentBlock = { type: "text" | "image"; value: string };
 
 export const Route = createFileRoute("/posts/$postId/modify")({
   beforeLoad: async () => {
     try {
-      await getCurrentUser();
+      await getServices().authService.getCurrentUser();
     } catch {
       throw redirect({ to: "/login" });
     }
