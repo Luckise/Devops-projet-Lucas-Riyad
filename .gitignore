@@ -16,8 +16,11 @@ todos.json
 .terraform/
 *.tfstate
 *.tfstate.*
+*.tfplan
+*.tfplan.*
 terraform.tfvars
 terraform.tfvars.json
+terraform/.terraform.lock.hcl
 
 # Ansible secrets
 ansible/group_vars/all/vault.yml
@@ -25,3 +28,13 @@ ansible/group_vars/all/vault.yml
 
 # Terraform private key
 terraform/devops-key.pem
+
+# Ansible molecule tests
+ansible/molecule/
+ansible/molecule.yml
+ansible/README_TESTS.md
+ansible/run_tests.sh
+
+# State backup files
+terraform/terraform.tfstate.*.backup
+terraform/terraform.tfstate.backup

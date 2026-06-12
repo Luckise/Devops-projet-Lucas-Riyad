@@ -34,6 +34,12 @@ variable "certificate_arn" {
   default     = ""
 }
 
+variable "enable_https" {
+  description = "Enable HTTPS listener."
+  type        = bool
+  default     = false
+}
+
 variable "target_port" {
   description = "Port to forward traffic to on the app tier."
   type        = number

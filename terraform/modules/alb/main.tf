@@ -1,6 +1,5 @@
 locals {
-  https_enabled = length(trimspace(var.certificate_arn)) > 0
-  alb_name      = trimspace(var.name) != "" ? trimspace(var.name) : "${var.name_prefix}-alb"
+  alb_name = trimspace(var.name) != "" ? trimspace(var.name) : "${var.name_prefix}-alb"
 }
 
 resource "aws_lb" "this" {
@@ -50,23 +49,22 @@ resource "aws_lb_listener" "http" {
   protocol          = "HTTP"
 
   default_action {
-    type = local.https_enabled ? "redirect" : "forward"
+    type             = var.enable_https ? "redirect" : "forward"
+    target_group_arn = var.enable_https ? null : aws_lb_target_group.this.arn
 
     dynamic "redirect" {
-      for_each = local.https_enabled ? [1] : []
+      for_each = var.enable_https ? [1] : []
       content {
         port        = "443"
         protocol    = "HTTPS"
         status_code = "HTTP_301"
       }
     }
-
-    target_group_arn = local.https_enabled ? null : aws_lb_target_group.this.arn
   }
 }
 
 resource "aws_lb_listener" "https" {
-  count             = local.https_enabled ? 1 : 0
+  count             = var.enable_https ? 1 : 0
   load_balancer_arn = aws_lb.this.arn
   port              = 443
   protocol          = "HTTPS"

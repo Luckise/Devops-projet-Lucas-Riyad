@@ -104,26 +104,9 @@ module "alb" {
   public_subnet_ids   = module.vpc.public_subnet_ids
   security_group_ids  = [module.security_groups.alb_security_group_id]
   target_instance_ids = module.ec2.instance_ids
-  certificate_arn     = var.certificate_arn
+  certificate_arn     = var.enable_https ? aws_acm_certificate.this.arn : ""
+  enable_https        = var.enable_https
   target_port         = var.app_container_port
   health_check_path   = var.app_health_check_path
   tags                = local.tags
-}
-
-module "route53" {
-  source = "./modules/route53"
-
-  project_name                 = var.project_name
-  environment                  = var.environment
-  common_tags                  = var.common_tags
-  app_domain_name              = "app.infra.lucas-demo"
-  subject_alternative_names    = var.subject_alternative_names
-  enable_https                 = var.enable_https
-  alb_name                     = var.alb_name
-  app_container_port           = var.app_container_port
-  app_health_check_path        = var.app_health_check_path
-  certificate_arn              = var.certificate_arn
-  tags                         = local.tags
-  alb_dns_name                 = module.alb.dns_name
-  alb_zone_id                   = module.alb.zone_id
 }

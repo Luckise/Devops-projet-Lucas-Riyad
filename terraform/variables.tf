@@ -187,7 +187,7 @@ variable "security_group_name_prefix" {
 variable "app_domain_name" {
   description = "Application domain name for HTTPS and DNS."
   type        = string
-  default     = ""
+  default     = "app-lucas-riyad.com"
 }
 
 variable "subject_alternative_names" {
@@ -199,6 +199,19 @@ variable "subject_alternative_names" {
 variable "enable_https" {
   description = "Enable HTTPS for the ALB."
   type        = bool
-  default     = true
+  default     = false
+}
+
+variable "duckdns_subdomain" {
+  description = "DuckDNS subdomain name (without .duckdns.org)."
+  type        = string
+  default     = "app-lucas"
+}
+
+variable "duckdns_token" {
+  description = "DuckDNS API token for DNS challenge."
+  type        = string
+  default     = ""
+  sensitive   = true
 }
 
