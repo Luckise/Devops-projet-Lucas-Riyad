@@ -1,14 +1,20 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { getGroup } from "../lib/groups";
+import { createFileRoute, redirect } from "@tanstack/react-router";
+import { getServices } from "../di/container";
 import { ArrowLeft, Users } from "lucide-react";
 
 export const Route = createFileRoute("/clubs/$clubId")({
-  component: ClubDetailRoute,
-  loader: ({ params }) => {
-    const club = getGroup(params.clubId);
+  beforeLoad: () => {
+    if (typeof window !== "undefined" && !localStorage.getItem("eat_user_profile")) {
+      throw redirect({ to: "/login" });
+    }
+  },
+  loader: async ({ params }) => {
+    const svc = await getServices();
+    const club = await svc.groupService.getById(params.clubId);
     if (!club) throw new Error("Club not found");
     return { club };
   },
+  component: ClubDetailRoute,
 });
 
 function ClubDetailRoute() {
