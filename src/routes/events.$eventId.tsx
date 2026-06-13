@@ -44,13 +44,24 @@ function EventDetailsRoute() {
 
     await new Promise((resolve) => setTimeout(resolve, 1500));
 
+    const userEmail =
+      user.email ||
+      (() => {
+        try {
+          const saved = localStorage.getItem("eat_user_profile");
+          return saved ? JSON.parse(saved).email : "";
+        } catch {
+          return "";
+        }
+      })();
+
     const newJoined = joined + 1;
     setJoined(newJoined);
 
     const services = await getServices();
     await services.eventService.update(event.id, {
       joined: newJoined,
-      attendees: [...(event.attendees || []), user.email].filter(Boolean),
+      attendees: [...(event.attendees || []), userEmail].filter(Boolean),
     } as any);
 
     await services.ticketService.create(event, user);
