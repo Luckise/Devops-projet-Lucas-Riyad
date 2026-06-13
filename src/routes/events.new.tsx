@@ -38,7 +38,9 @@ function EventCreate() {
         try {
           const saved = localStorage.getItem("eat_user_profile");
           return saved ? JSON.parse(saved).email : "";
-        } catch { return ""; }
+        } catch {
+          return "";
+        }
       })();
     if (email) {
       getServices()
