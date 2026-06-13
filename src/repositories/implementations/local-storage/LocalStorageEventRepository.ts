@@ -66,7 +66,7 @@ export class LocalStorageEventRepository implements IEventRepository {
     return [...new Set(stored.map((t) => t.eventId))];
   }
 
-  async getMyEventIds(): Promise<string[]> {
+  async getMyEventIds(_email?: string): Promise<string[]> {
     const saved = await this.getSavedEventIds();
     const purchased = await this.getPurchasedEventIds();
     return [...new Set([...saved, ...purchased])];

@@ -50,7 +50,7 @@ function createClientServices(): Services {
     getSavedEventIds: () => rpc.events.getSavedEventIds() as Promise<string[]>,
     isSaved: (eventId: string) => rpc.events.isSaved({ eventId }) as Promise<boolean>,
     toggleSaved: (eventId: string) => rpc.events.toggleSaved({ eventId }) as Promise<boolean>,
-    getMyEventIds: () => rpc.events.getMyEventIds() as Promise<string[]>,
+    getMyEventIds: (email: string) => rpc.events.getMyEventIds({ email }) as Promise<string[]>,
     hide: (id: string) => rpc.events.hideEvent({ id }) as Promise<void>,
     unhide: (id: string) => rpc.events.unhideEvent({ id }) as Promise<void>,
   };

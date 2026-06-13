@@ -10,7 +10,7 @@ export interface IEventRepository {
   isSaved(eventId: string): Promise<boolean>;
   toggleSaved(eventId: string): Promise<boolean>;
   getPurchasedEventIds(): Promise<string[]>;
-  getMyEventIds(): Promise<string[]>;
+  getMyEventIds(email: string): Promise<string[]>;
   hide(id: string): Promise<void>;
   unhide(id: string): Promise<void>;
 }

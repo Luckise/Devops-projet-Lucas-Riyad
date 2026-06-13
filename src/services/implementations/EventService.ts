@@ -37,8 +37,8 @@ export class EventService implements IEventService {
     return this.repo.toggleSaved(eventId);
   }
 
-  async getMyEventIds(): Promise<string[]> {
-    return this.repo.getMyEventIds();
+  async getMyEventIds(email: string): Promise<string[]> {
+    return this.repo.getMyEventIds(email);
   }
 
   async hide(id: string): Promise<void> {

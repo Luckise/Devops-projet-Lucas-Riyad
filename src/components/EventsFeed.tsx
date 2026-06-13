@@ -2,22 +2,23 @@ import { Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { MapPin, Calendar, Clock, ArrowRight, Users, Search, X, Shield } from "lucide-react";
 import { getServices } from "../di/container";
-import { getGroup } from "../lib/groups";
 import { formatDate, formatTime, isEventPast } from "../lib/date-utils";
 import SaveButton from "./SaveButton";
 
 export default function EventsFeed() {
   const [events, setEvents] = useState<any[]>([]);
+  const [groups, setGroups] = useState<Record<string, any>>({});
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     const onRefresh = () => {
-      getServices().then((svc) =>
+      getServices().then((svc) => {
         svc.eventService.getAll().then((all) => {
           const upcoming = all.filter((e) => !e.hidden && !isEventPast(e));
           setEvents(upcoming);
-        }),
-      );
+        });
+        svc.groupService.getAll().then(setGroups);
+      });
     };
     onRefresh();
     window.addEventListener("data-changed", onRefresh);
@@ -102,7 +103,7 @@ export default function EventsFeed() {
                 <div className="absolute top-5 left-5 z-20 pr-5">
                   {event.groupId &&
                     (() => {
-                      const club = getGroup(event.groupId);
+                      const club = groups[event.groupId];
                       if (!club) return null;
                       return (
                         <Link

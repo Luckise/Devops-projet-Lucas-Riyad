@@ -100,8 +100,15 @@ export class DatabaseEventRepository implements IEventRepository {
     return [];
   }
 
-  async getMyEventIds(): Promise<string[]> {
-    return [];
+  async getMyEventIds(email: string): Promise<string[]> {
+    if (!email) return [];
+    const rows = await getDb().select().from(events);
+    return rows
+      .filter((row) => {
+        const attendees = (row.attendees as string[]) ?? [];
+        return attendees.includes(email);
+      })
+      .map((row) => row.id);
   }
 
   async hide(id: string): Promise<void> {

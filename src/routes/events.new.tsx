@@ -55,6 +55,17 @@ function EventCreate() {
     if (!title || !date || !time || !location || !selectedGroup) return;
     setSubmitting(true);
 
+    const creatorEmail =
+      user.email ||
+      (() => {
+        try {
+          const saved = localStorage.getItem("eat_user_profile");
+          return saved ? JSON.parse(saved).email : "";
+        } catch {
+          return "";
+        }
+      })();
+
     await (
       await getServices()
     ).eventService.create({
@@ -68,10 +79,10 @@ function EventCreate() {
       tags: tags.filter(Boolean),
       maxParticipants: maxParticipants ? parseInt(maxParticipants, 10) : 0,
       groupId: selectedGroup,
-      joined: 0,
+      joined: 1,
       isPast: false,
       hidden: false,
-      attendees: [],
+      attendees: creatorEmail ? [creatorEmail] : [],
     });
 
     setSubmitting(false);

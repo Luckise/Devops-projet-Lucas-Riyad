@@ -33,9 +33,21 @@ function FeedRoute() {
   const [posts, setPosts] = useState<Post[]>([]);
 
   useEffect(() => {
+    const userEmail =
+      user.email ||
+      (() => {
+        try {
+          const saved = localStorage.getItem("eat_user_profile");
+          return saved ? JSON.parse(saved).email : "";
+        } catch {
+          return "";
+        }
+      })();
     const onRefresh = () => {
       getServices().then((svc) => {
-        svc.eventService.getMyEventIds().then(setMyEventIds);
+        if (userEmail) {
+          svc.eventService.getMyEventIds(userEmail).then(setMyEventIds);
+        }
         svc.eventService.getAll().then(setEvents);
         svc.postService.getAll().then(setPosts);
       });

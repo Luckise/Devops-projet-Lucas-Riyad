@@ -110,9 +110,18 @@ export const unhideEvent = os.input(z.object({ id: z.string() })).handler(async 
   await getDb().update(eventsTable).set({ hidden: false }).where(eq(eventsTable.id, input.id));
 });
 
-export const getMyEventIds = os.handler(async () => {
-  return [];
-});
+export const getMyEventIds = os
+  .input(z.object({ email: z.string() }))
+  .handler(async ({ input }) => {
+    if (!input.email) return [];
+    const rows = await getDb().select().from(eventsTable);
+    return rows
+      .filter((row) => {
+        const attendees = (row.attendees as string[]) ?? [];
+        return attendees.includes(input.email);
+      })
+      .map((row) => row.id);
+  });
 
 export const getSavedEventIds = os.handler(async () => {
   return [];

@@ -9,7 +9,7 @@ export interface IEventService {
   getSavedEventIds(): Promise<string[]>;
   isSaved(eventId: string): Promise<boolean>;
   toggleSaved(eventId: string): Promise<boolean>;
-  getMyEventIds(): Promise<string[]>;
+  getMyEventIds(email: string): Promise<string[]>;
   hide(id: string): Promise<void>;
   unhide(id: string): Promise<void>;
   findEvent(id: string): Promise<Event | undefined>;
