@@ -33,7 +33,10 @@ function EventCreate() {
 
   useEffect(() => {
     if (user.email) {
-      getServices().then((svc) => svc.groupService.getUserGroups(user.email).then(setUserGroups));
+      getServices()
+        .then((svc) => svc.groupService.getUserGroups(user.email))
+        .then(setUserGroups)
+        .catch((err) => console.error("[events.new] Failed to load groups:", err));
     }
   }, [user.email]);
 
