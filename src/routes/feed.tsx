@@ -12,6 +12,7 @@ import {
 import { getServices } from "../di/container";
 import { toast } from "../lib/toast";
 import type { Event } from "../types/models";
+import { useUser } from "../hooks/use-user";
 
 export const Route = createFileRoute("/feed")({
   beforeLoad: async () => {
@@ -92,26 +93,24 @@ const MOCK_FEED = [
 
 function FeedRoute() {
   const navigate = useNavigate();
+  const { user } = useUser();
   const [tab, setTab] = useState<"global" | "myevents">("global");
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [deletedPostIds, setDeletedPostIds] = useState<string[]>([]);
   const [myEventIds, setMyEventIds] = useState<string[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
-  const [profile, setProfile] = useState<{ email?: string }>({});
 
   useEffect(() => {
     const saved = localStorage.getItem("eat_deleted_posts");
     if (saved) setDeletedPostIds(JSON.parse(saved));
-    const stored = localStorage.getItem("eat_user_profile");
-    if (stored) setProfile(JSON.parse(stored));
     getServices().then((svc) => {
       svc.eventService.getMyEventIds().then(setMyEventIds);
       svc.eventService.getAll().then(setEvents);
     });
   }, []);
 
-  const userEmail = profile.email || "";
+  const userEmail = user.email || "";
 
   const allPosts = useMemo(() => {
     return MOCK_FEED.filter((post) => !deletedPostIds.includes(post.id)).filter((post) => {

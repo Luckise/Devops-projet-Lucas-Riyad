@@ -5,6 +5,7 @@ import ImageUpload from "../components/ImageUpload";
 import { getServices } from "../di/container";
 import { toast } from "../lib/toast";
 import type { Event } from "../types/models";
+import { useUser } from "../hooks/use-user";
 
 export const Route = createFileRoute("/posts/new")({
   beforeLoad: async () => {
@@ -21,6 +22,7 @@ type ContentBlock = { type: "text" | "image"; value: string };
 
 function PostCreate() {
   const navigate = useNavigate();
+  const { user } = useUser();
   const [content, setContent] = useState<ContentBlock[]>([{ type: "text", value: "" }]);
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -37,15 +39,11 @@ function PostCreate() {
     if (!selectedEventId || !hasText) return;
     setSubmitting(true);
 
-    const profile =
-      typeof window !== "undefined"
-        ? JSON.parse(localStorage.getItem("eat_user_profile") || "{}")
-        : {};
     const post = {
       content: filledContent,
       eventId: selectedEventId,
       createdAt: new Date().toISOString().split("T")[0],
-      authorEmail: profile.email || "",
+      authorEmail: user.email || "",
     };
 
     await (await getServices()).postService.create(post as any);

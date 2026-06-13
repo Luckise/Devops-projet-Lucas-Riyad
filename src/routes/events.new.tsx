@@ -4,6 +4,7 @@ import { ArrowLeft, X, Plus, ChevronDown } from "lucide-react";
 import ImageUpload from "../components/ImageUpload";
 import { getServices } from "../di/container";
 import { toast } from "../lib/toast";
+import { useUser } from "../hooks/use-user";
 
 export const Route = createFileRoute("/events/new")({
   beforeLoad: async () => {
@@ -20,6 +21,7 @@ export const Route = createFileRoute("/events/new")({
 
 function EventCreate() {
   const navigate = useNavigate();
+  const { user } = useUser();
   const [title, setTitle] = useState("");
   const [image, setImage] = useState("");
   const [date, setDate] = useState("");
@@ -34,14 +36,10 @@ function EventCreate() {
   const [userGroups, setUserGroups] = useState<any[]>([]);
 
   useEffect(() => {
-    const stored = localStorage.getItem("eat_user_profile");
-    if (stored) {
-      const profile = JSON.parse(stored);
-      getServices().then((svc) =>
-        svc.groupService.getUserGroups(profile.email || "").then(setUserGroups),
-      );
+    if (user.email) {
+      getServices().then((svc) => svc.groupService.getUserGroups(user.email).then(setUserGroups));
     }
-  }, []);
+  }, [user.email]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

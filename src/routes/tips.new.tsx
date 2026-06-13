@@ -4,6 +4,7 @@ import { ArrowLeft, Plus, X } from "lucide-react";
 import ImageUpload from "../components/ImageUpload";
 import { getServices } from "../di/container";
 import { toast } from "../lib/toast";
+import { useUser } from "../hooks/use-user";
 
 export const Route = createFileRoute("/tips/new")({
   beforeLoad: async () => {
@@ -21,6 +22,7 @@ const CATEGORIES = ["Recipes", "Promotions", "Addresses", "Guides"] as const;
 
 function TipCreate() {
   const navigate = useNavigate();
+  const { user } = useUser();
   const [category, setCategory] = useState<(typeof CATEGORIES)[number] | "">("");
   const [title, setTitle] = useState("");
   const [image, setImage] = useState("");
@@ -36,18 +38,13 @@ function TipCreate() {
     if (!title) return;
     setSubmitting(true);
 
-    const profile =
-      typeof window !== "undefined"
-        ? JSON.parse(localStorage.getItem("eat_user_profile") || "{}")
-        : {};
-
     const tip: Record<string, unknown> = {
       title,
       category,
       image,
       height: "aspect-[3/4]",
       content: content.filter((b) => b.value.trim()),
-      authorEmail: profile.email || "",
+      authorEmail: user.email || "",
     };
 
     if (category === "Recipes") {

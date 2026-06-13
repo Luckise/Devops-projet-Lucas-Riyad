@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { ChevronLeft, Calendar, EyeOff } from "lucide-react";
 import { getServices } from "../di/container";
 import { formatDate, formatTime } from "../lib/date-utils";
+import { useUser } from "../hooks/use-user";
 
 export const Route = createFileRoute("/profile/events")({
   beforeLoad: async () => {
@@ -20,14 +21,13 @@ export const Route = createFileRoute("/profile/events")({
 function ProfileEventsRoute() {
   const matches = useRouterState({ select: (s) => s.matches });
   const hasChild = matches.some((m) => m.routeId !== "__root__" && m.routeId !== "/profile/events");
+  const { user } = useUser();
   const [events, setEvents] = useState<any[]>([]);
 
   useEffect(() => {
     if (hasChild) return;
-    const stored = localStorage.getItem("eat_user_profile");
-    if (!stored) return;
-    const profile = JSON.parse(stored);
-    const email = profile?.email || "";
+    const email = user.email || "";
+    if (!email) return;
     getServices().then((svc) =>
       svc.groupService.getUserGroups(email).then((groups) => {
         const userGroupIds = groups.map((g) => g.id);
@@ -37,7 +37,7 @@ function ProfileEventsRoute() {
         });
       }),
     );
-  }, [hasChild]);
+  }, [hasChild, user.email]);
 
   if (hasChild) return <Outlet />;
 

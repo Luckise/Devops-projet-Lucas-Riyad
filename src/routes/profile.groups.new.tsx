@@ -5,6 +5,7 @@ import ImageUpload from "../components/ImageUpload";
 import { createGroup, saveClubPage } from "../lib/groups";
 import { toast } from "../lib/toast";
 import { getServices } from "../di/container";
+import { useUser } from "../hooks/use-user";
 
 type ContentBlock = { type: "text" | "image"; value: string };
 
@@ -21,9 +22,8 @@ export const Route = createFileRoute("/profile/groups/new")({
 
 function ClubCreate() {
   const navigate = useNavigate();
-  const stored = typeof window !== "undefined" ? localStorage.getItem("eat_user_profile") : null;
-  const profile = stored ? JSON.parse(stored) : null;
-  const email = profile?.email || "";
+  const { user } = useUser();
+  const email = user.email || "";
 
   const [name, setName] = useState("");
   const [image, setImage] = useState("");

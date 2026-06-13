@@ -2,6 +2,7 @@ import { createFileRoute, Link, Outlet, redirect, useRouterState } from "@tansta
 import { useState, useEffect } from "react";
 import { ChevronLeft, Lightbulb, EyeOff } from "lucide-react";
 import { getServices } from "../di/container";
+import { useUser } from "../hooks/use-user";
 
 export const Route = createFileRoute("/profile/tips")({
   beforeLoad: async () => {
@@ -17,9 +18,8 @@ export const Route = createFileRoute("/profile/tips")({
 function ProfileTipsRoute() {
   const matches = useRouterState({ select: (s) => s.matches });
   const hasChild = matches.some((m) => m.routeId !== "__root__" && m.routeId !== "/profile/tips");
-  const stored = typeof window !== "undefined" ? localStorage.getItem("eat_user_profile") : null;
-  const profile = stored ? JSON.parse(stored) : null;
-  const email = profile?.email || "";
+  const { user } = useUser();
+  const email = user.email || "";
 
   const [tips, setTips] = useState<any[]>([]);
 

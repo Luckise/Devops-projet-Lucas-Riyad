@@ -14,6 +14,7 @@ import {
 import { useState } from "react";
 import SaveButton from "../components/SaveButton";
 import { toast } from "../lib/toast";
+import { useUser } from "../hooks/use-user";
 
 export const Route = createFileRoute("/events/$eventId")({
   beforeLoad: async () => {
@@ -34,6 +35,7 @@ export const Route = createFileRoute("/events/$eventId")({
 function EventDetailsRoute() {
   const { event } = Route.useLoaderData();
   const navigate = useNavigate();
+  const { user } = useUser();
   const [joined, setJoined] = useState(event.joined);
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
@@ -51,11 +53,6 @@ function EventDetailsRoute() {
     if (isEventFull) return;
     setIsProcessing(true);
 
-    const profile =
-      typeof window !== "undefined"
-        ? JSON.parse(localStorage.getItem("eat_user_profile") || "{}")
-        : {};
-
     await new Promise((resolve) => setTimeout(resolve, 1500));
 
     const newJoined = joined + 1;
@@ -64,10 +61,10 @@ function EventDetailsRoute() {
     const services = await getServices();
     await services.eventService.update(event.id, {
       joined: newJoined,
-      attendees: [...(event.attendees || []), profile.email].filter(Boolean),
+      attendees: [...(event.attendees || []), user.email].filter(Boolean),
     } as any);
 
-    await services.ticketService.create(event, profile);
+    await services.ticketService.create(event, user);
 
     if (event.price > 0) {
       window.open("https://www.helloasso.com/", "_blank");

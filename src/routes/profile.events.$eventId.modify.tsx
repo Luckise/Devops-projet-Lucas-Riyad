@@ -4,6 +4,7 @@ import { ArrowLeft, X, Plus, ChevronDown, Trash2, Users, Search, EyeOff } from "
 import ImageUpload from "../components/ImageUpload";
 import { getServices } from "../di/container";
 import { toast } from "../lib/toast";
+import { useUser } from "../hooks/use-user";
 
 export const Route = createFileRoute("/profile/events/$eventId/modify")({
   beforeLoad: async () => {
@@ -26,6 +27,7 @@ export const Route = createFileRoute("/profile/events/$eventId/modify")({
 function ProfileEventEditRoute() {
   const { event } = Route.useLoaderData();
   const navigate = useNavigate();
+  const { user } = useUser();
   const [title, setTitle] = useState(event.title || "");
   const [image, setImage] = useState(event.image || "");
   const [date, setDate] = useState(event.date || "");
@@ -43,14 +45,10 @@ function ProfileEventEditRoute() {
   const [userGroups, setUserGroups] = useState<any[]>([]);
 
   useEffect(() => {
-    const stored = localStorage.getItem("eat_user_profile");
-    if (stored) {
-      const profile = JSON.parse(stored);
-      getServices().then((svc) =>
-        svc.groupService.getUserGroups(profile.email || "").then(setUserGroups),
-      );
+    if (user.email) {
+      getServices().then((svc) => svc.groupService.getUserGroups(user.email).then(setUserGroups));
     }
-  }, []);
+  }, [user.email]);
 
   const attendees: string[] = event.attendees || [];
   const filteredAttendees = searchQuery
