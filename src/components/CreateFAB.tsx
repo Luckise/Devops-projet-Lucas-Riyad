@@ -37,11 +37,6 @@ export default function CreateFAB() {
 
   if (loading || !isLoggedIn) return null;
 
-  const isEventPage =
-    typeof window !== "undefined" &&
-    (window.location.pathname === "/events" || window.location.pathname.startsWith("/events/"));
-  if (!isAdmin && isEventPage) return null;
-
   const OPTIONS = OPTIONS_ALL.filter((opt) => (opt.label === "Event" ? isAdmin : true));
 
   return (
