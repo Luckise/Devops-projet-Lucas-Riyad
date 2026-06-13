@@ -1,18 +1,10 @@
-import { createFileRoute, Link, useNavigate, redirect } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useState, useMemo, useEffect } from "react";
-import {
-  MessageCircle,
-  Heart,
-  Share,
-  MoreHorizontal,
-  Calendar as CalendarIcon,
-  Pencil,
-  Trash2,
-} from "lucide-react";
+import { MessageCircle, Heart, Share, Calendar as CalendarIcon, Trash2 } from "lucide-react";
 import { getServices } from "../di/container";
 import { toast } from "../lib/toast";
-import type { Event } from "../types/models";
 import { useUser } from "../hooks/use-user";
+import type { Event, Post, ContentBlock } from "../types/models";
 
 export const Route = createFileRoute("/feed")({
   beforeLoad: async () => {
@@ -25,87 +17,29 @@ export const Route = createFileRoute("/feed")({
   component: FeedRoute,
 });
 
-const MOCK_FEED = [
-  {
-    id: "1",
-    author: {
-      name: "Sarah Chen",
-      handle: "@sarahc",
-      avatar:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=150&auto=format&fit=crop",
-    },
-    timestamp: "2h",
-    content: "The lighting at the Warehouse 42 techno set last night was absolutely unreal.",
-    eventId: "1",
-    image:
-      "https://images.unsplash.com/photo-1574169208507-84376144848b?q=80&w=800&auto=format&fit=crop",
-    likes: 124,
-    comments: 12,
-  },
-  {
-    id: "2",
-    author: {
-      name: "Marcus Thorne",
-      handle: "@marcust",
-      avatar:
-        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150&auto=format&fit=crop",
-    },
-    timestamp: "5h",
-    content: "Sunrise soundbath at The Glasshouse. Exactly what was needed.",
-    eventId: "2",
-    image: null,
-    likes: 89,
-    comments: 4,
-  },
-  {
-    id: "3",
-    author: {
-      name: "Elena Rodriguez",
-      handle: "@elenar",
-      avatar:
-        "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=150&auto=format&fit=crop",
-    },
-    timestamp: "Oct 24",
-    content:
-      "Still thinking about the Autumn Street Food festival. The bao buns from that one truck... wow.",
-    eventId: "3",
-    image:
-      "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=800&auto=format&fit=crop",
-    likes: 256,
-    comments: 28,
-  },
-  {
-    id: "4",
-    author: {
-      name: "Alex Kim",
-      handle: "@alexk",
-      avatar:
-        "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=150&auto=format&fit=crop",
-    },
-    timestamp: "Oct 23",
-    content: "The Indie Film Showcase exceeded all expectations.",
-    eventId: "4",
-    image: null,
-    likes: 42,
-    comments: 1,
-  },
-];
+function renderContent(content: ContentBlock[] | string): string {
+  if (typeof content === "string") return content;
+  return content
+    .filter((b) => b.type === "text" && b.value.trim())
+    .map((b) => b.value)
+    .join("\n");
+}
 
 function FeedRoute() {
-  const navigate = useNavigate();
   const { user } = useUser();
   const [tab, setTab] = useState<"global" | "myevents">("global");
-  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [deletedPostIds, setDeletedPostIds] = useState<string[]>([]);
   const [myEventIds, setMyEventIds] = useState<string[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]);
 
   useEffect(() => {
     const onRefresh = () => {
       getServices().then((svc) => {
         svc.eventService.getMyEventIds().then(setMyEventIds);
         svc.eventService.getAll().then(setEvents);
+        svc.postService.getAll().then(setPosts);
       });
     };
     const saved = localStorage.getItem("eat_deleted_posts");
@@ -118,19 +52,43 @@ function FeedRoute() {
   const userEmail = user.email || "";
 
   const allPosts = useMemo(() => {
-    return MOCK_FEED.filter((post) => !deletedPostIds.includes(post.id)).filter((post) => {
-      if (tab === "global") return true;
-      return post.eventId && myEventIds.includes(post.eventId);
-    });
-  }, [tab, deletedPostIds, myEventIds]);
+    return posts
+      .filter((p) => !deletedPostIds.includes(p.id))
+      .filter((p) => {
+        if (tab === "global") return true;
+        return p.eventId && myEventIds.includes(p.eventId);
+      })
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }, [posts, tab, deletedPostIds, myEventIds]);
 
-  const handleDeletePost = () => {
-    if (!deleteConfirmId) return;
-    const nextDeleted = [...deletedPostIds, deleteConfirmId];
+  const handleDeletePost = (postId: string) => {
+    const nextDeleted = [...deletedPostIds, postId];
     setDeletedPostIds(nextDeleted);
     localStorage.setItem("eat_deleted_posts", JSON.stringify(nextDeleted));
     setDeleteConfirmId(null);
     toast("Post deleted");
+  };
+
+  const getAuthorName = (email?: string) => {
+    if (!email) return "Anonymous";
+    if (email === user.email) return `${user.firstName} ${user.lastName}`.trim() || email;
+    return email.split("@")[0];
+  };
+
+  const getAuthorAvatar = (email?: string) => {
+    if (email === user.email && user.avatar) return user.avatar;
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(getAuthorName(email))}&background=var(--ember)&color=fff&size=150`;
+  };
+
+  const timeAgo = (dateStr: string) => {
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return "just now";
+    if (mins < 60) return `${mins}m`;
+    const hours = Math.floor(mins / 60);
+    if (hours < 24) return `${hours}h`;
+    const days = Math.floor(hours / 24);
+    return `${days}d`;
   };
 
   return (
@@ -165,15 +123,16 @@ function FeedRoute() {
         <div className="flex flex-col">
           {allPosts.map((post) => {
             const linkedEvent = events.find((e) => e.id === post.eventId);
+            const textContent = renderContent(post.content);
             return (
               <article
                 key={post.id}
-                className="flex flex-row gap-3 px-4 py-3 border-b border-black/10 dark:border-white/10 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors cursor-pointer"
+                className="flex flex-row gap-3 px-4 py-3 border-b border-black/10 dark:border-white/10 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors"
               >
                 <div className="flex-shrink-0 pt-1">
                   <img
-                    src={post.author.avatar}
-                    alt={post.author.name}
+                    src={getAuthorAvatar(post.authorEmail)}
+                    alt={getAuthorName(post.authorEmail)}
                     className="w-10 h-10 rounded-full object-cover"
                   />
                 </div>
@@ -181,30 +140,31 @@ function FeedRoute() {
                 <div className="flex-1 flex flex-col min-w-0">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1.5 overflow-hidden text-[15px] text-black dark:text-white">
-                      <span className="font-bold truncate">{post.author.name}</span>
-                      <span className="text-black/50 dark:text-white/50 truncate">
-                        {post.author.handle}
-                      </span>
+                      <span className="font-bold truncate">{getAuthorName(post.authorEmail)}</span>
+                      {post.authorEmail && (
+                        <span className="text-black/50 dark:text-white/50 truncate">
+                          @{post.authorEmail.split("@")[0]}
+                        </span>
+                      )}
                       <span className="text-black/50 dark:text-white/50">·</span>
                       <span className="text-black/50 dark:text-white/50 flex-shrink-0">
-                        {post.timestamp}
+                        {timeAgo(post.createdAt)}
                       </span>
                     </div>
+                    {post.authorEmail === userEmail && (
+                      <button
+                        type="button"
+                        onClick={() => setDeleteConfirmId(post.id)}
+                        className="p-1 rounded-full hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
+                      >
+                        <Trash2 className="w-3.5 h-3.5 text-zinc-400 hover:text-red-500" />
+                      </button>
+                    )}
                   </div>
 
                   <p className="mt-0.5 text-[15px] text-black/85 dark:text-white/90 leading-snug whitespace-pre-wrap">
-                    {post.content}
+                    {textContent}
                   </p>
-                  {post.image && (
-                    <div className="mt-3 rounded-2xl overflow-hidden border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5">
-                      <img
-                        src={post.image}
-                        alt="Post attachment"
-                        className="w-full h-auto max-h-[400px] object-cover"
-                        loading="lazy"
-                      />
-                    </div>
-                  )}
 
                   {linkedEvent && (
                     <div className="mt-3">
@@ -227,13 +187,11 @@ function FeedRoute() {
                       <div className="p-2 rounded-full group-hover:bg-[var(--ember)]/10 transition-colors -ml-2">
                         <MessageCircle className="w-[18px] h-[18px]" />
                       </div>
-                      <span className="text-[13px]">{post.comments}</span>
                     </button>
                     <button className="flex items-center gap-2 hover:[color:var(--ember)] group transition-colors">
                       <div className="p-2 rounded-full group-hover:bg-[var(--ember)]/10 transition-colors -ml-2">
                         <Heart className="w-[18px] h-[18px]" />
                       </div>
-                      <span className="text-[13px]">{post.likes}</span>
                     </button>
                     <button className="flex items-center gap-2 hover:[color:var(--ember)] group transition-colors">
                       <div className="p-2 rounded-full group-hover:bg-[var(--ember)]/10 transition-colors -ml-2">
@@ -250,15 +208,17 @@ function FeedRoute() {
         {allPosts.length === 0 ? (
           <div className="py-16 px-6 text-center">
             <p className="text-black/60 dark:text-white/60 text-lg font-serif font-medium">
-              No posts yet.
+              Aucun post pour le moment.
             </p>
             <p className="text-black/40 dark:text-white/40 text-sm mt-2 font-medium">
-              Follow or get tickets for events to see posts about them here.
+              {tab === "myevents"
+                ? "Rejoignez des événements pour voir les posts ici."
+                : "Créez un post via le bouton + pour commencer."}
             </p>
           </div>
         ) : (
           <div className="py-12 px-6 text-center">
-            <p className="text-black/50 dark:text-white/50 text-[15px]">You're all caught up.</p>
+            <p className="text-black/50 dark:text-white/50 text-[15px]">Vous êtes à jour.</p>
           </div>
         )}
       </div>
@@ -270,10 +230,10 @@ function FeedRoute() {
               <Trash2 className="w-6 h-6 text-red-600 dark:text-red-400" />
             </div>
             <h3 className="text-lg font-bold text-center text-zinc-900 dark:text-white mb-2">
-              Delete this post?
+              Supprimer ce post ?
             </h3>
             <p className="text-sm text-center text-zinc-500 dark:text-zinc-400 mb-6">
-              This action cannot be undone.
+              Cette action est irréversible.
             </p>
             <div className="flex gap-3">
               <button
@@ -281,14 +241,14 @@ function FeedRoute() {
                 onClick={() => setDeleteConfirmId(null)}
                 className="flex-1 py-3 px-4 rounded-full border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 font-bold text-[13px] hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
               >
-                Cancel
+                Annuler
               </button>
               <button
                 type="button"
-                onClick={handleDeletePost}
+                onClick={() => handleDeletePost(deleteConfirmId)}
                 className="flex-1 py-3 px-4 rounded-full bg-red-600 text-white font-bold text-[13px] hover:bg-red-700 transition-colors"
               >
-                Delete
+                Supprimer
               </button>
             </div>
           </div>
