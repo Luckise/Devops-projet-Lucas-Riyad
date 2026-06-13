@@ -15,6 +15,7 @@ ExecStart={{ docker_bin }} run --rm \
   -e AWS_DEFAULT_REGION={{ aws_region }} \
   -e ASSET_BUCKET_NAME={{ asset_bucket_name }} \
   -e BACKUP_BUCKET_NAME={{ backup_bucket_name }} \
+  -e NODE_TLS_REJECT_UNAUTHORIZED=0 \
   -e DATABASE_URL="postgresql://{{ db_user }}:{{ db_password }}@{{ db_host }}:{{ db_port | default(5432) }}/{{ db_name }}?sslmode=require" \
   -e VITE_COGNITO_USER_POOL_ID={{ cognito_user_pool_id }} \
   -e VITE_COGNITO_CLIENT_ID={{ cognito_client_id }} \
