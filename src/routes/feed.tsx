@@ -1,9 +1,19 @@
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useState, useMemo, useEffect } from "react";
-import { MessageCircle, Heart, Share, Calendar as CalendarIcon, Trash2 } from "lucide-react";
+import {
+  MessageCircle,
+  Heart,
+  Share,
+  Calendar as CalendarIcon,
+  Trash2,
+  MapPin,
+  Clock,
+  Users,
+} from "lucide-react";
 import { getServices } from "../di/container";
 import { toast } from "../lib/toast";
 import { useUser } from "../hooks/use-user";
+import { formatDate, formatTime } from "../lib/date-utils";
 import type { Event, Post, ContentBlock } from "../types/models";
 
 export const Route = createFileRoute("/feed")({
@@ -60,6 +70,11 @@ function FeedRoute() {
   }, []);
 
   const userEmail = user.email || "";
+
+  const myEvents = useMemo(() => {
+    if (tab !== "myevents") return [];
+    return events.filter((e) => myEventIds.includes(e.id));
+  }, [events, tab, myEventIds]);
 
   const allPosts = useMemo(() => {
     return posts
@@ -129,6 +144,50 @@ function FeedRoute() {
             </button>
           </div>
         </div>
+
+        {tab === "myevents" && myEvents.length > 0 && (
+          <div className="flex flex-col">
+            {myEvents.map((event) => (
+              <Link
+                key={event.id}
+                to="/events/$eventId"
+                params={{ eventId: event.id }}
+                className="flex gap-3 px-4 py-3 border-b border-black/10 dark:border-white/10 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors"
+              >
+                <img
+                  src={event.image}
+                  alt={event.title}
+                  className="w-16 h-16 rounded-xl object-cover flex-shrink-0"
+                />
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-[15px] font-bold text-black dark:text-white truncate">
+                    {event.title}
+                  </h3>
+                  <div className="flex items-center gap-2 mt-1 text-[12px] text-black/50 dark:text-white/50">
+                    <span className="flex items-center gap-1">
+                      <CalendarIcon className="w-3 h-3" />
+                      {formatDate(event.date)}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Clock className="w-3 h-3" />
+                      {formatTime(event.time)}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 mt-1 text-[12px] text-black/50 dark:text-white/50">
+                    <span className="flex items-center gap-1">
+                      <MapPin className="w-3 h-3" />
+                      {event.location}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Users className="w-3 h-3" />
+                      {event.joined}/{event.maxParticipants}
+                    </span>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
 
         <div className="flex flex-col">
           {allPosts.map((post) => {
@@ -215,7 +274,7 @@ function FeedRoute() {
           })}
         </div>
 
-        {allPosts.length === 0 ? (
+        {allPosts.length === 0 && (tab !== "myevents" || myEvents.length === 0) ? (
           <div className="py-16 px-6 text-center">
             <p className="text-black/60 dark:text-white/60 text-lg font-serif font-medium">
               Aucun post pour le moment.
@@ -226,11 +285,11 @@ function FeedRoute() {
                 : "Créez un post via le bouton + pour commencer."}
             </p>
           </div>
-        ) : (
+        ) : allPosts.length > 0 ? (
           <div className="py-12 px-6 text-center">
             <p className="text-black/50 dark:text-white/50 text-[15px]">Vous êtes à jour.</p>
           </div>
-        )}
+        ) : null}
       </div>
 
       {deleteConfirmId && (

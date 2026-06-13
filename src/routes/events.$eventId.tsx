@@ -26,42 +26,44 @@ function EventDetailsRoute() {
   const navigate = useNavigate();
   const { user } = useUser();
   const [joined, setJoined] = useState(event.joined);
+  const [attendees, setAttendees] = useState<string[]>(event.attendees || []);
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
 
+  const userEmail =
+    user.email ||
+    (() => {
+      try {
+        const saved = localStorage.getItem("eat_user_profile");
+        return saved ? JSON.parse(saved).email : "";
+      } catch {
+        return "";
+      }
+    })();
+
   const eventPast = isEventPast(event);
   const isEventFull = event.maxParticipants > 0 && joined >= event.maxParticipants;
+  const hasJoined = userEmail ? attendees.includes(userEmail) : false;
 
   const handleJoin = async () => {
-    try {
-      await (await getServices()).authService.getCurrentUser();
-    } catch {
+    if (!userEmail) {
       navigate({ to: "/login" });
       return;
     }
-    if (isEventFull) return;
+    if (isEventFull || hasJoined) return;
     setIsProcessing(true);
 
     await new Promise((resolve) => setTimeout(resolve, 1500));
 
-    const userEmail =
-      user.email ||
-      (() => {
-        try {
-          const saved = localStorage.getItem("eat_user_profile");
-          return saved ? JSON.parse(saved).email : "";
-        } catch {
-          return "";
-        }
-      })();
-
+    const newAttendees = [...attendees, userEmail];
     const newJoined = joined + 1;
+    setAttendees(newAttendees);
     setJoined(newJoined);
 
     const services = await getServices();
     await services.eventService.update(event.id, {
       joined: newJoined,
-      attendees: [...(event.attendees || []), userEmail].filter(Boolean),
+      attendees: newAttendees,
     } as any);
 
     await services.ticketService.create(event, user);
@@ -200,10 +202,15 @@ function EventDetailsRoute() {
               )}
             </div>
 
-            {isEventFull ? (
+            {isEventFull && !hasJoined ? (
               <div className="flex-1 flex items-center justify-center gap-2 py-4 px-6 rounded-full font-bold text-[15px] bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-900/50">
                 <XCircle className="w-5 h-5" />
                 <span>Event Full</span>
+              </div>
+            ) : hasJoined ? (
+              <div className="flex-1 flex items-center justify-center gap-2 py-4 px-6 rounded-full font-bold text-[15px] bg-green-500 text-white">
+                <CheckCircle2 className="w-5 h-5" />
+                <span>Joined</span>
               </div>
             ) : (
               <button
