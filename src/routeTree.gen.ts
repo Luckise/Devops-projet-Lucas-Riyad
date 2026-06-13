@@ -33,12 +33,21 @@ import { Route as EventsEventIdRouteImport } from './routes/events.$eventId'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
 import { Route as DemoOrpcTodoRouteImport } from './routes/demo/orpc-todo'
 import { Route as ClubsClubIdRouteImport } from './routes/clubs.$clubId'
+import { Route as ApiTipsRouteImport } from './routes/api.tips'
+import { Route as ApiTicketsRouteImport } from './routes/api.tickets'
+import { Route as ApiPostsRouteImport } from './routes/api.posts'
+import { Route as ApiGroupsRouteImport } from './routes/api.groups'
+import { Route as ApiEventsRouteImport } from './routes/api.events'
 import { Route as ApiSplatRouteImport } from './routes/api.$'
 import { Route as ProfileGroupsNewRouteImport } from './routes/profile.groups.new'
 import { Route as PostsPostIdModifyRouteImport } from './routes/posts.$postId.modify'
 import { Route as DemoFormSimpleRouteImport } from './routes/demo/form.simple'
 import { Route as DemoFormAddressRouteImport } from './routes/demo/form.address'
+import { Route as ApiTipsTipIdRouteImport } from './routes/api.tips.$tipId'
 import { Route as ApiRpcSplatRouteImport } from './routes/api.rpc.$'
+import { Route as ApiPostsPostIdRouteImport } from './routes/api.posts.$postId'
+import { Route as ApiGroupsGroupIdRouteImport } from './routes/api.groups.$groupId'
+import { Route as ApiEventsEventIdRouteImport } from './routes/api.events.$eventId'
 import { Route as ApiCognitoGroupRouteImport } from './routes/api.cognito.group'
 import { Route as ProfileTipsTipIdModifyRouteImport } from './routes/profile.tips.$tipId.modify'
 import { Route as ProfileGroupsGroupIdModifyRouteImport } from './routes/profile.groups.$groupId.modify'
@@ -164,6 +173,31 @@ const ClubsClubIdRoute = ClubsClubIdRouteImport.update({
   path: '/$clubId',
   getParentRoute: () => ClubsRoute,
 } as any)
+const ApiTipsRoute = ApiTipsRouteImport.update({
+  id: '/api/tips',
+  path: '/api/tips',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiTicketsRoute = ApiTicketsRouteImport.update({
+  id: '/api/tickets',
+  path: '/api/tickets',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPostsRoute = ApiPostsRouteImport.update({
+  id: '/api/posts',
+  path: '/api/posts',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiGroupsRoute = ApiGroupsRouteImport.update({
+  id: '/api/groups',
+  path: '/api/groups',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiEventsRoute = ApiEventsRouteImport.update({
+  id: '/api/events',
+  path: '/api/events',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiSplatRoute = ApiSplatRouteImport.update({
   id: '/api/$',
   path: '/api/$',
@@ -189,10 +223,30 @@ const DemoFormAddressRoute = DemoFormAddressRouteImport.update({
   path: '/demo/form/address',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiTipsTipIdRoute = ApiTipsTipIdRouteImport.update({
+  id: '/$tipId',
+  path: '/$tipId',
+  getParentRoute: () => ApiTipsRoute,
+} as any)
 const ApiRpcSplatRoute = ApiRpcSplatRouteImport.update({
   id: '/api/rpc/$',
   path: '/api/rpc/$',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPostsPostIdRoute = ApiPostsPostIdRouteImport.update({
+  id: '/$postId',
+  path: '/$postId',
+  getParentRoute: () => ApiPostsRoute,
+} as any)
+const ApiGroupsGroupIdRoute = ApiGroupsGroupIdRouteImport.update({
+  id: '/$groupId',
+  path: '/$groupId',
+  getParentRoute: () => ApiGroupsRoute,
+} as any)
+const ApiEventsEventIdRoute = ApiEventsEventIdRouteImport.update({
+  id: '/$eventId',
+  path: '/$eventId',
+  getParentRoute: () => ApiEventsRoute,
 } as any)
 const ApiCognitoGroupRoute = ApiCognitoGroupRouteImport.update({
   id: '/api/cognito/group',
@@ -228,6 +282,11 @@ export interface FileRoutesByFullPath {
   '/tickets': typeof TicketsRoute
   '/tips': typeof TipsRouteWithChildren
   '/api/$': typeof ApiSplatRoute
+  '/api/events': typeof ApiEventsRouteWithChildren
+  '/api/groups': typeof ApiGroupsRouteWithChildren
+  '/api/posts': typeof ApiPostsRouteWithChildren
+  '/api/tickets': typeof ApiTicketsRoute
+  '/api/tips': typeof ApiTipsRouteWithChildren
   '/clubs/$clubId': typeof ClubsClubIdRoute
   '/demo/orpc-todo': typeof DemoOrpcTodoRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
@@ -244,7 +303,11 @@ export interface FileRoutesByFullPath {
   '/profile/': typeof ProfileIndexRoute
   '/tips/': typeof TipsIndexRoute
   '/api/cognito/group': typeof ApiCognitoGroupRoute
+  '/api/events/$eventId': typeof ApiEventsEventIdRoute
+  '/api/groups/$groupId': typeof ApiGroupsGroupIdRoute
+  '/api/posts/$postId': typeof ApiPostsPostIdRoute
   '/api/rpc/$': typeof ApiRpcSplatRoute
+  '/api/tips/$tipId': typeof ApiTipsTipIdRoute
   '/demo/form/address': typeof DemoFormAddressRoute
   '/demo/form/simple': typeof DemoFormSimpleRoute
   '/posts/$postId/modify': typeof PostsPostIdModifyRoute
@@ -262,6 +325,11 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupRoute
   '/tickets': typeof TicketsRoute
   '/api/$': typeof ApiSplatRoute
+  '/api/events': typeof ApiEventsRouteWithChildren
+  '/api/groups': typeof ApiGroupsRouteWithChildren
+  '/api/posts': typeof ApiPostsRouteWithChildren
+  '/api/tickets': typeof ApiTicketsRoute
+  '/api/tips': typeof ApiTipsRouteWithChildren
   '/clubs/$clubId': typeof ClubsClubIdRoute
   '/demo/orpc-todo': typeof DemoOrpcTodoRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
@@ -278,7 +346,11 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileIndexRoute
   '/tips': typeof TipsIndexRoute
   '/api/cognito/group': typeof ApiCognitoGroupRoute
+  '/api/events/$eventId': typeof ApiEventsEventIdRoute
+  '/api/groups/$groupId': typeof ApiGroupsGroupIdRoute
+  '/api/posts/$postId': typeof ApiPostsPostIdRoute
   '/api/rpc/$': typeof ApiRpcSplatRoute
+  '/api/tips/$tipId': typeof ApiTipsTipIdRoute
   '/demo/form/address': typeof DemoFormAddressRoute
   '/demo/form/simple': typeof DemoFormSimpleRoute
   '/posts/$postId/modify': typeof PostsPostIdModifyRoute
@@ -299,6 +371,11 @@ export interface FileRoutesById {
   '/tickets': typeof TicketsRoute
   '/tips': typeof TipsRouteWithChildren
   '/api/$': typeof ApiSplatRoute
+  '/api/events': typeof ApiEventsRouteWithChildren
+  '/api/groups': typeof ApiGroupsRouteWithChildren
+  '/api/posts': typeof ApiPostsRouteWithChildren
+  '/api/tickets': typeof ApiTicketsRoute
+  '/api/tips': typeof ApiTipsRouteWithChildren
   '/clubs/$clubId': typeof ClubsClubIdRoute
   '/demo/orpc-todo': typeof DemoOrpcTodoRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
@@ -315,7 +392,11 @@ export interface FileRoutesById {
   '/profile/': typeof ProfileIndexRoute
   '/tips/': typeof TipsIndexRoute
   '/api/cognito/group': typeof ApiCognitoGroupRoute
+  '/api/events/$eventId': typeof ApiEventsEventIdRoute
+  '/api/groups/$groupId': typeof ApiGroupsGroupIdRoute
+  '/api/posts/$postId': typeof ApiPostsPostIdRoute
   '/api/rpc/$': typeof ApiRpcSplatRoute
+  '/api/tips/$tipId': typeof ApiTipsTipIdRoute
   '/demo/form/address': typeof DemoFormAddressRoute
   '/demo/form/simple': typeof DemoFormSimpleRoute
   '/posts/$postId/modify': typeof PostsPostIdModifyRoute
@@ -337,6 +418,11 @@ export interface FileRouteTypes {
     | '/tickets'
     | '/tips'
     | '/api/$'
+    | '/api/events'
+    | '/api/groups'
+    | '/api/posts'
+    | '/api/tickets'
+    | '/api/tips'
     | '/clubs/$clubId'
     | '/demo/orpc-todo'
     | '/demo/tanstack-query'
@@ -353,7 +439,11 @@ export interface FileRouteTypes {
     | '/profile/'
     | '/tips/'
     | '/api/cognito/group'
+    | '/api/events/$eventId'
+    | '/api/groups/$groupId'
+    | '/api/posts/$postId'
     | '/api/rpc/$'
+    | '/api/tips/$tipId'
     | '/demo/form/address'
     | '/demo/form/simple'
     | '/posts/$postId/modify'
@@ -371,6 +461,11 @@ export interface FileRouteTypes {
     | '/signup'
     | '/tickets'
     | '/api/$'
+    | '/api/events'
+    | '/api/groups'
+    | '/api/posts'
+    | '/api/tickets'
+    | '/api/tips'
     | '/clubs/$clubId'
     | '/demo/orpc-todo'
     | '/demo/tanstack-query'
@@ -387,7 +482,11 @@ export interface FileRouteTypes {
     | '/profile'
     | '/tips'
     | '/api/cognito/group'
+    | '/api/events/$eventId'
+    | '/api/groups/$groupId'
+    | '/api/posts/$postId'
     | '/api/rpc/$'
+    | '/api/tips/$tipId'
     | '/demo/form/address'
     | '/demo/form/simple'
     | '/posts/$postId/modify'
@@ -407,6 +506,11 @@ export interface FileRouteTypes {
     | '/tickets'
     | '/tips'
     | '/api/$'
+    | '/api/events'
+    | '/api/groups'
+    | '/api/posts'
+    | '/api/tickets'
+    | '/api/tips'
     | '/clubs/$clubId'
     | '/demo/orpc-todo'
     | '/demo/tanstack-query'
@@ -423,7 +527,11 @@ export interface FileRouteTypes {
     | '/profile/'
     | '/tips/'
     | '/api/cognito/group'
+    | '/api/events/$eventId'
+    | '/api/groups/$groupId'
+    | '/api/posts/$postId'
     | '/api/rpc/$'
+    | '/api/tips/$tipId'
     | '/demo/form/address'
     | '/demo/form/simple'
     | '/posts/$postId/modify'
@@ -444,6 +552,11 @@ export interface RootRouteChildren {
   TicketsRoute: typeof TicketsRoute
   TipsRoute: typeof TipsRouteWithChildren
   ApiSplatRoute: typeof ApiSplatRoute
+  ApiEventsRoute: typeof ApiEventsRouteWithChildren
+  ApiGroupsRoute: typeof ApiGroupsRouteWithChildren
+  ApiPostsRoute: typeof ApiPostsRouteWithChildren
+  ApiTicketsRoute: typeof ApiTicketsRoute
+  ApiTipsRoute: typeof ApiTipsRouteWithChildren
   DemoOrpcTodoRoute: typeof DemoOrpcTodoRoute
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
   PostsNewRoute: typeof PostsNewRoute
@@ -629,6 +742,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ClubsClubIdRouteImport
       parentRoute: typeof ClubsRoute
     }
+    '/api/tips': {
+      id: '/api/tips'
+      path: '/api/tips'
+      fullPath: '/api/tips'
+      preLoaderRoute: typeof ApiTipsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/tickets': {
+      id: '/api/tickets'
+      path: '/api/tickets'
+      fullPath: '/api/tickets'
+      preLoaderRoute: typeof ApiTicketsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/posts': {
+      id: '/api/posts'
+      path: '/api/posts'
+      fullPath: '/api/posts'
+      preLoaderRoute: typeof ApiPostsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/groups': {
+      id: '/api/groups'
+      path: '/api/groups'
+      fullPath: '/api/groups'
+      preLoaderRoute: typeof ApiGroupsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/events': {
+      id: '/api/events'
+      path: '/api/events'
+      fullPath: '/api/events'
+      preLoaderRoute: typeof ApiEventsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/$': {
       id: '/api/$'
       path: '/api/$'
@@ -664,12 +812,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoFormAddressRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/tips/$tipId': {
+      id: '/api/tips/$tipId'
+      path: '/$tipId'
+      fullPath: '/api/tips/$tipId'
+      preLoaderRoute: typeof ApiTipsTipIdRouteImport
+      parentRoute: typeof ApiTipsRoute
+    }
     '/api/rpc/$': {
       id: '/api/rpc/$'
       path: '/api/rpc/$'
       fullPath: '/api/rpc/$'
       preLoaderRoute: typeof ApiRpcSplatRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/api/posts/$postId': {
+      id: '/api/posts/$postId'
+      path: '/$postId'
+      fullPath: '/api/posts/$postId'
+      preLoaderRoute: typeof ApiPostsPostIdRouteImport
+      parentRoute: typeof ApiPostsRoute
+    }
+    '/api/groups/$groupId': {
+      id: '/api/groups/$groupId'
+      path: '/$groupId'
+      fullPath: '/api/groups/$groupId'
+      preLoaderRoute: typeof ApiGroupsGroupIdRouteImport
+      parentRoute: typeof ApiGroupsRoute
+    }
+    '/api/events/$eventId': {
+      id: '/api/events/$eventId'
+      path: '/$eventId'
+      fullPath: '/api/events/$eventId'
+      preLoaderRoute: typeof ApiEventsEventIdRouteImport
+      parentRoute: typeof ApiEventsRoute
     }
     '/api/cognito/group': {
       id: '/api/cognito/group'
@@ -741,6 +917,53 @@ const TipsRouteChildren: TipsRouteChildren = {
 
 const TipsRouteWithChildren = TipsRoute._addFileChildren(TipsRouteChildren)
 
+interface ApiEventsRouteChildren {
+  ApiEventsEventIdRoute: typeof ApiEventsEventIdRoute
+}
+
+const ApiEventsRouteChildren: ApiEventsRouteChildren = {
+  ApiEventsEventIdRoute: ApiEventsEventIdRoute,
+}
+
+const ApiEventsRouteWithChildren = ApiEventsRoute._addFileChildren(
+  ApiEventsRouteChildren,
+)
+
+interface ApiGroupsRouteChildren {
+  ApiGroupsGroupIdRoute: typeof ApiGroupsGroupIdRoute
+}
+
+const ApiGroupsRouteChildren: ApiGroupsRouteChildren = {
+  ApiGroupsGroupIdRoute: ApiGroupsGroupIdRoute,
+}
+
+const ApiGroupsRouteWithChildren = ApiGroupsRoute._addFileChildren(
+  ApiGroupsRouteChildren,
+)
+
+interface ApiPostsRouteChildren {
+  ApiPostsPostIdRoute: typeof ApiPostsPostIdRoute
+}
+
+const ApiPostsRouteChildren: ApiPostsRouteChildren = {
+  ApiPostsPostIdRoute: ApiPostsPostIdRoute,
+}
+
+const ApiPostsRouteWithChildren = ApiPostsRoute._addFileChildren(
+  ApiPostsRouteChildren,
+)
+
+interface ApiTipsRouteChildren {
+  ApiTipsTipIdRoute: typeof ApiTipsTipIdRoute
+}
+
+const ApiTipsRouteChildren: ApiTipsRouteChildren = {
+  ApiTipsTipIdRoute: ApiTipsTipIdRoute,
+}
+
+const ApiTipsRouteWithChildren =
+  ApiTipsRoute._addFileChildren(ApiTipsRouteChildren)
+
 interface ProfileEventsRouteChildren {
   ProfileEventsEventIdModifyRoute: typeof ProfileEventsEventIdModifyRoute
 }
@@ -790,6 +1013,11 @@ const rootRouteChildren: RootRouteChildren = {
   TicketsRoute: TicketsRoute,
   TipsRoute: TipsRouteWithChildren,
   ApiSplatRoute: ApiSplatRoute,
+  ApiEventsRoute: ApiEventsRouteWithChildren,
+  ApiGroupsRoute: ApiGroupsRouteWithChildren,
+  ApiPostsRoute: ApiPostsRouteWithChildren,
+  ApiTicketsRoute: ApiTicketsRoute,
+  ApiTipsRoute: ApiTipsRouteWithChildren,
   DemoOrpcTodoRoute: DemoOrpcTodoRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
   PostsNewRoute: PostsNewRoute,
