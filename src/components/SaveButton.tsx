@@ -1,32 +1,49 @@
 import { useState, useEffect } from "react";
-import { getServices } from "../di/container";
 import { toast } from "../lib/toast";
+
+const STORAGE_KEY = "eat_followed_events";
+
+function getFollowed(): string[] {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+  } catch {
+    return [];
+  }
+}
+
+function toggleFollow(eventId: string): boolean {
+  const followed = getFollowed();
+  const idx = followed.indexOf(eventId);
+  if (idx === -1) {
+    followed.push(eventId);
+  } else {
+    followed.splice(idx, 1);
+  }
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(followed));
+  return idx === -1;
+}
 
 export default function SaveButton({ eventId, compact }: { eventId: string; compact?: boolean }) {
   const [saved, setSaved] = useState(false);
-  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    getServices().then((svc) => svc.eventService.isSaved(eventId).then(setSaved));
-    setReady(true);
+    setSaved(getFollowed().includes(eventId));
   }, [eventId]);
 
-  const handleClick = async (e: React.MouseEvent) => {
+  const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    const next = await (await getServices()).eventService.toggleSaved(eventId);
-    setSaved(next);
-    toast(next ? "Added to watchlist" : "Removed from watchlist");
+    const isNowFollowed = toggleFollow(eventId);
+    setSaved(isNowFollowed);
+    toast(isNowFollowed ? "Followed" : "Unfollowed");
   };
-
-  if (!ready) return null;
 
   if (compact) {
     return (
       <button
         type="button"
         onClick={handleClick}
-        aria-label={saved ? "Remove from watchlist" : "Add to watchlist"}
+        aria-label={saved ? "Unfollow" : "Follow"}
         className={`min-w-[44px] h-11 rounded-full flex items-center justify-center transition-all duration-200 ease-out border px-3 ${
           saved
             ? "bg-[var(--ember)] text-white border-[var(--ember)] shadow-[0_0_12px_var(--ember)/0.4]"
@@ -44,7 +61,7 @@ export default function SaveButton({ eventId, compact }: { eventId: string; comp
     <button
       type="button"
       onClick={handleClick}
-      aria-label={saved ? "Remove from watchlist" : "Add to watchlist"}
+      aria-label={saved ? "Unfollow" : "Follow"}
       className={`min-w-[48px] h-12 rounded-full flex items-center justify-center transition-all duration-200 ease-out shrink-0 border-2 px-4 ${
         saved
           ? "bg-[var(--ember)] text-white border-[var(--ember)] shadow-[0_0_12px_var(--ember)/0.4]"
