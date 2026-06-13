@@ -6,10 +6,8 @@ import { getServices } from "../di/container";
 import type { Ticket as TicketModel } from "../types/models";
 
 export const Route = createFileRoute("/tickets")({
-  beforeLoad: async () => {
-    try {
-      await (await getServices()).authService.getCurrentUser();
-    } catch {
+  beforeLoad: () => {
+    if (typeof window !== "undefined" && !localStorage.getItem("eat_user_profile")) {
       throw redirect({ to: "/login" });
     }
   },

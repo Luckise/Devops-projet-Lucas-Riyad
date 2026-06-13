@@ -11,13 +11,10 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useUser } from "../hooks/use-user";
-import { getServices } from "../di/container";
 
 export const Route = createFileRoute("/profile/")({
-  beforeLoad: async () => {
-    try {
-      await (await getServices()).authService.getCurrentUser();
-    } catch {
+  beforeLoad: () => {
+    if (typeof window !== "undefined" && !localStorage.getItem("eat_user_profile")) {
       throw redirect({ to: "/login" });
     }
   },

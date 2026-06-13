@@ -1,11 +1,4 @@
-import {
-  createFileRoute,
-  useNavigate,
-  Link,
-  Outlet,
-  redirect,
-  useRouterState,
-} from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, redirect, useRouterState } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import {
   ChevronLeft,
@@ -28,16 +21,11 @@ import {
 } from "../lib/groups";
 import type { Group } from "../lib/groups";
 import { getCurrentIdToken } from "../lib/cognito";
-import { getServices } from "../di/container";
 import { useUser } from "../hooks/use-user";
 
 export const Route = createFileRoute("/profile/groups")({
-  beforeLoad: async () => {
-    try {
-      const profile = await (await getServices()).authService.getCurrentUser();
-      if (!profile.isAdmin) throw redirect({ to: "/profile" });
-    } catch (err) {
-      if (err instanceof redirect) throw err;
+  beforeLoad: () => {
+    if (typeof window !== "undefined" && !localStorage.getItem("eat_user_profile")) {
       throw redirect({ to: "/login" });
     }
   },
@@ -47,7 +35,6 @@ export const Route = createFileRoute("/profile/groups")({
 function ProfileGroupsRoute() {
   const matches = useRouterState({ select: (s) => s.matches });
   const hasChild = matches.some((m) => m.routeId !== "__root__" && m.routeId !== "/profile/groups");
-  const navigate = useNavigate();
   const { user } = useUser();
   const email = user.email || "";
 

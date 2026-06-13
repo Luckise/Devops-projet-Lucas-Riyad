@@ -8,10 +8,8 @@ import type { Event } from "../types/models";
 import { useUser } from "../hooks/use-user";
 
 export const Route = createFileRoute("/posts/new")({
-  beforeLoad: async () => {
-    try {
-      await (await getServices()).authService.getCurrentUser();
-    } catch {
+  beforeLoad: () => {
+    if (typeof window !== "undefined" && !localStorage.getItem("eat_user_profile")) {
       throw redirect({ to: "/login" });
     }
   },

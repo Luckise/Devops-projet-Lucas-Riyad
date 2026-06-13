@@ -2,13 +2,10 @@ import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
 import { ArrowLeft, Save, Camera, User } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useUser } from "../hooks/use-user";
-import { getServices } from "../di/container";
 
 export const Route = createFileRoute("/profile/edit")({
-  beforeLoad: async () => {
-    try {
-      await (await getServices()).authService.getCurrentUser();
-    } catch {
+  beforeLoad: () => {
+    if (typeof window !== "undefined" && !localStorage.getItem("eat_user_profile")) {
       throw redirect({ to: "/login" });
     }
   },

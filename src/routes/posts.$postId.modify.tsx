@@ -8,10 +8,8 @@ import { toast } from "../lib/toast";
 type ContentBlock = { type: "text" | "image"; value: string };
 
 export const Route = createFileRoute("/posts/$postId/modify")({
-  beforeLoad: async () => {
-    try {
-      await (await getServices()).authService.getCurrentUser();
-    } catch {
+  beforeLoad: () => {
+    if (typeof window !== "undefined" && !localStorage.getItem("eat_user_profile")) {
       throw redirect({ to: "/login" });
     }
   },

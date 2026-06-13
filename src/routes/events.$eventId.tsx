@@ -1,26 +1,15 @@
 import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
 import { getServices } from "../di/container";
 import { formatDate, formatTime, isEventPast } from "../lib/date-utils";
-import {
-  ArrowLeft,
-  Calendar,
-  Clock,
-  MapPin,
-  Ticket,
-  CheckCircle2,
-  Users,
-  XCircle,
-} from "lucide-react";
+import { ArrowLeft, Calendar, Clock, MapPin, Ticket, CheckCircle2, XCircle } from "lucide-react";
 import { useState } from "react";
 import SaveButton from "../components/SaveButton";
 import { toast } from "../lib/toast";
 import { useUser } from "../hooks/use-user";
 
 export const Route = createFileRoute("/events/$eventId")({
-  beforeLoad: async () => {
-    try {
-      await (await getServices()).authService.getCurrentUser();
-    } catch {
+  beforeLoad: () => {
+    if (typeof window !== "undefined" && !localStorage.getItem("eat_user_profile")) {
       throw redirect({ to: "/login" });
     }
   },

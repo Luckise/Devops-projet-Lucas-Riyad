@@ -6,12 +6,8 @@ import { formatDate, formatTime } from "../lib/date-utils";
 import { useUser } from "../hooks/use-user";
 
 export const Route = createFileRoute("/profile/events")({
-  beforeLoad: async () => {
-    try {
-      const profile = await (await getServices()).authService.getCurrentUser();
-      if (!profile.isAdmin) throw redirect({ to: "/profile" });
-    } catch (err) {
-      if (err instanceof redirect) throw err;
+  beforeLoad: () => {
+    if (typeof window !== "undefined" && !localStorage.getItem("eat_user_profile")) {
       throw redirect({ to: "/login" });
     }
   },

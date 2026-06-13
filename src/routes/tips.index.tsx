@@ -4,10 +4,8 @@ import { getServices } from "../di/container";
 import type { Tip } from "../types/models";
 
 export const Route = createFileRoute("/tips/")({
-  beforeLoad: async () => {
-    try {
-      await (await getServices()).authService.getCurrentUser();
-    } catch {
+  beforeLoad: () => {
+    if (typeof window !== "undefined" && !localStorage.getItem("eat_user_profile")) {
       throw redirect({ to: "/login" });
     }
   },

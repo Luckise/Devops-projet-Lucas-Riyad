@@ -6,10 +6,8 @@ import { getServices } from "../di/container";
 import { toast } from "../lib/toast";
 
 export const Route = createFileRoute("/profile/tips/$tipId/modify")({
-  beforeLoad: async () => {
-    try {
-      await (await getServices()).authService.getCurrentUser();
-    } catch {
+  beforeLoad: () => {
+    if (typeof window !== "undefined" && !localStorage.getItem("eat_user_profile")) {
       throw redirect({ to: "/login" });
     }
   },
@@ -20,8 +18,6 @@ export const Route = createFileRoute("/profile/tips/$tipId/modify")({
     return { tip };
   },
 });
-
-const CATEGORIES = ["Recipes", "Promotions", "Addresses", "Guides"] as const;
 
 function ProfileTipEditRoute() {
   const { tip } = Route.useLoaderData();
