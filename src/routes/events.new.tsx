@@ -32,9 +32,17 @@ function EventCreate() {
   const [userGroups, setUserGroups] = useState<any[]>([]);
 
   useEffect(() => {
-    if (user.email) {
+    const email =
+      user.email ||
+      (() => {
+        try {
+          const saved = localStorage.getItem("eat_user_profile");
+          return saved ? JSON.parse(saved).email : "";
+        } catch { return ""; }
+      })();
+    if (email) {
       getServices()
-        .then((svc) => svc.groupService.getUserGroups(user.email))
+        .then((svc) => svc.groupService.getUserGroups(email))
         .then(setUserGroups)
         .catch((err) => console.error("[events.new] Failed to load groups:", err));
     }
