@@ -4,7 +4,6 @@ import { ArrowLeft, Plus, X } from "lucide-react";
 import ImageUpload from "../components/ImageUpload";
 import { getServices } from "../di/container";
 import { toast } from "../lib/toast";
-import { useUser } from "../hooks/use-user";
 
 type ContentBlock = { type: "text" | "image"; value: string };
 
@@ -19,18 +18,32 @@ export const Route = createFileRoute("/profile/groups/new")({
 
 function ClubCreate() {
   const navigate = useNavigate();
-  const { user } = useUser();
-  const email = user.email || "";
 
   const [name, setName] = useState("");
   const [image, setImage] = useState("");
   const [content, setContent] = useState<ContentBlock[]>([]);
   const [submitting, setSubmitting] = useState(false);
 
+  function getEmail(): string {
+    try {
+      const raw = localStorage.getItem("eat_user_profile");
+      return raw ? JSON.parse(raw).email || "" : "";
+    } catch {
+      return "";
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
     setSubmitting(true);
+
+    const email = getEmail();
+    if (!email) {
+      toast("Please log in first");
+      setSubmitting(false);
+      return;
+    }
 
     if (!image) {
       toast("Please add a cover image");

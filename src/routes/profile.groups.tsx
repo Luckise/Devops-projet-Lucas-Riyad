@@ -14,7 +14,24 @@ import {
 import { getServices } from "../di/container";
 import type { Group } from "../types/models";
 import { getCurrentIdToken } from "../lib/cognito";
-import { useUser } from "../hooks/use-user";
+
+function getEmail(): string {
+  try {
+    const raw = localStorage.getItem("eat_user_profile");
+    return raw ? JSON.parse(raw).email || "" : "";
+  } catch {
+    return "";
+  }
+}
+
+function getIsAdmin(): boolean {
+  try {
+    const raw = localStorage.getItem("eat_user_profile");
+    return raw ? !!JSON.parse(raw).isAdmin : false;
+  } catch {
+    return false;
+  }
+}
 
 export const Route = createFileRoute("/profile/groups")({
   beforeLoad: () => {
@@ -34,8 +51,7 @@ function userRole(group: Group, email: string): "Owner" | "Member" | null {
 function ProfileGroupsRoute() {
   const matches = useRouterState({ select: (s) => s.matches });
   const hasChild = matches.some((m) => m.routeId !== "__root__" && m.routeId !== "/profile/groups");
-  const { user } = useUser();
-  const email = user.email || "";
+  const email = getEmail();
 
   const [groups, setGroups] = useState<Group[]>([]);
   const [managing, setManaging] = useState<string | null>(null);
@@ -73,7 +89,7 @@ function ProfileGroupsRoute() {
     await refresh();
     setTimeout(() => setMessage(""), 2500);
 
-    if (ok && user.isAdmin) {
+    if (ok && getIsAdmin()) {
       try {
         const idToken = await getCurrentIdToken();
         if (idToken) {
