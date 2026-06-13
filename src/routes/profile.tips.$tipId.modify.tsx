@@ -71,6 +71,7 @@ function ProfileTipEditRoute() {
     await (await getServices()).tipService.update(tip.id, updates as any);
     setSubmitting(false);
     toast("Tip updated");
+    window.dispatchEvent(new Event("data-changed"));
     navigate({ to: "/profile/tips" });
   };
 
@@ -80,12 +81,14 @@ function ProfileTipEditRoute() {
     await (await getServices()).tipService.hide(tip.id);
     setShowDeleteConfirm(false);
     toast("Tip hidden from feed");
+    window.dispatchEvent(new Event("data-changed"));
     navigate({ to: "/profile/tips" });
   };
 
   const handleUnhide = async () => {
     await (await getServices()).tipService.unhide(tip.id);
     toast("Tip is now visible");
+    window.dispatchEvent(new Event("data-changed"));
     navigate({ to: "/profile/tips" });
   };
 

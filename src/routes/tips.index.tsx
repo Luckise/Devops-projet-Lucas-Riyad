@@ -21,7 +21,12 @@ function TipsRoute() {
   const [allTips, setAllTips] = useState<Tip[]>([]);
 
   useEffect(() => {
-    getServices().then((svc) => svc.tipService.getAll().then(setAllTips));
+    const onRefresh = () => {
+      getServices().then((svc) => svc.tipService.getAll().then(setAllTips));
+    };
+    onRefresh();
+    window.addEventListener("data-changed", onRefresh);
+    return () => window.removeEventListener("data-changed", onRefresh);
   }, []);
 
   const filteredTips = allTips.filter(

@@ -69,7 +69,10 @@ function ProfileGroupsRoute() {
   const refresh = () => setGroups(getUserGroups(email));
 
   useEffect(() => {
-    refresh();
+    const onRefresh = () => refresh();
+    onRefresh();
+    window.addEventListener("data-changed", onRefresh);
+    return () => window.removeEventListener("data-changed", onRefresh);
   }, [email]);
 
   const handleAddMember = async (groupId: string) => {

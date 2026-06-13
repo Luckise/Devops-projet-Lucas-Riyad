@@ -49,6 +49,7 @@ function PostCreate() {
     await (await getServices()).postService.create(post as any);
     setSubmitting(false);
     toast("Post published successfully");
+    window.dispatchEvent(new Event("data-changed"));
     navigate({ to: "/feed" });
   };
 

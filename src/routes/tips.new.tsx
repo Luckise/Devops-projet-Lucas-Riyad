@@ -58,6 +58,7 @@ function TipCreate() {
     await (await getServices()).tipService.create(tip as any);
     setSubmitting(false);
     toast("Tip created successfully");
+    window.dispatchEvent(new Event("data-changed"));
     navigate({ to: "/tips" });
   };
 

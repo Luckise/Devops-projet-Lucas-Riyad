@@ -50,6 +50,7 @@ function ClubCreate() {
 
     setSubmitting(false);
     toast("Club created");
+    window.dispatchEvent(new Event("data-changed"));
     navigate({ to: "/profile/groups" });
   };
 

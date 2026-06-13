@@ -71,6 +71,7 @@ function EventDetailsRoute() {
       setPaymentSuccess(true);
       setIsProcessing(false);
       toast("Redirected to HelloAsso for payment");
+      window.dispatchEvent(new Event("data-changed"));
 
       setTimeout(() => {
         navigate({ to: "/tickets" });
@@ -78,6 +79,7 @@ function EventDetailsRoute() {
     } else {
       setIsProcessing(false);
       toast("You joined! Ticket generated.");
+      window.dispatchEvent(new Event("data-changed"));
       navigate({ to: "/tickets" });
     }
   };

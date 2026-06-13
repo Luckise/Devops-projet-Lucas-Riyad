@@ -102,12 +102,17 @@ function FeedRoute() {
   const [events, setEvents] = useState<Event[]>([]);
 
   useEffect(() => {
+    const onRefresh = () => {
+      getServices().then((svc) => {
+        svc.eventService.getMyEventIds().then(setMyEventIds);
+        svc.eventService.getAll().then(setEvents);
+      });
+    };
     const saved = localStorage.getItem("eat_deleted_posts");
     if (saved) setDeletedPostIds(JSON.parse(saved));
-    getServices().then((svc) => {
-      svc.eventService.getMyEventIds().then(setMyEventIds);
-      svc.eventService.getAll().then(setEvents);
-    });
+    onRefresh();
+    window.addEventListener("data-changed", onRefresh);
+    return () => window.removeEventListener("data-changed", onRefresh);
   }, []);
 
   const userEmail = user.email || "";

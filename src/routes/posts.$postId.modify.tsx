@@ -41,6 +41,7 @@ function PostEditRoute() {
     await (await getServices()).postService.update(post.id, { content: filledContent } as any);
     setSubmitting(false);
     toast("Post updated");
+    window.dispatchEvent(new Event("data-changed"));
     navigate({ to: "/feed" });
   };
 

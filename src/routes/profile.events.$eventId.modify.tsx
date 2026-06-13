@@ -77,6 +77,7 @@ function ProfileEventEditRoute() {
 
     setSubmitting(false);
     toast("Event updated");
+    window.dispatchEvent(new Event("data-changed"));
     navigate({ to: "/profile/events" });
   };
 
@@ -86,12 +87,14 @@ function ProfileEventEditRoute() {
     await (await getServices()).eventService.hide(event.id);
     setShowDeleteConfirm(false);
     toast("Event hidden from feed");
+    window.dispatchEvent(new Event("data-changed"));
     navigate({ to: "/profile/events" });
   };
 
   const handleUnhide = async () => {
     await (await getServices()).eventService.unhide(event.id);
     toast("Event is now visible");
+    window.dispatchEvent(new Event("data-changed"));
     navigate({ to: "/profile/events" });
   };
 

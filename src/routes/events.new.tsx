@@ -67,6 +67,7 @@ function EventCreate() {
 
     setSubmitting(false);
     toast("Event created successfully");
+    window.dispatchEvent(new Event("data-changed"));
     navigate({ to: "/events" });
   };
 
