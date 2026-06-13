@@ -134,8 +134,8 @@ On déploie une app TanStack Start (full-stack SSR) sur 2 EC2 derrière un ALB, 
 ### 1. Cloner le repo
 
 ```bash
-git clone <url-du-repo>
-cd projet-devops
+git clone https://github.com/Luckise/Devops-projet-Lucas-Riyad.git
+cd Devops-projet-Lucas-Riyad
 ```
 
 ### 2. Configurer les variables
@@ -143,14 +143,37 @@ cd projet-devops
 ```bash
 # Terraform
 cp terraform/terraform.tfvars.example terraform/terraform.tfvars
-# Éditer avec vos valeurs : admin_cidr_blocks, bucket names, etc.
+# Éditer avec vos valeurs : enable_https, ec2_ami_id, etc.
 
-# Ansible vault (optionnel, recommandé pour les secrets)
-ansible-vault encrypt_string 'motdepasse' --name 'db_password' \
+# Ansible vault — stocker les secrets (db_password, cognito IDs)
+# Le fichier vault.yml est chiffré et gitignoré
+ansible-vault encrypt_string 'votre_mdp_rds' --name 'db_password' \
   >> ansible/inventory/group_vars/all/vault.yml
+ansible-vault encrypt_string 'eu-west-3_xxx' --name 'cognito_user_pool_id' \
+  >> ansible/inventory/group_vars/all/vault.yml
+ansible-vault encrypt_string 'xxx' --name 'cognito_client_id' \
+  >> ansible/inventory/group_vars/all/vault.yml
+
+# Le fichier .vault_pass contient le mot de passe pour déchiffrer le vault
+# Il est requis pour exécuter tous les playbooks Ansible
+echo "votre_mdp_vault" > ansible/.vault_pass
+chmod 600 ansible/.vault_pass
 ```
 
-### 3. Provisionner l'infrastructure AWS
+### 3. Configurer les GitHub Secrets
+
+Dans Settings → Secrets → Actions, ajouter :
+
+| Secret                      | Description                         |
+| --------------------------- | ----------------------------------- |
+| `VITE_COGNITO_USER_POOL_ID` | ID du User Pool Cognito             |
+| `VITE_COGNITO_CLIENT_ID`    | ID du Client Cognito                |
+| `AWS_ACCESS_KEY_ID`         | Clé d'accès AWS pour GitHub Actions |
+| `AWS_SECRET_ACCESS_KEY`     | Clé secrète AWS pour GitHub Actions |
+| `RDS_PASSWORD`              | Mot de passe de la base RDS         |
+| `S3_BUCKET_NAME`            | Nom du bucket S3 assets             |
+
+### 4. Provisionner l'infrastructure AWS
 
 ```bash
 cd terraform
@@ -160,22 +183,31 @@ terraform apply -auto-approve
 cd ..
 ```
 
-### 4. Générer l'inventaire Ansible
+### 5. Générer l'inventaire Ansible
 
 ```bash
 ./ansible/generate_inventory.sh
 ```
 
-### 5. Déployer l'application avec Ansible
+### 6. Déployer l'application avec Ansible
 
 ```bash
-ansible-playbook ansible/playbooks/site.yml -i ansible/inventory/hosts.yml
+# Configuration complète des instances (common → app → backup)
+ansible-playbook ansible/playbooks/site.yml -i ansible/inventory/hosts.yml \
+  --vault-password-file ansible/.vault_pass
+
+# Déploiement d'une nouvelle version (pull image + restart + health check)
+ansible-playbook ansible/playbooks/deploy.yml -i ansible/inventory/hosts.yml \
+  --vault-password-file ansible/.vault_pass
 ```
 
-### 6. (Bonus) Restauration depuis S3
+> **Important** : L'argument `--vault-password-file ansible/.vault_pass` est **obligatoire** pour tous les playbooks. Il permet à Ansible de déchiffrer le vault contenant le mot de passe RDS et les identifiants Cognito, qui sont ensuite passés aux conteneurs Docker via les variables d'environnement.
+
+### 7. (Bonus) Restauration depuis S3
 
 ```bash
-ansible-playbook ansible/playbooks/restore.yml -i ansible/inventory/hosts.yml
+ansible-playbook ansible/playbooks/restore.yml -i ansible/inventory/hosts.yml \
+  --vault-password-file ansible/.vault_pass
 ```
 
 ---
@@ -226,9 +258,20 @@ Généré dynamiquement depuis les outputs Terraform via `ansible/generate_inven
 Dans `ansible/inventory/group_vars/` :
 
 - `all/main.yml` : variables communes (région, endpoints, noms de buckets...)
-- `all/vault.yml` : secrets chiffrés avec Ansible Vault (db_password, tokens...)
+- `all/vault.yml` : secrets chiffrés avec Ansible Vault (db_password, cognito IDs...)
 - `all/ecr.yml` : généré automatiquement par `generate_inventory.sh`
 - `app.yml` : variables spécifiques au groupe `app`
+
+### Vault password
+
+Le fichier `ansible/.vault_pass` contient le mot de passe pour déchiffrer le vault. Il est **requis** pour exécuter tous les playbooks :
+
+```bash
+ansible-playbook ansible/playbooks/deploy.yml -i ansible/inventory/hosts.yml \
+  --vault-password-file ansible/.vault_pass
+```
+
+Sans cet argument, Ansible ne peut pas accéder aux secrets (mot de passe RDS, identifiants Cognito) et les conteneurs Docker ne démarreront pas correctement.
 
 ### Playbooks
 
@@ -439,4 +482,6 @@ ansible-playbook ansible/playbooks/restore.yml -i ansible/inventory/hosts.yml
 - **Security groups chaînés** : on référence le SG par son ID (`aws_security_group.app.id`), pas par son nom — sinon Terraform ne détecte pas les changements.
 - **DNS gratuit via DuckDNS** : on utilise `app-lucas.duckdns.org` au lieu de Route 53 (payant). DuckDNS pointe vers l'ALB. Le certificat ACM est valide pour le domaine.
 - **Docker restart** : sans `force_source: true`, Docker ne re-pull pas l'image si le tag existe déjà en cache. On a utilisé `ansible.builtin.shell` avec `docker pull` pour forcer.
-- **oxlint/oxfmt** : ce sont des outils Rust distribués via npm. Installation avec `npm i -g oxlint` ou via les devDependencies du projet.
+- **aws-amplify et Vite 8/Rolldown** : les modules CJS comme `amazon-cognito-identity-js` posent des problèmes de class heritage. Solution : lazy imports dynamiques pour tous les modules côté serveur (pg, drizzle, AWS SDK) via `import()` dans le container DI.
+- **Buffer is not defined** : le driver `pg` (node-postgres) utilise `Buffer` qui n'existe pas dans le browser. Solution : `define: { global: "globalThis" }` dans vite.config.ts + polyfill `globalThis.Buffer` importé en premier dans router.tsx.
+- **Cognito SECRET_HASH** : l'App Client avait un client secret configuré, mais les appels browser ne peuvent pas utiliser de secret. Solution : créer un nouvel App Client sans secret via AWS CLI.
