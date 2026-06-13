@@ -11,15 +11,8 @@ import {
   Send,
   ExternalLink,
 } from "lucide-react";
-import {
-  getUserGroups,
-  addMember,
-  removeMember,
-  transferOwnership,
-  renameGroup,
-  userRole,
-} from "../lib/groups";
-import type { Group } from "../lib/groups";
+import { getServices } from "../di/container";
+import type { Group } from "../types/models";
 import { getCurrentIdToken } from "../lib/cognito";
 import { useUser } from "../hooks/use-user";
 
@@ -31,6 +24,12 @@ export const Route = createFileRoute("/profile/groups")({
   },
   component: ProfileGroupsRoute,
 });
+
+function userRole(group: Group, email: string): "Owner" | "Member" | null {
+  if (group.owner === email) return "Owner";
+  if (group.members.includes(email)) return "Member";
+  return null;
+}
 
 function ProfileGroupsRoute() {
   const matches = useRouterState({ select: (s) => s.matches });
@@ -53,21 +52,25 @@ function ProfileGroupsRoute() {
     memberEmail: string;
   } | null>(null);
 
-  const refresh = () => setGroups(getUserGroups(email));
+  const refresh = async () => {
+    const svc = await getServices();
+    const groups = await svc.groupService.getUserGroups(email);
+    setGroups(groups);
+  };
 
   useEffect(() => {
-    const onRefresh = () => refresh();
-    onRefresh();
-    window.addEventListener("data-changed", onRefresh);
-    return () => window.removeEventListener("data-changed", onRefresh);
+    refresh();
+    window.addEventListener("data-changed", refresh);
+    return () => window.removeEventListener("data-changed", refresh);
   }, [email]);
 
   const handleAddMember = async (groupId: string) => {
     if (!memberInput.trim()) return;
-    const ok = addMember(groupId, memberInput.trim());
+    const svc = await getServices();
+    const ok = await svc.groupService.addMember(groupId, memberInput.trim());
     setMessage(ok ? `${memberInput.trim()} added` : "Already a member or invalid");
     setMemberInput("");
-    refresh();
+    await refresh();
     setTimeout(() => setMessage(""), 2500);
 
     if (ok && user.isAdmin) {
@@ -86,17 +89,19 @@ function ProfileGroupsRoute() {
     }
   };
 
-  const handleRemoveMember = (groupId: string, memberEmail: string) => {
-    removeMember(groupId, memberEmail);
+  const handleRemoveMember = async (groupId: string, memberEmail: string) => {
+    const svc = await getServices();
+    await svc.groupService.removeMember(groupId, memberEmail);
     setMessage(`${memberEmail} removed`);
-    refresh();
+    await refresh();
     setTimeout(() => setMessage(""), 2500);
   };
 
-  const handleTransfer = (groupId: string, memberEmail: string) => {
-    transferOwnership(groupId, memberEmail);
+  const handleTransfer = async (groupId: string, memberEmail: string) => {
+    const svc = await getServices();
+    await svc.groupService.transferOwnership(groupId, memberEmail);
     setMessage(`Ownership transferred to ${memberEmail}`);
-    refresh();
+    await refresh();
     setTimeout(() => setMessage(""), 2500);
   };
 
@@ -163,12 +168,13 @@ function ProfileGroupsRoute() {
                             autoFocus
                             value={editingNameValue}
                             onChange={(e) => setEditingNameValue(e.target.value)}
-                            onBlur={() => {
+                            onBlur={async () => {
                               if (
                                 editingNameValue.trim() &&
                                 editingNameValue.trim() !== group.name
                               ) {
-                                renameGroup(group.id, editingNameValue.trim());
+                                const svc = await getServices();
+                                await svc.groupService.rename(group.id, editingNameValue.trim());
                                 refresh();
                               }
                               setEditingName(null);

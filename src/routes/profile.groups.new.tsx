@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
 import { useState } from "react";
 import { ArrowLeft, Plus, X } from "lucide-react";
 import ImageUpload from "../components/ImageUpload";
-import { createGroup, saveClubPage } from "../lib/groups";
+import { getServices } from "../di/container";
 import { toast } from "../lib/toast";
 import { useUser } from "../hooks/use-user";
 
@@ -38,8 +38,9 @@ function ClubCreate() {
       return;
     }
 
-    const group = createGroup(name.trim(), email);
-    saveClubPage(
+    const svc = await getServices();
+    const group = await svc.groupService.create(name.trim(), email);
+    await svc.groupService.savePage(
       group.id,
       image,
       content.filter((b) => b.value.trim()),

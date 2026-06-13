@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
 import { useState } from "react";
 import { ArrowLeft, Plus, X } from "lucide-react";
 import ImageUpload from "../components/ImageUpload";
-import { getGroup, saveClubPage } from "../lib/groups";
+import { getServices } from "../di/container";
 import { toast } from "../lib/toast";
 
 type ContentBlock = { type: "text" | "image"; value: string };
@@ -14,8 +14,9 @@ export const Route = createFileRoute("/profile/groups/$groupId/modify")({
     }
   },
   component: ClubEditRoute,
-  loader: ({ params }) => {
-    const group = getGroup(params.groupId);
+  loader: async ({ params }) => {
+    const svc = await getServices();
+    const group = await svc.groupService.getById(params.groupId);
     if (!group) throw new Error("Group not found");
     return { group };
   },
@@ -42,7 +43,8 @@ function ClubEditRoute() {
       return;
     }
 
-    saveClubPage(
+    const svc = await getServices();
+    await svc.groupService.savePage(
       group.id,
       image,
       content.filter((b) => b.value.trim()),
