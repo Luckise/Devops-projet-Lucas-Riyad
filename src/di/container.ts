@@ -31,7 +31,7 @@ import { createIsomorphicFn } from "@tanstack/react-start";
 import { createORPCClient } from "@orpc/client";
 import { RPCLink } from "@orpc/client/fetch";
 import type { RouterClient } from "@orpc/server";
-import router from "#/orpc/router";
+import type router from "#/orpc/router";
 
 function createClientServices(): Services {
   const link = new RPCLink({
