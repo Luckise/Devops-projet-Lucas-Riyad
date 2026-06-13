@@ -1,10 +1,18 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useState } from "react";
 import { getAllClubs } from "../lib/groups";
 import { Search, X, Users } from "lucide-react";
+import { getServices } from "../di/container";
 import type { Group } from "../lib/groups";
 
 export const Route = createFileRoute("/clubs/")({
+  beforeLoad: async () => {
+    try {
+      await (await getServices()).authService.getCurrentUser();
+    } catch {
+      throw redirect({ to: "/login" });
+    }
+  },
   component: ClubsRoute,
 });
 

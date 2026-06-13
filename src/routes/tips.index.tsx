@@ -1,9 +1,16 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { getServices } from "../di/container";
 import type { Tip } from "../types/models";
 
 export const Route = createFileRoute("/tips/")({
+  beforeLoad: async () => {
+    try {
+      await (await getServices()).authService.getCurrentUser();
+    } catch {
+      throw redirect({ to: "/login" });
+    }
+  },
   component: TipsRoute,
 });
 

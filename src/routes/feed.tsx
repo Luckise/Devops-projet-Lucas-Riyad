@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, redirect } from "@tanstack/react-router";
 import { useState, useMemo, useEffect } from "react";
 import {
   MessageCircle,
@@ -13,7 +13,16 @@ import { getServices } from "../di/container";
 import { toast } from "../lib/toast";
 import type { Event } from "../types/models";
 
-export const Route = createFileRoute("/feed")({ component: FeedRoute });
+export const Route = createFileRoute("/feed")({
+  beforeLoad: async () => {
+    try {
+      await (await getServices()).authService.getCurrentUser();
+    } catch {
+      throw redirect({ to: "/login" });
+    }
+  },
+  component: FeedRoute,
+});
 
 const MOCK_FEED = [
   {

@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
 import { getServices } from "../di/container";
 import { formatDate, formatTime, isEventPast } from "../lib/date-utils";
 import {
@@ -16,6 +16,13 @@ import SaveButton from "../components/SaveButton";
 import { toast } from "../lib/toast";
 
 export const Route = createFileRoute("/events/$eventId")({
+  beforeLoad: async () => {
+    try {
+      await (await getServices()).authService.getCurrentUser();
+    } catch {
+      throw redirect({ to: "/login" });
+    }
+  },
   component: EventDetailsRoute,
   loader: async ({ params }) => {
     const event = await (await getServices()).eventService.findEvent(params.eventId);
