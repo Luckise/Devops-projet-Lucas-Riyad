@@ -86,7 +86,7 @@ function PostCreate() {
           <div>
             <div className="flex items-center justify-between mb-2.5">
               <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-                Content
+                Content <span className="text-red-500">*</span>
               </label>
               <div className="flex gap-2">
                 <button
@@ -114,7 +114,7 @@ function PostCreate() {
                     <textarea
                       value={block.value}
                       onChange={(e) => updateContentBlock(idx, e.target.value)}
-                      placeholder="Write your post..."
+                      placeholder="Écrivez votre message..."
                       rows={4}
                       className="flex-1 px-4 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-[var(--ember)]/30 transition-shadow resize-none"
                     />
@@ -143,7 +143,7 @@ function PostCreate() {
 
           <div>
             <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2.5 block">
-              Link to Event
+              Link to Event <span className="text-red-500">*</span>
             </label>
             <div className="max-h-[280px] overflow-y-auto space-y-2 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 p-2 border border-zinc-200 dark:border-zinc-800">
               {allEvents.length === 0 && (
