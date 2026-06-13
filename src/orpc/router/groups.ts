@@ -115,3 +115,12 @@ export const saveGroupPage = os
       .where(eq(groupsTable.id, input.groupId));
     return true;
   });
+
+export const deleteGroup = os
+  .input(z.object({ groupId: z.string() }))
+  .handler(async ({ input }) => {
+    const [row] = await getDb().select().from(groupsTable).where(eq(groupsTable.id, input.groupId));
+    if (!row) return false;
+    await getDb().delete(groupsTable).where(eq(groupsTable.id, input.groupId));
+    return true;
+  });

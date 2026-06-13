@@ -116,6 +116,7 @@ function createClientServices(): Services {
       rpc.groups.transferOwnership({ groupId, newOwnerEmail }) as Promise<boolean>,
     savePage: (groupId: string, image: string, content: ContentBlock[] | undefined) =>
       rpc.groups.saveGroupPage({ groupId, image, content }) as Promise<boolean>,
+    delete: (groupId: string) => rpc.groups.deleteGroup({ groupId }) as Promise<boolean>,
     isUserAdmin: async () => false,
     userRole: (group: Group, email: string) => {
       if (group.owner === email) return "Owner";

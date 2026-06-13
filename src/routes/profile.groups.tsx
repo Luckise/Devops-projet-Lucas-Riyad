@@ -10,6 +10,7 @@ import {
   UserMinus,
   Send,
   ExternalLink,
+  Trash2,
 } from "lucide-react";
 import { getServices } from "../di/container";
 import type { Group } from "../types/models";
@@ -67,6 +68,7 @@ function ProfileGroupsRoute() {
     groupId: string;
     memberEmail: string;
   } | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
 
   const refresh = async () => {
     const svc = await getServices();
@@ -117,6 +119,14 @@ function ProfileGroupsRoute() {
     const svc = await getServices();
     await svc.groupService.transferOwnership(groupId, memberEmail);
     setMessage(`Ownership transferred to ${memberEmail}`);
+    await refresh();
+    setTimeout(() => setMessage(""), 2500);
+  };
+
+  const handleDeleteGroup = async (groupId: string) => {
+    const svc = await getServices();
+    await svc.groupService.delete(groupId);
+    setMessage("Club deleted");
     await refresh();
     setTimeout(() => setMessage(""), 2500);
   };
@@ -339,6 +349,27 @@ function ProfileGroupsRoute() {
                         <ChevronLeft className="w-4 h-4 text-zinc-400 -rotate-180" />
                       </Link>
                     </div>
+
+                    <div className="pt-4 border-t border-zinc-200 dark:border-white/10">
+                      <button
+                        onClick={() => setConfirmDelete(group.id)}
+                        className="flex items-center justify-between w-full px-4 py-3 rounded-xl bg-white dark:bg-zinc-900 border border-red-200 dark:border-red-900/50 hover:border-red-400 dark:hover:border-red-800 transition-colors"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-lg bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                            <Trash2 className="w-4 h-4 text-red-600 dark:text-red-400" />
+                          </div>
+                          <div className="text-left">
+                            <p className="text-sm font-bold text-red-600 dark:text-red-400">
+                              Delete Club
+                            </p>
+                            <p className="text-[11px] text-zinc-500">
+                              Permanently remove this club
+                            </p>
+                          </div>
+                        </div>
+                      </button>
+                    </div>
                   </div>
                 )}
 
@@ -460,6 +491,41 @@ function ProfileGroupsRoute() {
                 className="flex-1 py-3 px-4 rounded-full bg-amber-600 text-white font-bold text-[13px] hover:bg-amber-700 transition-colors"
               >
                 Transfer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {confirmDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="mx-4 w-full max-w-sm p-6 rounded-3xl bg-white dark:bg-zinc-900 shadow-xl border border-zinc-200 dark:border-zinc-800">
+            <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mx-auto mb-4">
+              <Trash2 className="w-6 h-6 text-red-600 dark:text-red-400" />
+            </div>
+            <h3 className="text-lg font-bold text-center text-zinc-900 dark:text-white mb-2">
+              Delete club?
+            </h3>
+            <p className="text-sm text-center text-zinc-500 dark:text-zinc-400 mb-6">
+              This action is permanent. All members, content and the club page will be lost.
+            </p>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setConfirmDelete(null)}
+                className="flex-1 py-3 px-4 rounded-full border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 font-bold text-[13px] hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  handleDeleteGroup(confirmDelete);
+                  setConfirmDelete(null);
+                }}
+                className="flex-1 py-3 px-4 rounded-full bg-red-600 text-white font-bold text-[13px] hover:bg-red-700 transition-colors"
+              >
+                Delete
               </button>
             </div>
           </div>
