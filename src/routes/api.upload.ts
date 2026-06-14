@@ -53,10 +53,13 @@ async function handle({ request }: { request: Request }) {
     if (error?.$metadata) {
       console.error("[/api/upload] SDK Error:", JSON.stringify(error.$metadata));
     }
-    return new Response(JSON.stringify({ error: "Upload failed", detail: error?.message || String(error) }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({ error: "Upload failed", detail: error?.message || String(error) }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      },
+    );
   }
 }
 
