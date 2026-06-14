@@ -50,13 +50,10 @@ async function handle({ request }: { request: Request }) {
     });
   } catch (error: any) {
     console.error("[/api/upload] Error:", error?.message || error);
-    return new Response(
-      JSON.stringify({ error: "Upload failed" }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      },
-    );
+    return new Response(JSON.stringify({ error: "Upload failed" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 }
 
