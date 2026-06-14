@@ -1,41 +1,38 @@
 import { useState, useEffect } from "react";
+import { getServices } from "../di/container";
 import { toast } from "../lib/toast";
 
-const STORAGE_KEY = "eat_followed_events";
-
-function getFollowed(): string[] {
+function getEmail(): string {
   try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+    const saved = localStorage.getItem("eat_user_profile");
+    return saved ? JSON.parse(saved).email : "";
   } catch {
-    return [];
+    return "";
   }
-}
-
-function toggleFollow(eventId: string): boolean {
-  const followed = getFollowed();
-  const idx = followed.indexOf(eventId);
-  if (idx === -1) {
-    followed.push(eventId);
-  } else {
-    followed.splice(idx, 1);
-  }
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(followed));
-  return idx === -1;
 }
 
 export default function SaveButton({ eventId, compact }: { eventId: string; compact?: boolean }) {
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
-    setSaved(getFollowed().includes(eventId));
+    const email = getEmail();
+    if (email) {
+      getServices().then((svc) => svc.eventService.isSaved(eventId, email).then(setSaved));
+    }
   }, [eventId]);
 
-  const handleClick = (e: React.MouseEvent) => {
+  const handleClick = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    const isNowFollowed = toggleFollow(eventId);
-    setSaved(isNowFollowed);
-    toast(isNowFollowed ? "Followed" : "Unfollowed");
+    const email = getEmail();
+    if (!email) {
+      toast("Please log in to follow events");
+      return;
+    }
+    const next = await (await getServices()).eventService.toggleSaved(eventId, email);
+    setSaved(next);
+    toast(next ? "Followed" : "Unfollowed");
+    window.dispatchEvent(new Event("data-changed"));
   };
 
   if (compact) {

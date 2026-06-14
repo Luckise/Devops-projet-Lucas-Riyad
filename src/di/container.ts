@@ -47,9 +47,12 @@ function createClientServices(): Services {
     update: (id: string, updates: Partial<Event>) =>
       rpc.events.updateEvent({ id, updates: updates as any }) as Promise<void>,
     delete: (id: string) => rpc.events.deleteEvent({ id }) as Promise<void>,
-    getSavedEventIds: () => rpc.events.getSavedEventIds() as Promise<string[]>,
-    isSaved: (eventId: string) => rpc.events.isSaved({ eventId }) as Promise<boolean>,
-    toggleSaved: (eventId: string) => rpc.events.toggleSaved({ eventId }) as Promise<boolean>,
+    getSavedEventIds: (email: string) =>
+      rpc.events.getSavedEventIds({ email }) as Promise<string[]>,
+    isSaved: (eventId: string, email: string) =>
+      rpc.events.isSaved({ eventId, email }) as Promise<boolean>,
+    toggleSaved: (eventId: string, email: string) =>
+      rpc.events.toggleSaved({ eventId, email }) as Promise<boolean>,
     getMyEventIds: (email: string) => rpc.events.getMyEventIds({ email }) as Promise<string[]>,
     hide: (id: string) => rpc.events.hideEvent({ id }) as Promise<void>,
     unhide: (id: string) => rpc.events.unhideEvent({ id }) as Promise<void>,

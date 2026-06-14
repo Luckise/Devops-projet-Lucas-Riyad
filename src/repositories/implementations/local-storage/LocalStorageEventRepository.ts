@@ -39,16 +39,16 @@ export class LocalStorageEventRepository implements IEventRepository {
     );
   }
 
-  async getSavedEventIds(): Promise<string[]> {
+  async getSavedEventIds(_email?: string): Promise<string[]> {
     return this.getItems<string>(this.savedKey);
   }
 
-  async isSaved(eventId: string): Promise<boolean> {
+  async isSaved(eventId: string, _email?: string): Promise<boolean> {
     const saved = await this.getSavedEventIds();
     return saved.includes(eventId);
   }
 
-  async toggleSaved(eventId: string): Promise<boolean> {
+  async toggleSaved(eventId: string, _email?: string): Promise<boolean> {
     const saved = await this.getSavedEventIds();
     const idx = saved.indexOf(eventId);
     if (idx === -1) {

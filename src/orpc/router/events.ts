@@ -123,14 +123,43 @@ export const getMyEventIds = os
       .map((row) => row.id);
   });
 
-export const getSavedEventIds = os.handler(async () => {
-  return [];
-});
+export const getSavedEventIds = os
+  .input(z.object({ email: z.string() }))
+  .handler(async ({ input }) => {
+    if (!input.email) return [];
+    const rows = await getDb().select().from(eventsTable);
+    return rows
+      .filter((row) => {
+        const attendees = (row.attendees as string[]) ?? [];
+        return attendees.includes(input.email);
+      })
+      .map((row) => row.id);
+  });
 
-export const isSaved = os.input(z.object({ eventId: z.string() })).handler(async () => {
-  return false;
-});
+export const isSaved = os
+  .input(z.object({ eventId: z.string(), email: z.string() }))
+  .handler(async ({ input }) => {
+    if (!input.email) return false;
+    const [row] = await getDb().select().from(eventsTable).where(eq(eventsTable.id, input.eventId));
+    if (!row) return false;
+    const attendees = (row.attendees as string[]) ?? [];
+    return attendees.includes(input.email);
+  });
 
-export const toggleSaved = os.input(z.object({ eventId: z.string() })).handler(async () => {
-  return false;
-});
+export const toggleSaved = os
+  .input(z.object({ eventId: z.string(), email: z.string() }))
+  .handler(async ({ input }) => {
+    if (!input.email) return false;
+    const [row] = await getDb().select().from(eventsTable).where(eq(eventsTable.id, input.eventId));
+    if (!row) return false;
+    const attendees = (row.attendees as string[]) ?? [];
+    const isFollowed = attendees.includes(input.email);
+    const next = isFollowed
+      ? attendees.filter((e) => e !== input.email)
+      : [...attendees, input.email];
+    await getDb()
+      .update(eventsTable)
+      .set({ attendees: next })
+      .where(eq(eventsTable.id, input.eventId));
+    return !isFollowed;
+  });
