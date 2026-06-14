@@ -8,14 +8,15 @@ Restart={{ app_restart_policy }}
 ExecStartPre=-{{ docker_bin }} rm -f {{ app_container_name }}
 ExecStart={{ docker_bin }} run --rm \
   --name {{ app_container_name }} \
-  -p {{ app_container_port }}:{{ app_container_port }} \
+  --network host \
   -e NODE_ENV={{ app_node_env }} \
   -e PORT={{ app_container_port }} \
   -e AWS_REGION={{ aws_region }} \
   -e AWS_DEFAULT_REGION={{ aws_region }} \
   -e ASSET_BUCKET_NAME={{ asset_bucket_name }} \
   -e BACKUP_BUCKET_NAME={{ backup_bucket_name }} \
-  -e DATABASE_URL="postgresql://{{ db_user }}:{{ db_password }}@{{ db_host }}:{{ db_port | default(5432) }}/{{ db_name }}" \
+  -e NODE_TLS_REJECT_UNAUTHORIZED=0 \
+  -e DATABASE_URL="postgresql://{{ db_user }}:{{ db_password }}@{{ db_host }}:{{ db_port | default(5432) }}/{{ db_name }}?sslmode=require" \
   -e VITE_COGNITO_USER_POOL_ID={{ cognito_user_pool_id }} \
   -e VITE_COGNITO_CLIENT_ID={{ cognito_client_id }} \
   -e COGNITO_USER_POOL_ID={{ cognito_user_pool_id }} \

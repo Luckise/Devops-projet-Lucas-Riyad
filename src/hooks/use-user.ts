@@ -17,7 +17,7 @@ export function useUser() {
 
   const refresh = useCallback(async () => {
     try {
-      const profile = await getServices().authService.getCurrentUser();
+      const profile = await (await getServices()).authService.getCurrentUser();
       setUserState(profile);
     } catch {
       const saved = typeof window !== "undefined" ? localStorage.getItem("eat_user_profile") : null;
@@ -39,7 +39,7 @@ export function useUser() {
 
   const setUser = async (updated: UserProfile) => {
     try {
-      await getServices().authService.updateProfile(updated);
+      await (await getServices()).authService.updateProfile(updated);
     } catch {
       // fall back to localStorage
     }
@@ -52,7 +52,7 @@ export function useUser() {
 
   const logout = async () => {
     try {
-      await getServices().authService.signOut();
+      await (await getServices()).authService.signOut();
     } catch {
       // fall back
     }

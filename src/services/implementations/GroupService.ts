@@ -49,6 +49,10 @@ export class GroupService implements IGroupService {
     return this.repo.savePage(groupId, image, content);
   }
 
+  async delete(groupId: string): Promise<boolean> {
+    return this.repo.delete(groupId);
+  }
+
   async isUserAdmin(email: string): Promise<boolean> {
     return this.repo.isUserAdmin(email);
   }

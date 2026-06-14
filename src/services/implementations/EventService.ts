@@ -25,20 +25,20 @@ export class EventService implements IEventService {
     return this.repo.delete(id);
   }
 
-  async getSavedEventIds(): Promise<string[]> {
-    return this.repo.getSavedEventIds();
+  async getSavedEventIds(email: string): Promise<string[]> {
+    return this.repo.getSavedEventIds(email);
   }
 
-  async isSaved(eventId: string): Promise<boolean> {
-    return this.repo.isSaved(eventId);
+  async isSaved(eventId: string, email: string): Promise<boolean> {
+    return this.repo.isSaved(eventId, email);
   }
 
-  async toggleSaved(eventId: string): Promise<boolean> {
-    return this.repo.toggleSaved(eventId);
+  async toggleSaved(eventId: string, email: string): Promise<boolean> {
+    return this.repo.toggleSaved(eventId, email);
   }
 
-  async getMyEventIds(): Promise<string[]> {
-    return this.repo.getMyEventIds();
+  async getMyEventIds(email: string): Promise<string[]> {
+    return this.repo.getMyEventIds(email);
   }
 
   async hide(id: string): Promise<void> {

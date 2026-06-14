@@ -5,12 +5,11 @@ import ImageUpload from "../components/ImageUpload";
 import { getServices } from "../di/container";
 import { toast } from "../lib/toast";
 import type { Event } from "../types/models";
+import { useUser } from "../hooks/use-user";
 
 export const Route = createFileRoute("/posts/new")({
-  beforeLoad: async () => {
-    try {
-      await getServices().authService.getCurrentUser();
-    } catch {
+  beforeLoad: () => {
+    if (typeof window !== "undefined" && !localStorage.getItem("eat_user_profile")) {
       throw redirect({ to: "/login" });
     }
   },
@@ -21,13 +20,14 @@ type ContentBlock = { type: "text" | "image"; value: string };
 
 function PostCreate() {
   const navigate = useNavigate();
+  const { user } = useUser();
   const [content, setContent] = useState<ContentBlock[]>([{ type: "text", value: "" }]);
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [allEvents, setAllEvents] = useState<Event[]>([]);
 
   useEffect(() => {
-    getServices().eventService.getAll().then(setAllEvents);
+    getServices().then((svc) => svc.eventService.getAll().then(setAllEvents));
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -37,20 +37,17 @@ function PostCreate() {
     if (!selectedEventId || !hasText) return;
     setSubmitting(true);
 
-    const profile =
-      typeof window !== "undefined"
-        ? JSON.parse(localStorage.getItem("eat_user_profile") || "{}")
-        : {};
     const post = {
       content: filledContent,
       eventId: selectedEventId,
       createdAt: new Date().toISOString().split("T")[0],
-      authorEmail: profile.email || "",
+      authorEmail: user.email || "",
     };
 
-    await getServices().postService.create(post as any);
+    await (await getServices()).postService.create(post as any);
     setSubmitting(false);
     toast("Post published successfully");
+    window.dispatchEvent(new Event("data-changed"));
     navigate({ to: "/feed" });
   };
 
@@ -86,7 +83,7 @@ function PostCreate() {
           <div>
             <div className="flex items-center justify-between mb-2.5">
               <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-                Content
+                Content <span className="text-red-500">*</span>
               </label>
               <div className="flex gap-2">
                 <button
@@ -114,7 +111,7 @@ function PostCreate() {
                     <textarea
                       value={block.value}
                       onChange={(e) => updateContentBlock(idx, e.target.value)}
-                      placeholder="Write your post..."
+                      placeholder="Écrivez votre message..."
                       rows={4}
                       className="flex-1 px-4 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-[var(--ember)]/30 transition-shadow resize-none"
                     />
@@ -143,9 +140,14 @@ function PostCreate() {
 
           <div>
             <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2.5 block">
-              Link to Event
+              Link to Event <span className="text-red-500">*</span>
             </label>
             <div className="max-h-[280px] overflow-y-auto space-y-2 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 p-2 border border-zinc-200 dark:border-zinc-800">
+              {allEvents.length === 0 && (
+                <p className="text-sm text-zinc-400 dark:text-zinc-500 text-center py-6">
+                  Aucun événement pour le moment disponible
+                </p>
+              )}
               {allEvents.map((event) => (
                 <button
                   key={event.id}

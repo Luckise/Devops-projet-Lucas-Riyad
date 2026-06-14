@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Plus, Calendar, Lightbulb, Feather } from "lucide-react";
+import { useUser } from "../hooks/use-user";
 
 const OPTIONS_ALL = [
   { label: "Event", icon: Calendar, to: "/events/new" as const },
@@ -12,10 +13,10 @@ export default function CreateFAB() {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const ref = useRef<HTMLDivElement>(null);
+  const { user, loading } = useUser();
 
-  const stored = typeof window !== "undefined" ? localStorage.getItem("eat_user_profile") : null;
-  const profile = stored ? JSON.parse(stored) : null;
-  const isAdmin = profile?.isAdmin ?? false;
+  const isLoggedIn = !!user.email;
+  const isAdmin = user.isAdmin;
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -34,11 +35,7 @@ export default function CreateFAB() {
     };
   }, []);
 
-  if (!stored) return null;
-
-  const path = window.location.pathname;
-  const isEventPage = path === "/events" || path.startsWith("/events/");
-  if (!isAdmin && isEventPage) return null;
+  if (loading || !isLoggedIn) return null;
 
   const OPTIONS = OPTIONS_ALL.filter((opt) => (opt.label === "Event" ? isAdmin : true));
 

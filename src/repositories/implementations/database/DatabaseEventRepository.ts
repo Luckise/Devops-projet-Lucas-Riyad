@@ -84,24 +84,49 @@ export class DatabaseEventRepository implements IEventRepository {
     await getDb().delete(events).where(eq(events.id, id));
   }
 
-  async getSavedEventIds(): Promise<string[]> {
-    return [];
+  async getSavedEventIds(email: string): Promise<string[]> {
+    if (!email) return [];
+    const rows = await getDb().select().from(events);
+    return rows
+      .filter((row) => {
+        const attendees = (row.attendees as string[]) ?? [];
+        return attendees.includes(email);
+      })
+      .map((row) => row.id);
   }
 
-  async isSaved(_eventId: string): Promise<boolean> {
-    return false;
+  async isSaved(eventId: string, email: string): Promise<boolean> {
+    if (!email) return false;
+    const [row] = await getDb().select().from(events).where(eq(events.id, eventId));
+    if (!row) return false;
+    const attendees = (row.attendees as string[]) ?? [];
+    return attendees.includes(email);
   }
 
-  async toggleSaved(_eventId: string): Promise<boolean> {
-    return false;
+  async toggleSaved(eventId: string, email: string): Promise<boolean> {
+    if (!email) return false;
+    const [row] = await getDb().select().from(events).where(eq(events.id, eventId));
+    if (!row) return false;
+    const attendees = (row.attendees as string[]) ?? [];
+    const isFollowed = attendees.includes(email);
+    const next = isFollowed ? attendees.filter((e) => e !== email) : [...attendees, email];
+    await getDb().update(events).set({ attendees: next }).where(eq(events.id, eventId));
+    return !isFollowed;
   }
 
   async getPurchasedEventIds(): Promise<string[]> {
     return [];
   }
 
-  async getMyEventIds(): Promise<string[]> {
-    return [];
+  async getMyEventIds(email: string): Promise<string[]> {
+    if (!email) return [];
+    const rows = await getDb().select().from(events);
+    return rows
+      .filter((row) => {
+        const attendees = (row.attendees as string[]) ?? [];
+        return attendees.includes(email);
+      })
+      .map((row) => row.id);
   }
 
   async hide(id: string): Promise<void> {

@@ -32,7 +32,7 @@ function LoginRoute() {
   useEffect(() => {
     const checkSession = async () => {
       try {
-        await getServices().authService.getCurrentUser();
+        await (await getServices()).authService.getCurrentUser();
         navigate({ to: "/" });
       } catch {
         // not authenticated, stay on login
@@ -81,7 +81,7 @@ function LoginRoute() {
     setLoginError("");
 
     try {
-      const profile = await getServices().authService.signIn({ email, password });
+      const profile = await (await getServices()).authService.signIn({ email, password });
       localStorage.setItem("eat_user_profile", JSON.stringify(profile));
       window.dispatchEvent(new Event("user-updated"));
       navigate({ to: "/" });
@@ -133,7 +133,7 @@ function LoginRoute() {
                 htmlFor="login-email"
                 className="block text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2 ml-1"
               >
-                Email address
+                Email address <span className="text-red-500">*</span>
               </label>
               <div className="relative">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400">
@@ -151,8 +151,9 @@ function LoginRoute() {
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && isEmailValid) handleEmailContinue();
                   }}
-                  placeholder="firstname.lastname@efrei.net"
+                  placeholder="prenom.nom@efrei.net"
                   autoComplete="email"
+                  required
                   aria-invalid={!!emailError}
                   aria-describedby={emailError ? "email-error" : undefined}
                   className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-2xl pl-11 pr-4 py-3.5 text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-[var(--ember)] focus:border-transparent transition-all shadow-sm"
@@ -236,7 +237,7 @@ function LoginRoute() {
                   htmlFor="login-password"
                   className="block text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2 ml-1"
                 >
-                  Password
+                  Password <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
                   <input
@@ -254,7 +255,8 @@ function LoginRoute() {
                       passwordError ? "password-error" : loginError ? "login-error" : undefined
                     }
                     className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-2xl px-4 py-3.5 pr-12 text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-[var(--ember)] focus:border-transparent transition-all shadow-sm"
-                    placeholder="Enter your password"
+                    placeholder="Minimum 8 caractères"
+                    required
                   />
                   <button
                     type="button"

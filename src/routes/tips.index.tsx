@@ -1,9 +1,14 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { getServices } from "../di/container";
 import type { Tip } from "../types/models";
 
 export const Route = createFileRoute("/tips/")({
+  beforeLoad: () => {
+    if (typeof window !== "undefined" && !localStorage.getItem("eat_user_profile")) {
+      throw redirect({ to: "/login" });
+    }
+  },
   component: TipsRoute,
 });
 
@@ -14,7 +19,12 @@ function TipsRoute() {
   const [allTips, setAllTips] = useState<Tip[]>([]);
 
   useEffect(() => {
-    getServices().tipService.getAll().then(setAllTips);
+    const onRefresh = () => {
+      getServices().then((svc) => svc.tipService.getAll().then(setAllTips));
+    };
+    onRefresh();
+    window.addEventListener("data-changed", onRefresh);
+    return () => window.removeEventListener("data-changed", onRefresh);
   }, []);
 
   const filteredTips = allTips.filter(

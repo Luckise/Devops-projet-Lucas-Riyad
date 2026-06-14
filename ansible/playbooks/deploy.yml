@@ -24,6 +24,16 @@
       ansible.builtin.debug:
         var: pull_result.stdout_lines
 
+    - name: Update systemd unit with latest config
+      ansible.builtin.template:
+        src: "{{ playbook_dir }}/../roles/app/templates/app.service.j2"
+        dest: /etc/systemd/system/{{ app_container_name }}.service
+        mode: "0644"
+
+    - name: Reload systemd daemon
+      ansible.builtin.systemd:
+        daemon_reload: true
+
     - name: Restart app service
       ansible.builtin.systemd:
         name: "{{ app_container_name }}"

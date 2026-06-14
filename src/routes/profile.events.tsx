@@ -3,14 +3,11 @@ import { useState, useEffect } from "react";
 import { ChevronLeft, Calendar, EyeOff } from "lucide-react";
 import { getServices } from "../di/container";
 import { formatDate, formatTime } from "../lib/date-utils";
+import { useUser } from "../hooks/use-user";
 
 export const Route = createFileRoute("/profile/events")({
-  beforeLoad: async () => {
-    try {
-      const profile = await getServices().authService.getCurrentUser();
-      if (!profile.isAdmin) throw redirect({ to: "/profile" });
-    } catch (err) {
-      if (err instanceof redirect) throw err;
+  beforeLoad: () => {
+    if (typeof window !== "undefined" && !localStorage.getItem("eat_user_profile")) {
       throw redirect({ to: "/login" });
     }
   },
@@ -20,26 +17,23 @@ export const Route = createFileRoute("/profile/events")({
 function ProfileEventsRoute() {
   const matches = useRouterState({ select: (s) => s.matches });
   const hasChild = matches.some((m) => m.routeId !== "__root__" && m.routeId !== "/profile/events");
+  const { user } = useUser();
   const [events, setEvents] = useState<any[]>([]);
 
   useEffect(() => {
     if (hasChild) return;
-    const stored = localStorage.getItem("eat_user_profile");
-    if (!stored) return;
-    const profile = JSON.parse(stored);
-    const email = profile?.email || "";
-    getServices()
-      .groupService.getUserGroups(email)
-      .then((groups) => {
+    const email = user.email || "";
+    if (!email) return;
+    getServices().then((svc) =>
+      svc.groupService.getUserGroups(email).then((groups) => {
         const userGroupIds = groups.map((g) => g.id);
-        getServices()
-          .eventService.getAll()
-          .then((all) => {
-            const filtered = all.filter((e) => e.groupId && userGroupIds.includes(e.groupId));
-            setEvents(filtered);
-          });
-      });
-  }, [hasChild]);
+        svc.eventService.getAll().then((all) => {
+          const filtered = all.filter((e) => e.groupId && userGroupIds.includes(e.groupId));
+          setEvents(filtered);
+        });
+      }),
+    );
+  }, [hasChild, user.email]);
 
   if (hasChild) return <Outlet />;
 

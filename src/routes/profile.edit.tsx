@@ -2,13 +2,10 @@ import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
 import { ArrowLeft, Save, Camera, User } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useUser } from "../hooks/use-user";
-import { getServices } from "../di/container";
 
 export const Route = createFileRoute("/profile/edit")({
-  beforeLoad: async () => {
-    try {
-      await getServices().authService.getCurrentUser();
-    } catch {
+  beforeLoad: () => {
+    if (typeof window !== "undefined" && !localStorage.getItem("eat_user_profile")) {
       throw redirect({ to: "/login" });
     }
   },
@@ -127,7 +124,7 @@ function ProfileEditRoute() {
                 htmlFor="firstName"
                 className="block text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2 ml-1"
               >
-                First Name
+                First Name <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -135,6 +132,7 @@ function ProfileEditRoute() {
                 name="firstName"
                 value={formData.firstName}
                 onChange={handleChange}
+                placeholder="Votre prénom"
                 required
                 className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-2xl px-4 py-3.5 text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-[var(--ember)] focus:border-transparent transition-all shadow-sm"
               />
@@ -146,7 +144,7 @@ function ProfileEditRoute() {
                 htmlFor="lastName"
                 className="block text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2 ml-1"
               >
-                Surname
+                Surname <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -154,6 +152,7 @@ function ProfileEditRoute() {
                 name="lastName"
                 value={formData.lastName}
                 onChange={handleChange}
+                placeholder="Votre nom"
                 required
                 className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-2xl px-4 py-3.5 text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-[var(--ember)] focus:border-transparent transition-all shadow-sm"
               />
@@ -165,7 +164,7 @@ function ProfileEditRoute() {
                 htmlFor="nickname"
                 className="block text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2 ml-1"
               >
-                Nickname
+                Nickname <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -173,6 +172,7 @@ function ProfileEditRoute() {
                 name="nickname"
                 value={formData.nickname}
                 onChange={handleChange}
+                placeholder="Votre surnom"
                 required
                 className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-2xl px-4 py-3.5 text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-[var(--ember)] focus:border-transparent transition-all shadow-sm"
               />

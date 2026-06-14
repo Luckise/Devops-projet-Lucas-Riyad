@@ -8,771 +8,999 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from "./routes/__root";
-import { Route as TipsRouteImport } from "./routes/tips";
-import { Route as TicketsRouteImport } from "./routes/tickets";
-import { Route as SignupRouteImport } from "./routes/signup";
-import { Route as LoginRouteImport } from "./routes/login";
-import { Route as FeedRouteImport } from "./routes/feed";
-import { Route as EventsRouteImport } from "./routes/events";
-import { Route as ClubsRouteImport } from "./routes/clubs";
-import { Route as AboutRouteImport } from "./routes/about";
-import { Route as IndexRouteImport } from "./routes/index";
-import { Route as TipsIndexRouteImport } from "./routes/tips.index";
-import { Route as ProfileIndexRouteImport } from "./routes/profile.index";
-import { Route as ClubsIndexRouteImport } from "./routes/clubs.index";
-import { Route as TipsNewRouteImport } from "./routes/tips.new";
-import { Route as TipsTipIdRouteImport } from "./routes/tips.$tipId";
-import { Route as ProfileTipsRouteImport } from "./routes/profile.tips";
-import { Route as ProfileGroupsRouteImport } from "./routes/profile.groups";
-import { Route as ProfileEventsRouteImport } from "./routes/profile.events";
-import { Route as ProfileEditRouteImport } from "./routes/profile.edit";
-import { Route as PostsNewRouteImport } from "./routes/posts.new";
-import { Route as EventsNewRouteImport } from "./routes/events.new";
-import { Route as EventsEventIdRouteImport } from "./routes/events.$eventId";
-import { Route as DemoTanstackQueryRouteImport } from "./routes/demo/tanstack-query";
-import { Route as DemoOrpcTodoRouteImport } from "./routes/demo/orpc-todo";
-import { Route as ClubsClubIdRouteImport } from "./routes/clubs.$clubId";
-import { Route as ApiSplatRouteImport } from "./routes/api.$";
-import { Route as ProfileGroupsNewRouteImport } from "./routes/profile.groups.new";
-import { Route as PostsPostIdModifyRouteImport } from "./routes/posts.$postId.modify";
-import { Route as DemoFormSimpleRouteImport } from "./routes/demo/form.simple";
-import { Route as DemoFormAddressRouteImport } from "./routes/demo/form.address";
-import { Route as ApiRpcSplatRouteImport } from "./routes/api.rpc.$";
-import { Route as ApiCognitoGroupRouteImport } from "./routes/api.cognito.group";
-import { Route as ProfileTipsTipIdModifyRouteImport } from "./routes/profile.tips.$tipId.modify";
-import { Route as ProfileGroupsGroupIdModifyRouteImport } from "./routes/profile.groups.$groupId.modify";
-import { Route as ProfileEventsEventIdModifyRouteImport } from "./routes/profile.events.$eventId.modify";
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as TipsRouteImport } from './routes/tips'
+import { Route as TicketsRouteImport } from './routes/tickets'
+import { Route as SignupRouteImport } from './routes/signup'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as FeedRouteImport } from './routes/feed'
+import { Route as EventsRouteImport } from './routes/events'
+import { Route as ClubsRouteImport } from './routes/clubs'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as TipsIndexRouteImport } from './routes/tips.index'
+import { Route as ProfileIndexRouteImport } from './routes/profile.index'
+import { Route as ClubsIndexRouteImport } from './routes/clubs.index'
+import { Route as TipsNewRouteImport } from './routes/tips.new'
+import { Route as TipsTipIdRouteImport } from './routes/tips.$tipId'
+import { Route as ProfileTipsRouteImport } from './routes/profile.tips'
+import { Route as ProfileGroupsRouteImport } from './routes/profile.groups'
+import { Route as ProfileEventsRouteImport } from './routes/profile.events'
+import { Route as ProfileEditRouteImport } from './routes/profile.edit'
+import { Route as PostsNewRouteImport } from './routes/posts.new'
+import { Route as EventsNewRouteImport } from './routes/events.new'
+import { Route as EventsEventIdRouteImport } from './routes/events.$eventId'
+import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
+import { Route as DemoOrpcTodoRouteImport } from './routes/demo/orpc-todo'
+import { Route as ClubsClubIdRouteImport } from './routes/clubs.$clubId'
+import { Route as ApiTipsRouteImport } from './routes/api.tips'
+import { Route as ApiTicketsRouteImport } from './routes/api.tickets'
+import { Route as ApiPostsRouteImport } from './routes/api.posts'
+import { Route as ApiGroupsRouteImport } from './routes/api.groups'
+import { Route as ApiEventsRouteImport } from './routes/api.events'
+import { Route as ApiSplatRouteImport } from './routes/api.$'
+import { Route as ProfileGroupsNewRouteImport } from './routes/profile.groups.new'
+import { Route as PostsPostIdModifyRouteImport } from './routes/posts.$postId.modify'
+import { Route as DemoFormSimpleRouteImport } from './routes/demo/form.simple'
+import { Route as DemoFormAddressRouteImport } from './routes/demo/form.address'
+import { Route as ApiTipsTipIdRouteImport } from './routes/api.tips.$tipId'
+import { Route as ApiRpcSplatRouteImport } from './routes/api.rpc.$'
+import { Route as ApiPostsPostIdRouteImport } from './routes/api.posts.$postId'
+import { Route as ApiGroupsGroupIdRouteImport } from './routes/api.groups.$groupId'
+import { Route as ApiEventsEventIdRouteImport } from './routes/api.events.$eventId'
+import { Route as ApiCognitoGroupRouteImport } from './routes/api.cognito.group'
+import { Route as ProfileTipsTipIdModifyRouteImport } from './routes/profile.tips.$tipId.modify'
+import { Route as ProfileGroupsGroupIdModifyRouteImport } from './routes/profile.groups.$groupId.modify'
+import { Route as ProfileEventsEventIdModifyRouteImport } from './routes/profile.events.$eventId.modify'
 
 const TipsRoute = TipsRouteImport.update({
-  id: "/tips",
-  path: "/tips",
+  id: '/tips',
+  path: '/tips',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const TicketsRoute = TicketsRouteImport.update({
-  id: "/tickets",
-  path: "/tickets",
+  id: '/tickets',
+  path: '/tickets',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const SignupRoute = SignupRouteImport.update({
-  id: "/signup",
-  path: "/signup",
+  id: '/signup',
+  path: '/signup',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const LoginRoute = LoginRouteImport.update({
-  id: "/login",
-  path: "/login",
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const FeedRoute = FeedRouteImport.update({
-  id: "/feed",
-  path: "/feed",
+  id: '/feed',
+  path: '/feed',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const EventsRoute = EventsRouteImport.update({
-  id: "/events",
-  path: "/events",
+  id: '/events',
+  path: '/events',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ClubsRoute = ClubsRouteImport.update({
-  id: "/clubs",
-  path: "/clubs",
+  id: '/clubs',
+  path: '/clubs',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const AboutRoute = AboutRouteImport.update({
-  id: "/about",
-  path: "/about",
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const IndexRoute = IndexRouteImport.update({
-  id: "/",
-  path: "/",
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const TipsIndexRoute = TipsIndexRouteImport.update({
-  id: "/",
-  path: "/",
+  id: '/',
+  path: '/',
   getParentRoute: () => TipsRoute,
-} as any);
+} as any)
 const ProfileIndexRoute = ProfileIndexRouteImport.update({
-  id: "/profile/",
-  path: "/profile/",
+  id: '/profile/',
+  path: '/profile/',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ClubsIndexRoute = ClubsIndexRouteImport.update({
-  id: "/",
-  path: "/",
+  id: '/',
+  path: '/',
   getParentRoute: () => ClubsRoute,
-} as any);
+} as any)
 const TipsNewRoute = TipsNewRouteImport.update({
-  id: "/new",
-  path: "/new",
+  id: '/new',
+  path: '/new',
   getParentRoute: () => TipsRoute,
-} as any);
+} as any)
 const TipsTipIdRoute = TipsTipIdRouteImport.update({
-  id: "/$tipId",
-  path: "/$tipId",
+  id: '/$tipId',
+  path: '/$tipId',
   getParentRoute: () => TipsRoute,
-} as any);
+} as any)
 const ProfileTipsRoute = ProfileTipsRouteImport.update({
-  id: "/profile/tips",
-  path: "/profile/tips",
+  id: '/profile/tips',
+  path: '/profile/tips',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ProfileGroupsRoute = ProfileGroupsRouteImport.update({
-  id: "/profile/groups",
-  path: "/profile/groups",
+  id: '/profile/groups',
+  path: '/profile/groups',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ProfileEventsRoute = ProfileEventsRouteImport.update({
-  id: "/profile/events",
-  path: "/profile/events",
+  id: '/profile/events',
+  path: '/profile/events',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ProfileEditRoute = ProfileEditRouteImport.update({
-  id: "/profile/edit",
-  path: "/profile/edit",
+  id: '/profile/edit',
+  path: '/profile/edit',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const PostsNewRoute = PostsNewRouteImport.update({
-  id: "/posts/new",
-  path: "/posts/new",
+  id: '/posts/new',
+  path: '/posts/new',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const EventsNewRoute = EventsNewRouteImport.update({
-  id: "/new",
-  path: "/new",
+  id: '/new',
+  path: '/new',
   getParentRoute: () => EventsRoute,
-} as any);
+} as any)
 const EventsEventIdRoute = EventsEventIdRouteImport.update({
-  id: "/$eventId",
-  path: "/$eventId",
+  id: '/$eventId',
+  path: '/$eventId',
   getParentRoute: () => EventsRoute,
-} as any);
+} as any)
 const DemoTanstackQueryRoute = DemoTanstackQueryRouteImport.update({
-  id: "/demo/tanstack-query",
-  path: "/demo/tanstack-query",
+  id: '/demo/tanstack-query',
+  path: '/demo/tanstack-query',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const DemoOrpcTodoRoute = DemoOrpcTodoRouteImport.update({
-  id: "/demo/orpc-todo",
-  path: "/demo/orpc-todo",
+  id: '/demo/orpc-todo',
+  path: '/demo/orpc-todo',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ClubsClubIdRoute = ClubsClubIdRouteImport.update({
-  id: "/$clubId",
-  path: "/$clubId",
+  id: '/$clubId',
+  path: '/$clubId',
   getParentRoute: () => ClubsRoute,
-} as any);
+} as any)
+const ApiTipsRoute = ApiTipsRouteImport.update({
+  id: '/api/tips',
+  path: '/api/tips',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiTicketsRoute = ApiTicketsRouteImport.update({
+  id: '/api/tickets',
+  path: '/api/tickets',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPostsRoute = ApiPostsRouteImport.update({
+  id: '/api/posts',
+  path: '/api/posts',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiGroupsRoute = ApiGroupsRouteImport.update({
+  id: '/api/groups',
+  path: '/api/groups',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiEventsRoute = ApiEventsRouteImport.update({
+  id: '/api/events',
+  path: '/api/events',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiSplatRoute = ApiSplatRouteImport.update({
-  id: "/api/$",
-  path: "/api/$",
+  id: '/api/$',
+  path: '/api/$',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ProfileGroupsNewRoute = ProfileGroupsNewRouteImport.update({
-  id: "/new",
-  path: "/new",
+  id: '/new',
+  path: '/new',
   getParentRoute: () => ProfileGroupsRoute,
-} as any);
+} as any)
 const PostsPostIdModifyRoute = PostsPostIdModifyRouteImport.update({
-  id: "/posts/$postId/modify",
-  path: "/posts/$postId/modify",
+  id: '/posts/$postId/modify',
+  path: '/posts/$postId/modify',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const DemoFormSimpleRoute = DemoFormSimpleRouteImport.update({
-  id: "/demo/form/simple",
-  path: "/demo/form/simple",
+  id: '/demo/form/simple',
+  path: '/demo/form/simple',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const DemoFormAddressRoute = DemoFormAddressRouteImport.update({
-  id: "/demo/form/address",
-  path: "/demo/form/address",
+  id: '/demo/form/address',
+  path: '/demo/form/address',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
+const ApiTipsTipIdRoute = ApiTipsTipIdRouteImport.update({
+  id: '/$tipId',
+  path: '/$tipId',
+  getParentRoute: () => ApiTipsRoute,
+} as any)
 const ApiRpcSplatRoute = ApiRpcSplatRouteImport.update({
-  id: "/api/rpc/$",
-  path: "/api/rpc/$",
+  id: '/api/rpc/$',
+  path: '/api/rpc/$',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
+const ApiPostsPostIdRoute = ApiPostsPostIdRouteImport.update({
+  id: '/$postId',
+  path: '/$postId',
+  getParentRoute: () => ApiPostsRoute,
+} as any)
+const ApiGroupsGroupIdRoute = ApiGroupsGroupIdRouteImport.update({
+  id: '/$groupId',
+  path: '/$groupId',
+  getParentRoute: () => ApiGroupsRoute,
+} as any)
+const ApiEventsEventIdRoute = ApiEventsEventIdRouteImport.update({
+  id: '/$eventId',
+  path: '/$eventId',
+  getParentRoute: () => ApiEventsRoute,
+} as any)
 const ApiCognitoGroupRoute = ApiCognitoGroupRouteImport.update({
-  id: "/api/cognito/group",
-  path: "/api/cognito/group",
+  id: '/api/cognito/group',
+  path: '/api/cognito/group',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ProfileTipsTipIdModifyRoute = ProfileTipsTipIdModifyRouteImport.update({
-  id: "/$tipId/modify",
-  path: "/$tipId/modify",
+  id: '/$tipId/modify',
+  path: '/$tipId/modify',
   getParentRoute: () => ProfileTipsRoute,
-} as any);
-const ProfileGroupsGroupIdModifyRoute = ProfileGroupsGroupIdModifyRouteImport.update({
-  id: "/$groupId/modify",
-  path: "/$groupId/modify",
-  getParentRoute: () => ProfileGroupsRoute,
-} as any);
-const ProfileEventsEventIdModifyRoute = ProfileEventsEventIdModifyRouteImport.update({
-  id: "/$eventId/modify",
-  path: "/$eventId/modify",
-  getParentRoute: () => ProfileEventsRoute,
-} as any);
+} as any)
+const ProfileGroupsGroupIdModifyRoute =
+  ProfileGroupsGroupIdModifyRouteImport.update({
+    id: '/$groupId/modify',
+    path: '/$groupId/modify',
+    getParentRoute: () => ProfileGroupsRoute,
+  } as any)
+const ProfileEventsEventIdModifyRoute =
+  ProfileEventsEventIdModifyRouteImport.update({
+    id: '/$eventId/modify',
+    path: '/$eventId/modify',
+    getParentRoute: () => ProfileEventsRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
-  "/": typeof IndexRoute;
-  "/about": typeof AboutRoute;
-  "/clubs": typeof ClubsRouteWithChildren;
-  "/events": typeof EventsRouteWithChildren;
-  "/feed": typeof FeedRoute;
-  "/login": typeof LoginRoute;
-  "/signup": typeof SignupRoute;
-  "/tickets": typeof TicketsRoute;
-  "/tips": typeof TipsRouteWithChildren;
-  "/api/$": typeof ApiSplatRoute;
-  "/clubs/$clubId": typeof ClubsClubIdRoute;
-  "/demo/orpc-todo": typeof DemoOrpcTodoRoute;
-  "/demo/tanstack-query": typeof DemoTanstackQueryRoute;
-  "/events/$eventId": typeof EventsEventIdRoute;
-  "/events/new": typeof EventsNewRoute;
-  "/posts/new": typeof PostsNewRoute;
-  "/profile/edit": typeof ProfileEditRoute;
-  "/profile/events": typeof ProfileEventsRouteWithChildren;
-  "/profile/groups": typeof ProfileGroupsRouteWithChildren;
-  "/profile/tips": typeof ProfileTipsRouteWithChildren;
-  "/tips/$tipId": typeof TipsTipIdRoute;
-  "/tips/new": typeof TipsNewRoute;
-  "/clubs/": typeof ClubsIndexRoute;
-  "/profile/": typeof ProfileIndexRoute;
-  "/tips/": typeof TipsIndexRoute;
-  "/api/cognito/group": typeof ApiCognitoGroupRoute;
-  "/api/rpc/$": typeof ApiRpcSplatRoute;
-  "/demo/form/address": typeof DemoFormAddressRoute;
-  "/demo/form/simple": typeof DemoFormSimpleRoute;
-  "/posts/$postId/modify": typeof PostsPostIdModifyRoute;
-  "/profile/groups/new": typeof ProfileGroupsNewRoute;
-  "/profile/events/$eventId/modify": typeof ProfileEventsEventIdModifyRoute;
-  "/profile/groups/$groupId/modify": typeof ProfileGroupsGroupIdModifyRoute;
-  "/profile/tips/$tipId/modify": typeof ProfileTipsTipIdModifyRoute;
+  '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/clubs': typeof ClubsRouteWithChildren
+  '/events': typeof EventsRouteWithChildren
+  '/feed': typeof FeedRoute
+  '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
+  '/tickets': typeof TicketsRoute
+  '/tips': typeof TipsRouteWithChildren
+  '/api/$': typeof ApiSplatRoute
+  '/api/events': typeof ApiEventsRouteWithChildren
+  '/api/groups': typeof ApiGroupsRouteWithChildren
+  '/api/posts': typeof ApiPostsRouteWithChildren
+  '/api/tickets': typeof ApiTicketsRoute
+  '/api/tips': typeof ApiTipsRouteWithChildren
+  '/clubs/$clubId': typeof ClubsClubIdRoute
+  '/demo/orpc-todo': typeof DemoOrpcTodoRoute
+  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/events/$eventId': typeof EventsEventIdRoute
+  '/events/new': typeof EventsNewRoute
+  '/posts/new': typeof PostsNewRoute
+  '/profile/edit': typeof ProfileEditRoute
+  '/profile/events': typeof ProfileEventsRouteWithChildren
+  '/profile/groups': typeof ProfileGroupsRouteWithChildren
+  '/profile/tips': typeof ProfileTipsRouteWithChildren
+  '/tips/$tipId': typeof TipsTipIdRoute
+  '/tips/new': typeof TipsNewRoute
+  '/clubs/': typeof ClubsIndexRoute
+  '/profile/': typeof ProfileIndexRoute
+  '/tips/': typeof TipsIndexRoute
+  '/api/cognito/group': typeof ApiCognitoGroupRoute
+  '/api/events/$eventId': typeof ApiEventsEventIdRoute
+  '/api/groups/$groupId': typeof ApiGroupsGroupIdRoute
+  '/api/posts/$postId': typeof ApiPostsPostIdRoute
+  '/api/rpc/$': typeof ApiRpcSplatRoute
+  '/api/tips/$tipId': typeof ApiTipsTipIdRoute
+  '/demo/form/address': typeof DemoFormAddressRoute
+  '/demo/form/simple': typeof DemoFormSimpleRoute
+  '/posts/$postId/modify': typeof PostsPostIdModifyRoute
+  '/profile/groups/new': typeof ProfileGroupsNewRoute
+  '/profile/events/$eventId/modify': typeof ProfileEventsEventIdModifyRoute
+  '/profile/groups/$groupId/modify': typeof ProfileGroupsGroupIdModifyRoute
+  '/profile/tips/$tipId/modify': typeof ProfileTipsTipIdModifyRoute
 }
 export interface FileRoutesByTo {
-  "/": typeof IndexRoute;
-  "/about": typeof AboutRoute;
-  "/events": typeof EventsRouteWithChildren;
-  "/feed": typeof FeedRoute;
-  "/login": typeof LoginRoute;
-  "/signup": typeof SignupRoute;
-  "/tickets": typeof TicketsRoute;
-  "/api/$": typeof ApiSplatRoute;
-  "/clubs/$clubId": typeof ClubsClubIdRoute;
-  "/demo/orpc-todo": typeof DemoOrpcTodoRoute;
-  "/demo/tanstack-query": typeof DemoTanstackQueryRoute;
-  "/events/$eventId": typeof EventsEventIdRoute;
-  "/events/new": typeof EventsNewRoute;
-  "/posts/new": typeof PostsNewRoute;
-  "/profile/edit": typeof ProfileEditRoute;
-  "/profile/events": typeof ProfileEventsRouteWithChildren;
-  "/profile/groups": typeof ProfileGroupsRouteWithChildren;
-  "/profile/tips": typeof ProfileTipsRouteWithChildren;
-  "/tips/$tipId": typeof TipsTipIdRoute;
-  "/tips/new": typeof TipsNewRoute;
-  "/clubs": typeof ClubsIndexRoute;
-  "/profile": typeof ProfileIndexRoute;
-  "/tips": typeof TipsIndexRoute;
-  "/api/cognito/group": typeof ApiCognitoGroupRoute;
-  "/api/rpc/$": typeof ApiRpcSplatRoute;
-  "/demo/form/address": typeof DemoFormAddressRoute;
-  "/demo/form/simple": typeof DemoFormSimpleRoute;
-  "/posts/$postId/modify": typeof PostsPostIdModifyRoute;
-  "/profile/groups/new": typeof ProfileGroupsNewRoute;
-  "/profile/events/$eventId/modify": typeof ProfileEventsEventIdModifyRoute;
-  "/profile/groups/$groupId/modify": typeof ProfileGroupsGroupIdModifyRoute;
-  "/profile/tips/$tipId/modify": typeof ProfileTipsTipIdModifyRoute;
+  '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/events': typeof EventsRouteWithChildren
+  '/feed': typeof FeedRoute
+  '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
+  '/tickets': typeof TicketsRoute
+  '/api/$': typeof ApiSplatRoute
+  '/api/events': typeof ApiEventsRouteWithChildren
+  '/api/groups': typeof ApiGroupsRouteWithChildren
+  '/api/posts': typeof ApiPostsRouteWithChildren
+  '/api/tickets': typeof ApiTicketsRoute
+  '/api/tips': typeof ApiTipsRouteWithChildren
+  '/clubs/$clubId': typeof ClubsClubIdRoute
+  '/demo/orpc-todo': typeof DemoOrpcTodoRoute
+  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/events/$eventId': typeof EventsEventIdRoute
+  '/events/new': typeof EventsNewRoute
+  '/posts/new': typeof PostsNewRoute
+  '/profile/edit': typeof ProfileEditRoute
+  '/profile/events': typeof ProfileEventsRouteWithChildren
+  '/profile/groups': typeof ProfileGroupsRouteWithChildren
+  '/profile/tips': typeof ProfileTipsRouteWithChildren
+  '/tips/$tipId': typeof TipsTipIdRoute
+  '/tips/new': typeof TipsNewRoute
+  '/clubs': typeof ClubsIndexRoute
+  '/profile': typeof ProfileIndexRoute
+  '/tips': typeof TipsIndexRoute
+  '/api/cognito/group': typeof ApiCognitoGroupRoute
+  '/api/events/$eventId': typeof ApiEventsEventIdRoute
+  '/api/groups/$groupId': typeof ApiGroupsGroupIdRoute
+  '/api/posts/$postId': typeof ApiPostsPostIdRoute
+  '/api/rpc/$': typeof ApiRpcSplatRoute
+  '/api/tips/$tipId': typeof ApiTipsTipIdRoute
+  '/demo/form/address': typeof DemoFormAddressRoute
+  '/demo/form/simple': typeof DemoFormSimpleRoute
+  '/posts/$postId/modify': typeof PostsPostIdModifyRoute
+  '/profile/groups/new': typeof ProfileGroupsNewRoute
+  '/profile/events/$eventId/modify': typeof ProfileEventsEventIdModifyRoute
+  '/profile/groups/$groupId/modify': typeof ProfileGroupsGroupIdModifyRoute
+  '/profile/tips/$tipId/modify': typeof ProfileTipsTipIdModifyRoute
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport;
-  "/": typeof IndexRoute;
-  "/about": typeof AboutRoute;
-  "/clubs": typeof ClubsRouteWithChildren;
-  "/events": typeof EventsRouteWithChildren;
-  "/feed": typeof FeedRoute;
-  "/login": typeof LoginRoute;
-  "/signup": typeof SignupRoute;
-  "/tickets": typeof TicketsRoute;
-  "/tips": typeof TipsRouteWithChildren;
-  "/api/$": typeof ApiSplatRoute;
-  "/clubs/$clubId": typeof ClubsClubIdRoute;
-  "/demo/orpc-todo": typeof DemoOrpcTodoRoute;
-  "/demo/tanstack-query": typeof DemoTanstackQueryRoute;
-  "/events/$eventId": typeof EventsEventIdRoute;
-  "/events/new": typeof EventsNewRoute;
-  "/posts/new": typeof PostsNewRoute;
-  "/profile/edit": typeof ProfileEditRoute;
-  "/profile/events": typeof ProfileEventsRouteWithChildren;
-  "/profile/groups": typeof ProfileGroupsRouteWithChildren;
-  "/profile/tips": typeof ProfileTipsRouteWithChildren;
-  "/tips/$tipId": typeof TipsTipIdRoute;
-  "/tips/new": typeof TipsNewRoute;
-  "/clubs/": typeof ClubsIndexRoute;
-  "/profile/": typeof ProfileIndexRoute;
-  "/tips/": typeof TipsIndexRoute;
-  "/api/cognito/group": typeof ApiCognitoGroupRoute;
-  "/api/rpc/$": typeof ApiRpcSplatRoute;
-  "/demo/form/address": typeof DemoFormAddressRoute;
-  "/demo/form/simple": typeof DemoFormSimpleRoute;
-  "/posts/$postId/modify": typeof PostsPostIdModifyRoute;
-  "/profile/groups/new": typeof ProfileGroupsNewRoute;
-  "/profile/events/$eventId/modify": typeof ProfileEventsEventIdModifyRoute;
-  "/profile/groups/$groupId/modify": typeof ProfileGroupsGroupIdModifyRoute;
-  "/profile/tips/$tipId/modify": typeof ProfileTipsTipIdModifyRoute;
+  __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/clubs': typeof ClubsRouteWithChildren
+  '/events': typeof EventsRouteWithChildren
+  '/feed': typeof FeedRoute
+  '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
+  '/tickets': typeof TicketsRoute
+  '/tips': typeof TipsRouteWithChildren
+  '/api/$': typeof ApiSplatRoute
+  '/api/events': typeof ApiEventsRouteWithChildren
+  '/api/groups': typeof ApiGroupsRouteWithChildren
+  '/api/posts': typeof ApiPostsRouteWithChildren
+  '/api/tickets': typeof ApiTicketsRoute
+  '/api/tips': typeof ApiTipsRouteWithChildren
+  '/clubs/$clubId': typeof ClubsClubIdRoute
+  '/demo/orpc-todo': typeof DemoOrpcTodoRoute
+  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/events/$eventId': typeof EventsEventIdRoute
+  '/events/new': typeof EventsNewRoute
+  '/posts/new': typeof PostsNewRoute
+  '/profile/edit': typeof ProfileEditRoute
+  '/profile/events': typeof ProfileEventsRouteWithChildren
+  '/profile/groups': typeof ProfileGroupsRouteWithChildren
+  '/profile/tips': typeof ProfileTipsRouteWithChildren
+  '/tips/$tipId': typeof TipsTipIdRoute
+  '/tips/new': typeof TipsNewRoute
+  '/clubs/': typeof ClubsIndexRoute
+  '/profile/': typeof ProfileIndexRoute
+  '/tips/': typeof TipsIndexRoute
+  '/api/cognito/group': typeof ApiCognitoGroupRoute
+  '/api/events/$eventId': typeof ApiEventsEventIdRoute
+  '/api/groups/$groupId': typeof ApiGroupsGroupIdRoute
+  '/api/posts/$postId': typeof ApiPostsPostIdRoute
+  '/api/rpc/$': typeof ApiRpcSplatRoute
+  '/api/tips/$tipId': typeof ApiTipsTipIdRoute
+  '/demo/form/address': typeof DemoFormAddressRoute
+  '/demo/form/simple': typeof DemoFormSimpleRoute
+  '/posts/$postId/modify': typeof PostsPostIdModifyRoute
+  '/profile/groups/new': typeof ProfileGroupsNewRoute
+  '/profile/events/$eventId/modify': typeof ProfileEventsEventIdModifyRoute
+  '/profile/groups/$groupId/modify': typeof ProfileGroupsGroupIdModifyRoute
+  '/profile/tips/$tipId/modify': typeof ProfileTipsTipIdModifyRoute
 }
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath;
+  fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | "/"
-    | "/about"
-    | "/clubs"
-    | "/events"
-    | "/feed"
-    | "/login"
-    | "/signup"
-    | "/tickets"
-    | "/tips"
-    | "/api/$"
-    | "/clubs/$clubId"
-    | "/demo/orpc-todo"
-    | "/demo/tanstack-query"
-    | "/events/$eventId"
-    | "/events/new"
-    | "/posts/new"
-    | "/profile/edit"
-    | "/profile/events"
-    | "/profile/groups"
-    | "/profile/tips"
-    | "/tips/$tipId"
-    | "/tips/new"
-    | "/clubs/"
-    | "/profile/"
-    | "/tips/"
-    | "/api/cognito/group"
-    | "/api/rpc/$"
-    | "/demo/form/address"
-    | "/demo/form/simple"
-    | "/posts/$postId/modify"
-    | "/profile/groups/new"
-    | "/profile/events/$eventId/modify"
-    | "/profile/groups/$groupId/modify"
-    | "/profile/tips/$tipId/modify";
-  fileRoutesByTo: FileRoutesByTo;
+    | '/'
+    | '/about'
+    | '/clubs'
+    | '/events'
+    | '/feed'
+    | '/login'
+    | '/signup'
+    | '/tickets'
+    | '/tips'
+    | '/api/$'
+    | '/api/events'
+    | '/api/groups'
+    | '/api/posts'
+    | '/api/tickets'
+    | '/api/tips'
+    | '/clubs/$clubId'
+    | '/demo/orpc-todo'
+    | '/demo/tanstack-query'
+    | '/events/$eventId'
+    | '/events/new'
+    | '/posts/new'
+    | '/profile/edit'
+    | '/profile/events'
+    | '/profile/groups'
+    | '/profile/tips'
+    | '/tips/$tipId'
+    | '/tips/new'
+    | '/clubs/'
+    | '/profile/'
+    | '/tips/'
+    | '/api/cognito/group'
+    | '/api/events/$eventId'
+    | '/api/groups/$groupId'
+    | '/api/posts/$postId'
+    | '/api/rpc/$'
+    | '/api/tips/$tipId'
+    | '/demo/form/address'
+    | '/demo/form/simple'
+    | '/posts/$postId/modify'
+    | '/profile/groups/new'
+    | '/profile/events/$eventId/modify'
+    | '/profile/groups/$groupId/modify'
+    | '/profile/tips/$tipId/modify'
+  fileRoutesByTo: FileRoutesByTo
   to:
-    | "/"
-    | "/about"
-    | "/events"
-    | "/feed"
-    | "/login"
-    | "/signup"
-    | "/tickets"
-    | "/api/$"
-    | "/clubs/$clubId"
-    | "/demo/orpc-todo"
-    | "/demo/tanstack-query"
-    | "/events/$eventId"
-    | "/events/new"
-    | "/posts/new"
-    | "/profile/edit"
-    | "/profile/events"
-    | "/profile/groups"
-    | "/profile/tips"
-    | "/tips/$tipId"
-    | "/tips/new"
-    | "/clubs"
-    | "/profile"
-    | "/tips"
-    | "/api/cognito/group"
-    | "/api/rpc/$"
-    | "/demo/form/address"
-    | "/demo/form/simple"
-    | "/posts/$postId/modify"
-    | "/profile/groups/new"
-    | "/profile/events/$eventId/modify"
-    | "/profile/groups/$groupId/modify"
-    | "/profile/tips/$tipId/modify";
+    | '/'
+    | '/about'
+    | '/events'
+    | '/feed'
+    | '/login'
+    | '/signup'
+    | '/tickets'
+    | '/api/$'
+    | '/api/events'
+    | '/api/groups'
+    | '/api/posts'
+    | '/api/tickets'
+    | '/api/tips'
+    | '/clubs/$clubId'
+    | '/demo/orpc-todo'
+    | '/demo/tanstack-query'
+    | '/events/$eventId'
+    | '/events/new'
+    | '/posts/new'
+    | '/profile/edit'
+    | '/profile/events'
+    | '/profile/groups'
+    | '/profile/tips'
+    | '/tips/$tipId'
+    | '/tips/new'
+    | '/clubs'
+    | '/profile'
+    | '/tips'
+    | '/api/cognito/group'
+    | '/api/events/$eventId'
+    | '/api/groups/$groupId'
+    | '/api/posts/$postId'
+    | '/api/rpc/$'
+    | '/api/tips/$tipId'
+    | '/demo/form/address'
+    | '/demo/form/simple'
+    | '/posts/$postId/modify'
+    | '/profile/groups/new'
+    | '/profile/events/$eventId/modify'
+    | '/profile/groups/$groupId/modify'
+    | '/profile/tips/$tipId/modify'
   id:
-    | "__root__"
-    | "/"
-    | "/about"
-    | "/clubs"
-    | "/events"
-    | "/feed"
-    | "/login"
-    | "/signup"
-    | "/tickets"
-    | "/tips"
-    | "/api/$"
-    | "/clubs/$clubId"
-    | "/demo/orpc-todo"
-    | "/demo/tanstack-query"
-    | "/events/$eventId"
-    | "/events/new"
-    | "/posts/new"
-    | "/profile/edit"
-    | "/profile/events"
-    | "/profile/groups"
-    | "/profile/tips"
-    | "/tips/$tipId"
-    | "/tips/new"
-    | "/clubs/"
-    | "/profile/"
-    | "/tips/"
-    | "/api/cognito/group"
-    | "/api/rpc/$"
-    | "/demo/form/address"
-    | "/demo/form/simple"
-    | "/posts/$postId/modify"
-    | "/profile/groups/new"
-    | "/profile/events/$eventId/modify"
-    | "/profile/groups/$groupId/modify"
-    | "/profile/tips/$tipId/modify";
-  fileRoutesById: FileRoutesById;
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/clubs'
+    | '/events'
+    | '/feed'
+    | '/login'
+    | '/signup'
+    | '/tickets'
+    | '/tips'
+    | '/api/$'
+    | '/api/events'
+    | '/api/groups'
+    | '/api/posts'
+    | '/api/tickets'
+    | '/api/tips'
+    | '/clubs/$clubId'
+    | '/demo/orpc-todo'
+    | '/demo/tanstack-query'
+    | '/events/$eventId'
+    | '/events/new'
+    | '/posts/new'
+    | '/profile/edit'
+    | '/profile/events'
+    | '/profile/groups'
+    | '/profile/tips'
+    | '/tips/$tipId'
+    | '/tips/new'
+    | '/clubs/'
+    | '/profile/'
+    | '/tips/'
+    | '/api/cognito/group'
+    | '/api/events/$eventId'
+    | '/api/groups/$groupId'
+    | '/api/posts/$postId'
+    | '/api/rpc/$'
+    | '/api/tips/$tipId'
+    | '/demo/form/address'
+    | '/demo/form/simple'
+    | '/posts/$postId/modify'
+    | '/profile/groups/new'
+    | '/profile/events/$eventId/modify'
+    | '/profile/groups/$groupId/modify'
+    | '/profile/tips/$tipId/modify'
+  fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute;
-  AboutRoute: typeof AboutRoute;
-  ClubsRoute: typeof ClubsRouteWithChildren;
-  EventsRoute: typeof EventsRouteWithChildren;
-  FeedRoute: typeof FeedRoute;
-  LoginRoute: typeof LoginRoute;
-  SignupRoute: typeof SignupRoute;
-  TicketsRoute: typeof TicketsRoute;
-  TipsRoute: typeof TipsRouteWithChildren;
-  ApiSplatRoute: typeof ApiSplatRoute;
-  DemoOrpcTodoRoute: typeof DemoOrpcTodoRoute;
-  DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute;
-  PostsNewRoute: typeof PostsNewRoute;
-  ProfileEditRoute: typeof ProfileEditRoute;
-  ProfileEventsRoute: typeof ProfileEventsRouteWithChildren;
-  ProfileGroupsRoute: typeof ProfileGroupsRouteWithChildren;
-  ProfileTipsRoute: typeof ProfileTipsRouteWithChildren;
-  ProfileIndexRoute: typeof ProfileIndexRoute;
-  ApiCognitoGroupRoute: typeof ApiCognitoGroupRoute;
-  ApiRpcSplatRoute: typeof ApiRpcSplatRoute;
-  DemoFormAddressRoute: typeof DemoFormAddressRoute;
-  DemoFormSimpleRoute: typeof DemoFormSimpleRoute;
-  PostsPostIdModifyRoute: typeof PostsPostIdModifyRoute;
+  IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
+  ClubsRoute: typeof ClubsRouteWithChildren
+  EventsRoute: typeof EventsRouteWithChildren
+  FeedRoute: typeof FeedRoute
+  LoginRoute: typeof LoginRoute
+  SignupRoute: typeof SignupRoute
+  TicketsRoute: typeof TicketsRoute
+  TipsRoute: typeof TipsRouteWithChildren
+  ApiSplatRoute: typeof ApiSplatRoute
+  ApiEventsRoute: typeof ApiEventsRouteWithChildren
+  ApiGroupsRoute: typeof ApiGroupsRouteWithChildren
+  ApiPostsRoute: typeof ApiPostsRouteWithChildren
+  ApiTicketsRoute: typeof ApiTicketsRoute
+  ApiTipsRoute: typeof ApiTipsRouteWithChildren
+  DemoOrpcTodoRoute: typeof DemoOrpcTodoRoute
+  DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
+  PostsNewRoute: typeof PostsNewRoute
+  ProfileEditRoute: typeof ProfileEditRoute
+  ProfileEventsRoute: typeof ProfileEventsRouteWithChildren
+  ProfileGroupsRoute: typeof ProfileGroupsRouteWithChildren
+  ProfileTipsRoute: typeof ProfileTipsRouteWithChildren
+  ProfileIndexRoute: typeof ProfileIndexRoute
+  ApiCognitoGroupRoute: typeof ApiCognitoGroupRoute
+  ApiRpcSplatRoute: typeof ApiRpcSplatRoute
+  DemoFormAddressRoute: typeof DemoFormAddressRoute
+  DemoFormSimpleRoute: typeof DemoFormSimpleRoute
+  PostsPostIdModifyRoute: typeof PostsPostIdModifyRoute
 }
 
-declare module "@tanstack/react-router" {
+declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    "/tips": {
-      id: "/tips";
-      path: "/tips";
-      fullPath: "/tips";
-      preLoaderRoute: typeof TipsRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/tickets": {
-      id: "/tickets";
-      path: "/tickets";
-      fullPath: "/tickets";
-      preLoaderRoute: typeof TicketsRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/signup": {
-      id: "/signup";
-      path: "/signup";
-      fullPath: "/signup";
-      preLoaderRoute: typeof SignupRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/login": {
-      id: "/login";
-      path: "/login";
-      fullPath: "/login";
-      preLoaderRoute: typeof LoginRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/feed": {
-      id: "/feed";
-      path: "/feed";
-      fullPath: "/feed";
-      preLoaderRoute: typeof FeedRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/events": {
-      id: "/events";
-      path: "/events";
-      fullPath: "/events";
-      preLoaderRoute: typeof EventsRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/clubs": {
-      id: "/clubs";
-      path: "/clubs";
-      fullPath: "/clubs";
-      preLoaderRoute: typeof ClubsRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/about": {
-      id: "/about";
-      path: "/about";
-      fullPath: "/about";
-      preLoaderRoute: typeof AboutRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/": {
-      id: "/";
-      path: "/";
-      fullPath: "/";
-      preLoaderRoute: typeof IndexRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/tips/": {
-      id: "/tips/";
-      path: "/";
-      fullPath: "/tips/";
-      preLoaderRoute: typeof TipsIndexRouteImport;
-      parentRoute: typeof TipsRoute;
-    };
-    "/profile/": {
-      id: "/profile/";
-      path: "/profile";
-      fullPath: "/profile/";
-      preLoaderRoute: typeof ProfileIndexRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/clubs/": {
-      id: "/clubs/";
-      path: "/";
-      fullPath: "/clubs/";
-      preLoaderRoute: typeof ClubsIndexRouteImport;
-      parentRoute: typeof ClubsRoute;
-    };
-    "/tips/new": {
-      id: "/tips/new";
-      path: "/new";
-      fullPath: "/tips/new";
-      preLoaderRoute: typeof TipsNewRouteImport;
-      parentRoute: typeof TipsRoute;
-    };
-    "/tips/$tipId": {
-      id: "/tips/$tipId";
-      path: "/$tipId";
-      fullPath: "/tips/$tipId";
-      preLoaderRoute: typeof TipsTipIdRouteImport;
-      parentRoute: typeof TipsRoute;
-    };
-    "/profile/tips": {
-      id: "/profile/tips";
-      path: "/profile/tips";
-      fullPath: "/profile/tips";
-      preLoaderRoute: typeof ProfileTipsRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/profile/groups": {
-      id: "/profile/groups";
-      path: "/profile/groups";
-      fullPath: "/profile/groups";
-      preLoaderRoute: typeof ProfileGroupsRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/profile/events": {
-      id: "/profile/events";
-      path: "/profile/events";
-      fullPath: "/profile/events";
-      preLoaderRoute: typeof ProfileEventsRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/profile/edit": {
-      id: "/profile/edit";
-      path: "/profile/edit";
-      fullPath: "/profile/edit";
-      preLoaderRoute: typeof ProfileEditRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/posts/new": {
-      id: "/posts/new";
-      path: "/posts/new";
-      fullPath: "/posts/new";
-      preLoaderRoute: typeof PostsNewRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/events/new": {
-      id: "/events/new";
-      path: "/new";
-      fullPath: "/events/new";
-      preLoaderRoute: typeof EventsNewRouteImport;
-      parentRoute: typeof EventsRoute;
-    };
-    "/events/$eventId": {
-      id: "/events/$eventId";
-      path: "/$eventId";
-      fullPath: "/events/$eventId";
-      preLoaderRoute: typeof EventsEventIdRouteImport;
-      parentRoute: typeof EventsRoute;
-    };
-    "/demo/tanstack-query": {
-      id: "/demo/tanstack-query";
-      path: "/demo/tanstack-query";
-      fullPath: "/demo/tanstack-query";
-      preLoaderRoute: typeof DemoTanstackQueryRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/demo/orpc-todo": {
-      id: "/demo/orpc-todo";
-      path: "/demo/orpc-todo";
-      fullPath: "/demo/orpc-todo";
-      preLoaderRoute: typeof DemoOrpcTodoRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/clubs/$clubId": {
-      id: "/clubs/$clubId";
-      path: "/$clubId";
-      fullPath: "/clubs/$clubId";
-      preLoaderRoute: typeof ClubsClubIdRouteImport;
-      parentRoute: typeof ClubsRoute;
-    };
-    "/api/$": {
-      id: "/api/$";
-      path: "/api/$";
-      fullPath: "/api/$";
-      preLoaderRoute: typeof ApiSplatRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/profile/groups/new": {
-      id: "/profile/groups/new";
-      path: "/new";
-      fullPath: "/profile/groups/new";
-      preLoaderRoute: typeof ProfileGroupsNewRouteImport;
-      parentRoute: typeof ProfileGroupsRoute;
-    };
-    "/posts/$postId/modify": {
-      id: "/posts/$postId/modify";
-      path: "/posts/$postId/modify";
-      fullPath: "/posts/$postId/modify";
-      preLoaderRoute: typeof PostsPostIdModifyRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/demo/form/simple": {
-      id: "/demo/form/simple";
-      path: "/demo/form/simple";
-      fullPath: "/demo/form/simple";
-      preLoaderRoute: typeof DemoFormSimpleRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/demo/form/address": {
-      id: "/demo/form/address";
-      path: "/demo/form/address";
-      fullPath: "/demo/form/address";
-      preLoaderRoute: typeof DemoFormAddressRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/api/rpc/$": {
-      id: "/api/rpc/$";
-      path: "/api/rpc/$";
-      fullPath: "/api/rpc/$";
-      preLoaderRoute: typeof ApiRpcSplatRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/api/cognito/group": {
-      id: "/api/cognito/group";
-      path: "/api/cognito/group";
-      fullPath: "/api/cognito/group";
-      preLoaderRoute: typeof ApiCognitoGroupRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/profile/tips/$tipId/modify": {
-      id: "/profile/tips/$tipId/modify";
-      path: "/$tipId/modify";
-      fullPath: "/profile/tips/$tipId/modify";
-      preLoaderRoute: typeof ProfileTipsTipIdModifyRouteImport;
-      parentRoute: typeof ProfileTipsRoute;
-    };
-    "/profile/groups/$groupId/modify": {
-      id: "/profile/groups/$groupId/modify";
-      path: "/$groupId/modify";
-      fullPath: "/profile/groups/$groupId/modify";
-      preLoaderRoute: typeof ProfileGroupsGroupIdModifyRouteImport;
-      parentRoute: typeof ProfileGroupsRoute;
-    };
-    "/profile/events/$eventId/modify": {
-      id: "/profile/events/$eventId/modify";
-      path: "/$eventId/modify";
-      fullPath: "/profile/events/$eventId/modify";
-      preLoaderRoute: typeof ProfileEventsEventIdModifyRouteImport;
-      parentRoute: typeof ProfileEventsRoute;
-    };
+    '/tips': {
+      id: '/tips'
+      path: '/tips'
+      fullPath: '/tips'
+      preLoaderRoute: typeof TipsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tickets': {
+      id: '/tickets'
+      path: '/tickets'
+      fullPath: '/tickets'
+      preLoaderRoute: typeof TicketsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/feed': {
+      id: '/feed'
+      path: '/feed'
+      fullPath: '/feed'
+      preLoaderRoute: typeof FeedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/events': {
+      id: '/events'
+      path: '/events'
+      fullPath: '/events'
+      preLoaderRoute: typeof EventsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/clubs': {
+      id: '/clubs'
+      path: '/clubs'
+      fullPath: '/clubs'
+      preLoaderRoute: typeof ClubsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tips/': {
+      id: '/tips/'
+      path: '/'
+      fullPath: '/tips/'
+      preLoaderRoute: typeof TipsIndexRouteImport
+      parentRoute: typeof TipsRoute
+    }
+    '/profile/': {
+      id: '/profile/'
+      path: '/profile'
+      fullPath: '/profile/'
+      preLoaderRoute: typeof ProfileIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/clubs/': {
+      id: '/clubs/'
+      path: '/'
+      fullPath: '/clubs/'
+      preLoaderRoute: typeof ClubsIndexRouteImport
+      parentRoute: typeof ClubsRoute
+    }
+    '/tips/new': {
+      id: '/tips/new'
+      path: '/new'
+      fullPath: '/tips/new'
+      preLoaderRoute: typeof TipsNewRouteImport
+      parentRoute: typeof TipsRoute
+    }
+    '/tips/$tipId': {
+      id: '/tips/$tipId'
+      path: '/$tipId'
+      fullPath: '/tips/$tipId'
+      preLoaderRoute: typeof TipsTipIdRouteImport
+      parentRoute: typeof TipsRoute
+    }
+    '/profile/tips': {
+      id: '/profile/tips'
+      path: '/profile/tips'
+      fullPath: '/profile/tips'
+      preLoaderRoute: typeof ProfileTipsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile/groups': {
+      id: '/profile/groups'
+      path: '/profile/groups'
+      fullPath: '/profile/groups'
+      preLoaderRoute: typeof ProfileGroupsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile/events': {
+      id: '/profile/events'
+      path: '/profile/events'
+      fullPath: '/profile/events'
+      preLoaderRoute: typeof ProfileEventsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile/edit': {
+      id: '/profile/edit'
+      path: '/profile/edit'
+      fullPath: '/profile/edit'
+      preLoaderRoute: typeof ProfileEditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/posts/new': {
+      id: '/posts/new'
+      path: '/posts/new'
+      fullPath: '/posts/new'
+      preLoaderRoute: typeof PostsNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/events/new': {
+      id: '/events/new'
+      path: '/new'
+      fullPath: '/events/new'
+      preLoaderRoute: typeof EventsNewRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/events/$eventId': {
+      id: '/events/$eventId'
+      path: '/$eventId'
+      fullPath: '/events/$eventId'
+      preLoaderRoute: typeof EventsEventIdRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/demo/tanstack-query': {
+      id: '/demo/tanstack-query'
+      path: '/demo/tanstack-query'
+      fullPath: '/demo/tanstack-query'
+      preLoaderRoute: typeof DemoTanstackQueryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/orpc-todo': {
+      id: '/demo/orpc-todo'
+      path: '/demo/orpc-todo'
+      fullPath: '/demo/orpc-todo'
+      preLoaderRoute: typeof DemoOrpcTodoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/clubs/$clubId': {
+      id: '/clubs/$clubId'
+      path: '/$clubId'
+      fullPath: '/clubs/$clubId'
+      preLoaderRoute: typeof ClubsClubIdRouteImport
+      parentRoute: typeof ClubsRoute
+    }
+    '/api/tips': {
+      id: '/api/tips'
+      path: '/api/tips'
+      fullPath: '/api/tips'
+      preLoaderRoute: typeof ApiTipsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/tickets': {
+      id: '/api/tickets'
+      path: '/api/tickets'
+      fullPath: '/api/tickets'
+      preLoaderRoute: typeof ApiTicketsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/posts': {
+      id: '/api/posts'
+      path: '/api/posts'
+      fullPath: '/api/posts'
+      preLoaderRoute: typeof ApiPostsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/groups': {
+      id: '/api/groups'
+      path: '/api/groups'
+      fullPath: '/api/groups'
+      preLoaderRoute: typeof ApiGroupsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/events': {
+      id: '/api/events'
+      path: '/api/events'
+      fullPath: '/api/events'
+      preLoaderRoute: typeof ApiEventsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$': {
+      id: '/api/$'
+      path: '/api/$'
+      fullPath: '/api/$'
+      preLoaderRoute: typeof ApiSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile/groups/new': {
+      id: '/profile/groups/new'
+      path: '/new'
+      fullPath: '/profile/groups/new'
+      preLoaderRoute: typeof ProfileGroupsNewRouteImport
+      parentRoute: typeof ProfileGroupsRoute
+    }
+    '/posts/$postId/modify': {
+      id: '/posts/$postId/modify'
+      path: '/posts/$postId/modify'
+      fullPath: '/posts/$postId/modify'
+      preLoaderRoute: typeof PostsPostIdModifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/form/simple': {
+      id: '/demo/form/simple'
+      path: '/demo/form/simple'
+      fullPath: '/demo/form/simple'
+      preLoaderRoute: typeof DemoFormSimpleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/form/address': {
+      id: '/demo/form/address'
+      path: '/demo/form/address'
+      fullPath: '/demo/form/address'
+      preLoaderRoute: typeof DemoFormAddressRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/tips/$tipId': {
+      id: '/api/tips/$tipId'
+      path: '/$tipId'
+      fullPath: '/api/tips/$tipId'
+      preLoaderRoute: typeof ApiTipsTipIdRouteImport
+      parentRoute: typeof ApiTipsRoute
+    }
+    '/api/rpc/$': {
+      id: '/api/rpc/$'
+      path: '/api/rpc/$'
+      fullPath: '/api/rpc/$'
+      preLoaderRoute: typeof ApiRpcSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/posts/$postId': {
+      id: '/api/posts/$postId'
+      path: '/$postId'
+      fullPath: '/api/posts/$postId'
+      preLoaderRoute: typeof ApiPostsPostIdRouteImport
+      parentRoute: typeof ApiPostsRoute
+    }
+    '/api/groups/$groupId': {
+      id: '/api/groups/$groupId'
+      path: '/$groupId'
+      fullPath: '/api/groups/$groupId'
+      preLoaderRoute: typeof ApiGroupsGroupIdRouteImport
+      parentRoute: typeof ApiGroupsRoute
+    }
+    '/api/events/$eventId': {
+      id: '/api/events/$eventId'
+      path: '/$eventId'
+      fullPath: '/api/events/$eventId'
+      preLoaderRoute: typeof ApiEventsEventIdRouteImport
+      parentRoute: typeof ApiEventsRoute
+    }
+    '/api/cognito/group': {
+      id: '/api/cognito/group'
+      path: '/api/cognito/group'
+      fullPath: '/api/cognito/group'
+      preLoaderRoute: typeof ApiCognitoGroupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile/tips/$tipId/modify': {
+      id: '/profile/tips/$tipId/modify'
+      path: '/$tipId/modify'
+      fullPath: '/profile/tips/$tipId/modify'
+      preLoaderRoute: typeof ProfileTipsTipIdModifyRouteImport
+      parentRoute: typeof ProfileTipsRoute
+    }
+    '/profile/groups/$groupId/modify': {
+      id: '/profile/groups/$groupId/modify'
+      path: '/$groupId/modify'
+      fullPath: '/profile/groups/$groupId/modify'
+      preLoaderRoute: typeof ProfileGroupsGroupIdModifyRouteImport
+      parentRoute: typeof ProfileGroupsRoute
+    }
+    '/profile/events/$eventId/modify': {
+      id: '/profile/events/$eventId/modify'
+      path: '/$eventId/modify'
+      fullPath: '/profile/events/$eventId/modify'
+      preLoaderRoute: typeof ProfileEventsEventIdModifyRouteImport
+      parentRoute: typeof ProfileEventsRoute
+    }
   }
 }
 
 interface ClubsRouteChildren {
-  ClubsClubIdRoute: typeof ClubsClubIdRoute;
-  ClubsIndexRoute: typeof ClubsIndexRoute;
+  ClubsClubIdRoute: typeof ClubsClubIdRoute
+  ClubsIndexRoute: typeof ClubsIndexRoute
 }
 
 const ClubsRouteChildren: ClubsRouteChildren = {
   ClubsClubIdRoute: ClubsClubIdRoute,
   ClubsIndexRoute: ClubsIndexRoute,
-};
+}
 
-const ClubsRouteWithChildren = ClubsRoute._addFileChildren(ClubsRouteChildren);
+const ClubsRouteWithChildren = ClubsRoute._addFileChildren(ClubsRouteChildren)
 
 interface EventsRouteChildren {
-  EventsEventIdRoute: typeof EventsEventIdRoute;
-  EventsNewRoute: typeof EventsNewRoute;
+  EventsEventIdRoute: typeof EventsEventIdRoute
+  EventsNewRoute: typeof EventsNewRoute
 }
 
 const EventsRouteChildren: EventsRouteChildren = {
   EventsEventIdRoute: EventsEventIdRoute,
   EventsNewRoute: EventsNewRoute,
-};
+}
 
-const EventsRouteWithChildren = EventsRoute._addFileChildren(EventsRouteChildren);
+const EventsRouteWithChildren =
+  EventsRoute._addFileChildren(EventsRouteChildren)
 
 interface TipsRouteChildren {
-  TipsTipIdRoute: typeof TipsTipIdRoute;
-  TipsNewRoute: typeof TipsNewRoute;
-  TipsIndexRoute: typeof TipsIndexRoute;
+  TipsTipIdRoute: typeof TipsTipIdRoute
+  TipsNewRoute: typeof TipsNewRoute
+  TipsIndexRoute: typeof TipsIndexRoute
 }
 
 const TipsRouteChildren: TipsRouteChildren = {
   TipsTipIdRoute: TipsTipIdRoute,
   TipsNewRoute: TipsNewRoute,
   TipsIndexRoute: TipsIndexRoute,
-};
+}
 
-const TipsRouteWithChildren = TipsRoute._addFileChildren(TipsRouteChildren);
+const TipsRouteWithChildren = TipsRoute._addFileChildren(TipsRouteChildren)
+
+interface ApiEventsRouteChildren {
+  ApiEventsEventIdRoute: typeof ApiEventsEventIdRoute
+}
+
+const ApiEventsRouteChildren: ApiEventsRouteChildren = {
+  ApiEventsEventIdRoute: ApiEventsEventIdRoute,
+}
+
+const ApiEventsRouteWithChildren = ApiEventsRoute._addFileChildren(
+  ApiEventsRouteChildren,
+)
+
+interface ApiGroupsRouteChildren {
+  ApiGroupsGroupIdRoute: typeof ApiGroupsGroupIdRoute
+}
+
+const ApiGroupsRouteChildren: ApiGroupsRouteChildren = {
+  ApiGroupsGroupIdRoute: ApiGroupsGroupIdRoute,
+}
+
+const ApiGroupsRouteWithChildren = ApiGroupsRoute._addFileChildren(
+  ApiGroupsRouteChildren,
+)
+
+interface ApiPostsRouteChildren {
+  ApiPostsPostIdRoute: typeof ApiPostsPostIdRoute
+}
+
+const ApiPostsRouteChildren: ApiPostsRouteChildren = {
+  ApiPostsPostIdRoute: ApiPostsPostIdRoute,
+}
+
+const ApiPostsRouteWithChildren = ApiPostsRoute._addFileChildren(
+  ApiPostsRouteChildren,
+)
+
+interface ApiTipsRouteChildren {
+  ApiTipsTipIdRoute: typeof ApiTipsTipIdRoute
+}
+
+const ApiTipsRouteChildren: ApiTipsRouteChildren = {
+  ApiTipsTipIdRoute: ApiTipsTipIdRoute,
+}
+
+const ApiTipsRouteWithChildren =
+  ApiTipsRoute._addFileChildren(ApiTipsRouteChildren)
 
 interface ProfileEventsRouteChildren {
-  ProfileEventsEventIdModifyRoute: typeof ProfileEventsEventIdModifyRoute;
+  ProfileEventsEventIdModifyRoute: typeof ProfileEventsEventIdModifyRoute
 }
 
 const ProfileEventsRouteChildren: ProfileEventsRouteChildren = {
   ProfileEventsEventIdModifyRoute: ProfileEventsEventIdModifyRoute,
-};
+}
 
 const ProfileEventsRouteWithChildren = ProfileEventsRoute._addFileChildren(
   ProfileEventsRouteChildren,
-);
+)
 
 interface ProfileGroupsRouteChildren {
-  ProfileGroupsNewRoute: typeof ProfileGroupsNewRoute;
-  ProfileGroupsGroupIdModifyRoute: typeof ProfileGroupsGroupIdModifyRoute;
+  ProfileGroupsNewRoute: typeof ProfileGroupsNewRoute
+  ProfileGroupsGroupIdModifyRoute: typeof ProfileGroupsGroupIdModifyRoute
 }
 
 const ProfileGroupsRouteChildren: ProfileGroupsRouteChildren = {
   ProfileGroupsNewRoute: ProfileGroupsNewRoute,
   ProfileGroupsGroupIdModifyRoute: ProfileGroupsGroupIdModifyRoute,
-};
+}
 
 const ProfileGroupsRouteWithChildren = ProfileGroupsRoute._addFileChildren(
   ProfileGroupsRouteChildren,
-);
+)
 
 interface ProfileTipsRouteChildren {
-  ProfileTipsTipIdModifyRoute: typeof ProfileTipsTipIdModifyRoute;
+  ProfileTipsTipIdModifyRoute: typeof ProfileTipsTipIdModifyRoute
 }
 
 const ProfileTipsRouteChildren: ProfileTipsRouteChildren = {
   ProfileTipsTipIdModifyRoute: ProfileTipsTipIdModifyRoute,
-};
+}
 
-const ProfileTipsRouteWithChildren = ProfileTipsRoute._addFileChildren(ProfileTipsRouteChildren);
+const ProfileTipsRouteWithChildren = ProfileTipsRoute._addFileChildren(
+  ProfileTipsRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -785,6 +1013,11 @@ const rootRouteChildren: RootRouteChildren = {
   TicketsRoute: TicketsRoute,
   TipsRoute: TipsRouteWithChildren,
   ApiSplatRoute: ApiSplatRoute,
+  ApiEventsRoute: ApiEventsRouteWithChildren,
+  ApiGroupsRoute: ApiGroupsRouteWithChildren,
+  ApiPostsRoute: ApiPostsRouteWithChildren,
+  ApiTicketsRoute: ApiTicketsRoute,
+  ApiTipsRoute: ApiTipsRouteWithChildren,
   DemoOrpcTodoRoute: DemoOrpcTodoRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
   PostsNewRoute: PostsNewRoute,
@@ -798,16 +1031,16 @@ const rootRouteChildren: RootRouteChildren = {
   DemoFormAddressRoute: DemoFormAddressRoute,
   DemoFormSimpleRoute: DemoFormSimpleRoute,
   PostsPostIdModifyRoute: PostsPostIdModifyRoute,
-};
+}
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>();
+  ._addFileTypes<FileRouteTypes>()
 
-import type { getRouter } from "./router.tsx";
-import type { createStart } from "@tanstack/react-start";
-declare module "@tanstack/react-start" {
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
   interface Register {
-    ssr: true;
-    router: Awaited<ReturnType<typeof getRouter>>;
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
   }
 }

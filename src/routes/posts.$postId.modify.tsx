@@ -8,16 +8,14 @@ import { toast } from "../lib/toast";
 type ContentBlock = { type: "text" | "image"; value: string };
 
 export const Route = createFileRoute("/posts/$postId/modify")({
-  beforeLoad: async () => {
-    try {
-      await getServices().authService.getCurrentUser();
-    } catch {
+  beforeLoad: () => {
+    if (typeof window !== "undefined" && !localStorage.getItem("eat_user_profile")) {
       throw redirect({ to: "/login" });
     }
   },
   component: PostEditRoute,
   loader: async ({ params }) => {
-    const post = await getServices().postService.getById(params.postId);
+    const post = await (await getServices()).postService.getById(params.postId);
     if (!post) throw new Error("Post not found");
     return { post };
   },
@@ -38,9 +36,10 @@ function PostEditRoute() {
     if (!hasText) return;
     setSubmitting(true);
 
-    await getServices().postService.update(post.id, { content: filledContent } as any);
+    await (await getServices()).postService.update(post.id, { content: filledContent } as any);
     setSubmitting(false);
     toast("Post updated");
+    window.dispatchEvent(new Event("data-changed"));
     navigate({ to: "/feed" });
   };
 
@@ -79,7 +78,7 @@ function PostEditRoute() {
           <div>
             <div className="flex items-center justify-between mb-2.5">
               <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-                Content
+                Content <span className="text-red-500">*</span>
               </label>
               <div className="flex gap-2">
                 <button
@@ -107,7 +106,7 @@ function PostEditRoute() {
                     <textarea
                       value={block.value}
                       onChange={(e) => updateContentBlock(idx, e.target.value)}
-                      placeholder="Write your post..."
+                      placeholder="Écrivez votre message..."
                       rows={4}
                       className="flex-1 px-4 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-[var(--ember)]/30 transition-shadow resize-none"
                     />

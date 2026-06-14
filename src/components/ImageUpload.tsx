@@ -1,5 +1,5 @@
-import { useRef } from "react";
-import { Upload, X } from "lucide-react";
+import { useRef, useState } from "react";
+import { Upload, X, Loader2 } from "lucide-react";
 
 export default function ImageUpload({
   value,
@@ -13,13 +13,47 @@ export default function ImageUpload({
   compact?: boolean;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
 
-  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => onChange(reader.result as string);
-    reader.readAsDataURL(file);
+
+    setUploading(true);
+    try {
+      const reader = new FileReader();
+      const base64 = await new Promise<string>((resolve, reject) => {
+        reader.onload = () => {
+          const result = reader.result as string;
+          const data = result.split(",")[1];
+          resolve(data);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          file: base64,
+          filename: file.name,
+          contentType: file.type,
+        }),
+      });
+
+      if (!res.ok) throw new Error("Upload failed");
+
+      const { url } = await res.json();
+      onChange(url);
+    } catch (err) {
+      console.error("[ImageUpload] Failed:", err);
+      const reader = new FileReader();
+      reader.onload = () => onChange(reader.result as string);
+      reader.readAsDataURL(file);
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleRemove = () => {
@@ -50,13 +84,23 @@ export default function ImageUpload({
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
+          disabled={uploading}
           className={`w-full rounded-2xl border-2 border-dashed border-zinc-300 dark:border-zinc-700 flex flex-col items-center justify-center gap-2 hover:border-[var(--ember)]/50 hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-all ${
             compact ? "h-32" : "h-48"
           }`}
         >
-          <Upload className="w-6 h-6 text-zinc-400" />
-          <span className="text-sm text-zinc-500 font-medium">Click to upload</span>
-          <span className="text-[11px] text-zinc-400">PNG, JPG, WebP</span>
+          {uploading ? (
+            <>
+              <Loader2 className="w-6 h-6 text-[var(--ember)] animate-spin" />
+              <span className="text-sm text-[var(--ember)] font-medium">Uploading...</span>
+            </>
+          ) : (
+            <>
+              <Upload className="w-6 h-6 text-zinc-400" />
+              <span className="text-sm text-zinc-500 font-medium">Click to upload</span>
+              <span className="text-[11px] text-zinc-400">PNG, JPG, WebP</span>
+            </>
+          )}
         </button>
       )}
     </div>

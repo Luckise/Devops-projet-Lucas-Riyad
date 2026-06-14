@@ -1,17 +1,25 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
-import { getAllClubs } from "../lib/groups";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { getServices } from "../di/container";
 import { Search, X, Users } from "lucide-react";
-import type { Group } from "../lib/groups";
+import type { Group } from "../types/models";
 
 export const Route = createFileRoute("/clubs/")({
+  beforeLoad: () => {
+    if (typeof window !== "undefined" && !localStorage.getItem("eat_user_profile")) {
+      throw redirect({ to: "/login" });
+    }
+  },
   component: ClubsRoute,
 });
 
 function ClubsRoute() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [clubs, setClubs] = useState<Group[]>([]);
 
-  const clubs: Group[] = getAllClubs().filter((c) => c.image);
+  useEffect(() => {
+    getServices().then((svc) => svc.groupService.getAllClubs().then(setClubs));
+  }, []);
 
   const filtered = searchQuery
     ? clubs.filter((c) => c.name.toLowerCase().includes(searchQuery.toLowerCase()))

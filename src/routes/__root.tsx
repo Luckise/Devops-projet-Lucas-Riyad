@@ -4,7 +4,7 @@ import BottomNav from "../components/BottomNav";
 import Header from "../components/Header";
 import CreateFAB from "../components/CreateFAB";
 
-import "../lib/amplify";
+import "../lib/cognito";
 import "../styles.css";
 
 import type { QueryClient } from "@tanstack/react-query";

@@ -1,24 +1,21 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
 import { getServices } from "../di/container";
 import { formatDate, formatTime, isEventPast } from "../lib/date-utils";
-import {
-  ArrowLeft,
-  Calendar,
-  Clock,
-  MapPin,
-  Ticket,
-  CheckCircle2,
-  Users,
-  XCircle,
-} from "lucide-react";
+import { ArrowLeft, Calendar, Clock, MapPin, Ticket, CheckCircle2, XCircle } from "lucide-react";
 import { useState } from "react";
 import SaveButton from "../components/SaveButton";
 import { toast } from "../lib/toast";
+import { useUser } from "../hooks/use-user";
 
 export const Route = createFileRoute("/events/$eventId")({
+  beforeLoad: () => {
+    if (typeof window !== "undefined" && !localStorage.getItem("eat_user_profile")) {
+      throw redirect({ to: "/login" });
+    }
+  },
   component: EventDetailsRoute,
   loader: async ({ params }) => {
-    const event = await getServices().eventService.findEvent(params.eventId);
+    const event = await (await getServices()).eventService.findEvent(params.eventId);
     if (!event) throw new Error("Event not found");
     return { event };
   },
@@ -27,46 +24,56 @@ export const Route = createFileRoute("/events/$eventId")({
 function EventDetailsRoute() {
   const { event } = Route.useLoaderData();
   const navigate = useNavigate();
+  const { user } = useUser();
   const [joined, setJoined] = useState(event.joined);
+  const [attendees, setAttendees] = useState<string[]>(event.attendees || []);
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
 
+  const userEmail =
+    user.email ||
+    (() => {
+      try {
+        const saved = localStorage.getItem("eat_user_profile");
+        return saved ? JSON.parse(saved).email : "";
+      } catch {
+        return "";
+      }
+    })();
+
   const eventPast = isEventPast(event);
   const isEventFull = event.maxParticipants > 0 && joined >= event.maxParticipants;
+  const hasJoined = userEmail ? attendees.includes(userEmail) : false;
 
   const handleJoin = async () => {
-    try {
-      await getServices().authService.getCurrentUser();
-    } catch {
+    if (!userEmail) {
       navigate({ to: "/login" });
       return;
     }
-    if (isEventFull) return;
+    if (isEventFull || hasJoined) return;
     setIsProcessing(true);
-
-    const profile =
-      typeof window !== "undefined"
-        ? JSON.parse(localStorage.getItem("eat_user_profile") || "{}")
-        : {};
 
     await new Promise((resolve) => setTimeout(resolve, 1500));
 
+    const newAttendees = [...attendees, userEmail];
     const newJoined = joined + 1;
+    setAttendees(newAttendees);
     setJoined(newJoined);
 
-    const services = getServices();
+    const services = await getServices();
     await services.eventService.update(event.id, {
       joined: newJoined,
-      attendees: [...(event.attendees || []), profile.email].filter(Boolean),
+      attendees: newAttendees,
     } as any);
 
-    await services.ticketService.create(event, profile);
+    await services.ticketService.create(event, user);
 
     if (event.price > 0) {
       window.open("https://www.helloasso.com/", "_blank");
       setPaymentSuccess(true);
       setIsProcessing(false);
       toast("Redirected to HelloAsso for payment");
+      window.dispatchEvent(new Event("data-changed"));
 
       setTimeout(() => {
         navigate({ to: "/tickets" });
@@ -74,6 +81,7 @@ function EventDetailsRoute() {
     } else {
       setIsProcessing(false);
       toast("You joined! Ticket generated.");
+      window.dispatchEvent(new Event("data-changed"));
       navigate({ to: "/tickets" });
     }
   };
@@ -194,10 +202,15 @@ function EventDetailsRoute() {
               )}
             </div>
 
-            {isEventFull ? (
+            {isEventFull && !hasJoined ? (
               <div className="flex-1 flex items-center justify-center gap-2 py-4 px-6 rounded-full font-bold text-[15px] bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-900/50">
                 <XCircle className="w-5 h-5" />
                 <span>Event Full</span>
+              </div>
+            ) : hasJoined ? (
+              <div className="flex-1 flex items-center justify-center gap-2 py-4 px-6 rounded-full font-bold text-[15px] bg-green-500 text-white">
+                <CheckCircle2 className="w-5 h-5" />
+                <span>Joined</span>
               </div>
             ) : (
               <button

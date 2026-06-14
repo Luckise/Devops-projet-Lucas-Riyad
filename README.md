@@ -2,7 +2,7 @@
 
 Projet d'infrastructure et déploiement — 4e année EFREI.
 
-On déploie une app TanStack Start (full-stack SSR) sur 2 EC2 derrière un ALB, avec RDS PostgreSQL, Cognito pour l'auth, S3 pour les assets et backups, le tout provisionné en Terraform, configuré avec Ansible et livré en CI/CD via GitHub Actions.
+On déploie une app TanStack Start (full-stack SSR) sur 2 EC2 derrière un ALB, avec RDS PostgreSQL, Cognito pour l'auth, S3 pour les assets et backups, le tout provisionné en Terraform, configuré avec Ansible et livré en CI/CD via GitHub Actions. HTTPS via DuckDNS + certificat ACM (gratuit).
 
 ---
 
@@ -27,7 +27,7 @@ On déploie une app TanStack Start (full-stack SSR) sur 2 EC2 derrière un ALB, 
 
 ## Pré-requis
 
-- **AWS account** avec les permissions pour créer VPC, EC2, RDS, ALB, S3, Cognito, ECR, Route 53
+- **AWS account** avec les permissions pour créer VPC, EC2, RDS, ALB, S3, Cognito, ECR
 - **Terraform** ≥ 1.6
 - **Ansible** ≥ 2.15
 - **Python 3** + `molecule` et `docker` (pour les tests)
@@ -43,10 +43,10 @@ On déploie une app TanStack Start (full-stack SSR) sur 2 EC2 derrière un ALB, 
 ```
                           Internet
                              |
-                      [Route 53]
-                     app-lucas-riyad.com
+                       [DuckDNS]
+                    app-lucas.duckdns.org
                              |
-                          [ALB] (port 443 HTTPS → redirige 80→443)
+                           [ALB] (port 443 HTTPS → redirige 80→443)
                          /        \
                    [EC2 app]    [EC2 app]        ← N=2, port 3000, Docker
                         |            |
@@ -59,7 +59,7 @@ On déploie une app TanStack Start (full-stack SSR) sur 2 EC2 derrière un ALB, 
   [Cognito]                    ← auth gérée par AWS
   [S3 assets]                  ← uploads de l'application
   [ECR]                        ← registry Docker
-  [Route 53]                   ← DNS : app-lucas-riyad.com
+  [DuckDNS]                    ← DNS gratuit : app-lucas.duckdns.org
 ```
 
 ### Détail des machines
@@ -112,9 +112,9 @@ On déploie une app TanStack Start (full-stack SSR) sur 2 EC2 derrière un ALB, 
 ### Flux réseau
 
 ```
-1. User → https://app-lucas-riyad.com (port 443)
+1. User → https://app-lucas.duckdns.org (port 443)
        ↓
-2. Route 53 résout → ALB DNS (IP publique)
+2. DuckDNS résout → ALB DNS (IP publique)
        ↓
 3. ALB reçoit, termine TLS (certificat ACM)
        ↓
@@ -134,8 +134,8 @@ On déploie une app TanStack Start (full-stack SSR) sur 2 EC2 derrière un ALB, 
 ### 1. Cloner le repo
 
 ```bash
-git clone <url-du-repo>
-cd projet-devops
+git clone https://github.com/Luckise/Devops-projet-Lucas-Riyad.git
+cd Devops-projet-Lucas-Riyad
 ```
 
 ### 2. Configurer les variables
@@ -143,14 +143,37 @@ cd projet-devops
 ```bash
 # Terraform
 cp terraform/terraform.tfvars.example terraform/terraform.tfvars
-# Éditer avec vos valeurs : admin_cidr_blocks, bucket names, etc.
+# Éditer avec vos valeurs : enable_https, ec2_ami_id, etc.
 
-# Ansible vault (optionnel, recommandé pour les secrets)
-ansible-vault encrypt_string 'motdepasse' --name 'db_password' \
+# Ansible vault — stocker les secrets (db_password, cognito IDs)
+# Le fichier vault.yml est chiffré et gitignoré
+ansible-vault encrypt_string 'votre_mdp_rds' --name 'db_password' \
   >> ansible/inventory/group_vars/all/vault.yml
+ansible-vault encrypt_string 'eu-west-3_xxx' --name 'cognito_user_pool_id' \
+  >> ansible/inventory/group_vars/all/vault.yml
+ansible-vault encrypt_string 'xxx' --name 'cognito_client_id' \
+  >> ansible/inventory/group_vars/all/vault.yml
+
+# Le fichier .vault_pass contient le mot de passe pour déchiffrer le vault
+# Il est requis pour exécuter tous les playbooks Ansible
+echo "votre_mdp_vault" > ansible/.vault_pass
+chmod 600 ansible/.vault_pass
 ```
 
-### 3. Provisionner l'infrastructure AWS
+### 3. Configurer les GitHub Secrets
+
+Dans Settings → Secrets → Actions, ajouter :
+
+| Secret                      | Description                         |
+| --------------------------- | ----------------------------------- |
+| `VITE_COGNITO_USER_POOL_ID` | ID du User Pool Cognito             |
+| `VITE_COGNITO_CLIENT_ID`    | ID du Client Cognito                |
+| `AWS_ACCESS_KEY_ID`         | Clé d'accès AWS pour GitHub Actions |
+| `AWS_SECRET_ACCESS_KEY`     | Clé secrète AWS pour GitHub Actions |
+| `RDS_PASSWORD`              | Mot de passe de la base RDS         |
+| `S3_BUCKET_NAME`            | Nom du bucket S3 assets             |
+
+### 4. Provisionner l'infrastructure AWS
 
 ```bash
 cd terraform
@@ -160,22 +183,31 @@ terraform apply -auto-approve
 cd ..
 ```
 
-### 4. Générer l'inventaire Ansible
+### 5. Générer l'inventaire Ansible
 
 ```bash
 ./ansible/generate_inventory.sh
 ```
 
-### 5. Déployer l'application avec Ansible
+### 6. Déployer l'application avec Ansible
 
 ```bash
-ansible-playbook ansible/playbooks/site.yml -i ansible/inventory/hosts.yml
+# Configuration complète des instances (common → app → backup)
+ansible-playbook ansible/playbooks/site.yml -i ansible/inventory/hosts.yml \
+  --vault-password-file ansible/.vault_pass
+
+# Déploiement d'une nouvelle version (pull image + restart + health check)
+ansible-playbook ansible/playbooks/deploy.yml -i ansible/inventory/hosts.yml \
+  --vault-password-file ansible/.vault_pass
 ```
 
-### 6. (Bonus) Restauration depuis S3
+> **Important** : L'argument `--vault-password-file ansible/.vault_pass` est **obligatoire** pour tous les playbooks. Il permet à Ansible de déchiffrer le vault contenant le mot de passe RDS et les identifiants Cognito, qui sont ensuite passés aux conteneurs Docker via les variables d'environnement.
+
+### 7. (Bonus) Restauration depuis S3
 
 ```bash
-ansible-playbook ansible/playbooks/restore.yml -i ansible/inventory/hosts.yml
+ansible-playbook ansible/playbooks/restore.yml -i ansible/inventory/hosts.yml \
+  --vault-password-file ansible/.vault_pass
 ```
 
 ---
@@ -226,16 +258,28 @@ Généré dynamiquement depuis les outputs Terraform via `ansible/generate_inven
 Dans `ansible/inventory/group_vars/` :
 
 - `all/main.yml` : variables communes (région, endpoints, noms de buckets...)
-- `all/vault.yml` : secrets chiffrés avec Ansible Vault (db_password, tokens...)
+- `all/vault.yml` : secrets chiffrés avec Ansible Vault (db_password, cognito IDs...)
 - `all/ecr.yml` : généré automatiquement par `generate_inventory.sh`
 - `app.yml` : variables spécifiques au groupe `app`
 
+### Vault password
+
+Le fichier `ansible/.vault_pass` contient le mot de passe pour déchiffrer le vault. Il est **requis** pour exécuter tous les playbooks :
+
+```bash
+ansible-playbook ansible/playbooks/deploy.yml -i ansible/inventory/hosts.yml \
+  --vault-password-file ansible/.vault_pass
+```
+
+Sans cet argument, Ansible ne peut pas accéder aux secrets (mot de passe RDS, identifiants Cognito) et les conteneurs Docker ne démarreront pas correctement.
+
 ### Playbooks
 
-| Playbook      | Description                                         |
-| ------------- | --------------------------------------------------- |
-| `site.yml`    | Configure les instances app (common → app → backup) |
-| `restore.yml` | Récupère le dernier backup S3 et restaure la BDD    |
+| Playbook      | Description                                                  |
+| ------------- | ------------------------------------------------------------ |
+| `site.yml`    | Configuration complète des instances (common → app → backup) |
+| `deploy.yml`  | Pull dernière image Docker + restart + health check          |
+| `restore.yml` | Récupère le dernier backup S3 et restaure la BDD             |
 
 ---
 
@@ -288,18 +332,18 @@ Deux workflows :
 ### `ci.yml` — Sur push et PR
 
 ```
-Push sur main / PR
+Push sur main
        ↓
-  [Lint + Format]    ← oxlint + oxfmt --check
+  [Lint + Format]    ← oxfmt --check + oxlint
        ↓ (si main)
-  [Build Docker]     ← docker build -t <ecr_url>:sha-<sha> -t <ecr_url>:latest
+  [Build Docker]     ← docker build (avec build-args pour Cognito, DB, S3)
        ↓
-  [Push ECR]        ← docker push (sha + latest)
+  [Push ECR]        ← docker push (latest)
        ↓
-  [Deploy]          ← ansible-playbook site.yml -e app_image_tag=sha-<sha>
+  [Ansible Deploy]  ← ansible-playbook deploy.yml (pull + restart + health check)
 ```
 
-Le tag `sha-<git_sha>` permet de tracer exactement quelle version tourne sur chaque EC2. Le tag `latest` est mis à jour à chaque push sur main pour le bootstrap des nouvelles instances.
+Le workflow CI build et push l'image vers ECR (tag `latest`). Le déploiement Ansible est déclenché manuellement via `ansible-playbook deploy.yml` — il pull la dernière image et redémarre les conteneurs.
 
 ## Stratégie de backup
 
@@ -354,9 +398,11 @@ ansible-playbook ansible/playbooks/restore.yml -i ansible/inventory/hosts.yml
 
 - **Credentials AWS** : jamais en clair. Les EC2 utilisent une IAM Role (pas de clés statiques). L'Ansible Vault est utilisé pour le mot de passe RDS.
 - **Secrets dans le repo** : `.gitignore` exclut `*.tfstate`, `*.tfvars`, `vault.yml`, `*.pem`, `.env`. Toute credential commitée en clair par erreur est une pénalité automatique.
+- **GitHub Actions Secrets** : `VITE_COGNITO_USER_POOL_ID`, `VITE_COGNITO_CLIENT_ID`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `RDS_PASSWORD`, `S3_BUCKET_NAME` — tous requis pour le build CI et le déploiement.
 - **Réseau** : RDS dans subnet privé, pas d'IP publique. EC2 accessibles uniquement sur le port 22 (SSH) et seulement depuis une IP admin, ou via SSM Session Manager.
 - **ALB** : seul point d'entrée, TLS terminé au niveau de l'ALB. Les EC2 reçoivent le trafic en HTTP clair.
 - **Bucket S3** : blocs d'accès public activés, chiffrement AES256 côté serveur.
+- **Cognito** : App Client sans client secret pour les appels browser. Les opérations sensibles (AdminAddUserToGroup) passent par des API routes serveur.
 
 ---
 
@@ -394,7 +440,8 @@ ansible-playbook ansible/playbooks/restore.yml -i ansible/inventory/hosts.yml
 │   │   ├── app/                  # Pull image + systemd
 │   │   └── backup/               # pg_dump + cron + S3
 │   ├── playbooks/
-│   │   ├── site.yml              # Déploiement principal
+│   │   ├── site.yml              # Configuration complète des instances
+│   │   ├── deploy.yml            # Pull image + restart + health check
 │   │   └── restore.yml           # Restauration depuis S3 (bonus)
 │   ├── molecule/                 # Tests Molecule
 │   │   └── default/
@@ -412,11 +459,29 @@ ansible-playbook ansible/playbooks/restore.yml -i ansible/inventory/hosts.yml
 
 ---
 
+## Accès
+
+| Ressource   | URL / Endpoint                                                                                |
+| ----------- | --------------------------------------------------------------------------------------------- |
+| Application | https://app-lucas.duckdns.org                                                                 |
+| Cognito     | User Pool `eu-west-3_lVGeXq3XV`, App Client `6o96ffav0fggnv1hpaihik38d9`                      |
+| RDS         | `devops-projet-lucas-riyad-dev-db-72f9c285.cvgqemogmgnt.eu-west-3.rds.amazonaws.com:5432/app` |
+| ECR         | `697359331837.dkr.ecr.eu-west-3.amazonaws.com/devops-projet-lucas-riyad-dev-app`              |
+| S3 assets   | `devops-projet-lucas-riyad-dev-assets-e5f3e56b`                                               |
+| S3 backups  | `devops-projet-lucas-riyad-dev-backups-e5f3e56b`                                              |
+| EC2 1       | `i-0a8987c4ea7c4188b` (15.224.19.226)                                                         |
+| EC2 2       | `i-09e51ec0c58363c14` (51.44.250.124)                                                         |
+| ACM cert    | `arn:aws:acm:eu-west-3:697359331837:certificate/abdae829-fe52-489d-8a92-925f72c24922`         |
+
+---
+
 ## Galères rencontrées
 
-- **ALB ne forwarde pas automatiquement le chemin** : il faut bien configurer le target group sur le bon port et un health check qui répond 200 (`/health`).
+- **ALB ne forward pas automatiquement le chemin** : il faut bien configurer le target group sur le bon port et un health check qui répond 200 (`/events`).
 - **ECR login expire toutes les 12h** : Ansible doit refaire `aws ecr get-login-password` à chaque déploiement.
 - **Security groups chaînés** : on référence le SG par son ID (`aws_security_group.app.id`), pas par son nom — sinon Terraform ne détecte pas les changements.
-- **Route 53 + Duck DNS** : on ne peut pas faire un alias Route 53 vers un nom de domaine externe directement. La solution est une délégation NS.
+- **DNS gratuit via DuckDNS** : on utilise `app-lucas.duckdns.org` au lieu de Route 53 (payant). DuckDNS pointe vers l'ALB. Le certificat ACM est valide pour le domaine.
 - **Docker restart** : sans `force_source: true`, Docker ne re-pull pas l'image si le tag existe déjà en cache. On a utilisé `ansible.builtin.shell` avec `docker pull` pour forcer.
-- **oxlint/oxfmt** : ce sont des outils Rust distribués via npm. Installation avec `npm i -g oxlint` ou via les devDependencies du projet.
+- **aws-amplify et Vite 8/Rolldown** : les modules CJS comme `amazon-cognito-identity-js` posent des problèmes de class heritage. Solution : lazy imports dynamiques pour tous les modules côté serveur (pg, drizzle, AWS SDK) via `import()` dans le container DI.
+- **Buffer is not defined** : le driver `pg` (node-postgres) utilise `Buffer` qui n'existe pas dans le browser. Solution : `define: { global: "globalThis" }` dans vite.config.ts + polyfill `globalThis.Buffer` importé en premier dans router.tsx.
+- **Cognito SECRET_HASH** : l'App Client avait un client secret configuré, mais les appels browser ne peuvent pas utiliser de secret. Solution : créer un nouvel App Client sans secret via AWS CLI.

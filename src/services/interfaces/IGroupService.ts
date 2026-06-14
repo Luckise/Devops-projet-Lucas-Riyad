@@ -11,6 +11,7 @@ export interface IGroupService {
   rename(groupId: string, newName: string): Promise<boolean>;
   transferOwnership(groupId: string, newOwnerEmail: string): Promise<boolean>;
   savePage(groupId: string, image: string, content: ContentBlock[] | undefined): Promise<boolean>;
+  delete(groupId: string): Promise<boolean>;
   isUserAdmin(email: string): Promise<boolean>;
   userRole(group: Group, email: string): "Owner" | "Member" | null;
 }

@@ -4,14 +4,11 @@ import { ArrowLeft, X, Plus, ChevronDown } from "lucide-react";
 import ImageUpload from "../components/ImageUpload";
 import { getServices } from "../di/container";
 import { toast } from "../lib/toast";
+import { useUser } from "../hooks/use-user";
 
 export const Route = createFileRoute("/events/new")({
-  beforeLoad: async () => {
-    try {
-      const profile = await getServices().authService.getCurrentUser();
-      if (!profile.isAdmin) throw redirect({ to: "/" });
-    } catch (err) {
-      if (err instanceof redirect) throw err;
+  beforeLoad: () => {
+    if (typeof window !== "undefined" && !localStorage.getItem("eat_user_profile")) {
       throw redirect({ to: "/login" });
     }
   },
@@ -20,6 +17,7 @@ export const Route = createFileRoute("/events/new")({
 
 function EventCreate() {
   const navigate = useNavigate();
+  const { user } = useUser();
   const [title, setTitle] = useState("");
   const [image, setImage] = useState("");
   const [date, setDate] = useState("");
@@ -34,21 +32,43 @@ function EventCreate() {
   const [userGroups, setUserGroups] = useState<any[]>([]);
 
   useEffect(() => {
-    const stored = localStorage.getItem("eat_user_profile");
-    if (stored) {
-      const profile = JSON.parse(stored);
+    const email =
+      user.email ||
+      (() => {
+        try {
+          const saved = localStorage.getItem("eat_user_profile");
+          return saved ? JSON.parse(saved).email : "";
+        } catch {
+          return "";
+        }
+      })();
+    if (email) {
       getServices()
-        .groupService.getUserGroups(profile.email || "")
-        .then(setUserGroups);
+        .then((svc) => svc.groupService.getUserGroups(email))
+        .then(setUserGroups)
+        .catch((err) => console.error("[events.new] Failed to load groups:", err));
     }
-  }, []);
+  }, [user.email]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title || !date || !time || !location || !selectedGroup) return;
     setSubmitting(true);
 
-    await getServices().eventService.create({
+    const creatorEmail =
+      user.email ||
+      (() => {
+        try {
+          const saved = localStorage.getItem("eat_user_profile");
+          return saved ? JSON.parse(saved).email : "";
+        } catch {
+          return "";
+        }
+      })();
+
+    await (
+      await getServices()
+    ).eventService.create({
       title,
       image,
       date,
@@ -59,14 +79,15 @@ function EventCreate() {
       tags: tags.filter(Boolean),
       maxParticipants: maxParticipants ? parseInt(maxParticipants, 10) : 0,
       groupId: selectedGroup,
-      joined: 0,
+      joined: 1,
       isPast: false,
       hidden: false,
-      attendees: [],
+      attendees: creatorEmail ? [creatorEmail] : [],
     });
 
     setSubmitting(false);
     toast("Event created successfully");
+    window.dispatchEvent(new Event("data-changed"));
     navigate({ to: "/events" });
   };
 
@@ -108,13 +129,14 @@ function EventCreate() {
 
           <div>
             <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2.5 block">
-              Title
+              Title <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Event name"
+              placeholder="Donnez un titre à votre événement"
+              required
               className="w-full px-4 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-[var(--ember)]/30 transition-shadow"
             />
           </div>
@@ -122,23 +144,27 @@ function EventCreate() {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2.5 block">
-                Date
+                Date <span className="text-red-500">*</span>
               </label>
               <input
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
+                placeholder="JJ/MM/AAAA"
+                required
                 className="w-full px-4 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--ember)]/30 transition-shadow [color-scheme:light] dark:[color-scheme:dark]"
               />
             </div>
             <div>
               <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2.5 block">
-                Time
+                Time <span className="text-red-500">*</span>
               </label>
               <input
                 type="time"
                 value={time}
                 onChange={(e) => setTime(e.target.value)}
+                placeholder="HH:MM"
+                required
                 className="w-full px-4 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--ember)]/30 transition-shadow [color-scheme:light] dark:[color-scheme:dark]"
               />
             </div>
@@ -146,13 +172,14 @@ function EventCreate() {
 
           <div>
             <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2.5 block">
-              Location
+              Location <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
-              placeholder="e.g., Central Plaza"
+              placeholder="Adresse ou lieu de l'événement"
+              required
               className="w-full px-4 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-[var(--ember)]/30 transition-shadow"
             />
           </div>
@@ -160,13 +187,14 @@ function EventCreate() {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2.5 block">
-                Price (EUR)
+                Price (EUR) <span className="text-red-500">*</span>
               </label>
               <input
                 type="number"
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
-                placeholder="0 = Free"
+                placeholder="Prix en € (0 = gratuit)"
+                required
                 min="0"
                 step="0.5"
                 className="w-full px-4 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-[var(--ember)]/30 transition-shadow"
@@ -174,13 +202,14 @@ function EventCreate() {
             </div>
             <div>
               <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2.5 block">
-                Max Participants
+                Max Participants <span className="text-red-500">*</span>
               </label>
               <input
                 type="number"
                 value={maxParticipants}
                 onChange={(e) => setMaxParticipants(e.target.value)}
-                placeholder="e.g. 500"
+                placeholder="Nombre max de participants"
+                required
                 min="1"
                 className="w-full px-4 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-[var(--ember)]/30 transition-shadow"
               />
@@ -189,7 +218,7 @@ function EventCreate() {
 
           <div>
             <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2.5 block">
-              Group
+              Group <span className="text-red-500">*</span>
             </label>
             <div className="relative">
               <select
@@ -197,7 +226,7 @@ function EventCreate() {
                 onChange={(e) => setSelectedGroup(e.target.value)}
                 className="w-full px-4 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--ember)]/30 transition-shadow appearance-none"
               >
-                <option value="">Select a group</option>
+                <option value="">Choisir un groupe</option>
                 {userGroups.map((g: any) => (
                   <option key={g.id} value={g.id}>
                     {g.name}
@@ -248,12 +277,13 @@ function EventCreate() {
 
           <div>
             <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2.5 block">
-              Description
+              Description <span className="text-red-500">*</span>
             </label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Describe the event..."
+              placeholder="Décrivez en détail votre événement..."
+              required
               rows={5}
               className="w-full px-4 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-[var(--ember)]/30 transition-shadow resize-none"
             />

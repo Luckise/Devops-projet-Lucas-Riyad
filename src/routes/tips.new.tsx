@@ -4,12 +4,11 @@ import { ArrowLeft, Plus, X } from "lucide-react";
 import ImageUpload from "../components/ImageUpload";
 import { getServices } from "../di/container";
 import { toast } from "../lib/toast";
+import { useUser } from "../hooks/use-user";
 
 export const Route = createFileRoute("/tips/new")({
-  beforeLoad: async () => {
-    try {
-      await getServices().authService.getCurrentUser();
-    } catch {
+  beforeLoad: () => {
+    if (typeof window !== "undefined" && !localStorage.getItem("eat_user_profile")) {
       throw redirect({ to: "/login" });
     }
   },
@@ -21,6 +20,7 @@ const CATEGORIES = ["Recipes", "Promotions", "Addresses", "Guides"] as const;
 
 function TipCreate() {
   const navigate = useNavigate();
+  const { user } = useUser();
   const [category, setCategory] = useState<(typeof CATEGORIES)[number] | "">("");
   const [title, setTitle] = useState("");
   const [image, setImage] = useState("");
@@ -36,18 +36,13 @@ function TipCreate() {
     if (!title) return;
     setSubmitting(true);
 
-    const profile =
-      typeof window !== "undefined"
-        ? JSON.parse(localStorage.getItem("eat_user_profile") || "{}")
-        : {};
-
     const tip: Record<string, unknown> = {
       title,
       category,
       image,
       height: "aspect-[3/4]",
       content: content.filter((b) => b.value.trim()),
-      authorEmail: profile.email || "",
+      authorEmail: user.email || "",
     };
 
     if (category === "Recipes") {
@@ -58,9 +53,10 @@ function TipCreate() {
       tip.address = address;
     }
 
-    await getServices().tipService.create(tip as any);
+    await (await getServices()).tipService.create(tip as any);
     setSubmitting(false);
     toast("Tip created successfully");
+    window.dispatchEvent(new Event("data-changed"));
     navigate({ to: "/tips" });
   };
 
@@ -105,7 +101,7 @@ function TipCreate() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2.5 block">
-              Category
+              Category <span className="text-red-500">*</span>
             </label>
             <div className="flex flex-wrap gap-2">
               {CATEGORIES.map((cat) => (
@@ -129,13 +125,14 @@ function TipCreate() {
 
           <div>
             <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2.5 block">
-              Title
+              Title <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Give your tip a name"
+              placeholder="Donnez un titre à votre astuce"
+              required
               className="w-full px-4 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-[var(--ember)]/30 transition-shadow"
             />
           </div>
@@ -144,7 +141,7 @@ function TipCreate() {
             <>
               <div>
                 <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2.5 block">
-                  Cooking Time
+                  Cooking Time <span className="text-red-500">*</span>
                 </label>
                 <div className="flex gap-2">
                   <input
@@ -152,7 +149,8 @@ function TipCreate() {
                     min="1"
                     value={cookingTimeValue}
                     onChange={(e) => setCookingTimeValue(e.target.value)}
-                    placeholder="25"
+                    placeholder="Durée (ex: 25)"
+                    required
                     className="flex-1 px-4 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-[var(--ember)]/30 transition-shadow"
                   />
                   <select
@@ -160,8 +158,8 @@ function TipCreate() {
                     onChange={(e) => setCookingTimeUnit(e.target.value as "min" | "hour")}
                     className="w-28 px-4 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--ember)]/30 transition-shadow appearance-none"
                   >
-                    <option value="min">min</option>
-                    <option value="hour">hour</option>
+                    <option value="min">minutes</option>
+                    <option value="hour">heures</option>
                   </select>
                 </div>
               </div>
@@ -169,7 +167,7 @@ function TipCreate() {
               <div>
                 <div className="flex items-center justify-between mb-2.5">
                   <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-                    Ingredients
+                    Ingredients <span className="text-red-500">*</span>
                   </label>
                   <button
                     type="button"
@@ -187,7 +185,7 @@ function TipCreate() {
                         type="text"
                         value={ing}
                         onChange={(e) => updateIngredient(idx, e.target.value)}
-                        placeholder={`Ingredient ${idx + 1}`}
+                        placeholder={`Ingrédient ${idx + 1}`}
                         className="flex-1 px-4 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-[var(--ember)]/30 transition-shadow"
                       />
                       {ingredients.length > 1 && (
@@ -209,13 +207,14 @@ function TipCreate() {
           {category === "Addresses" && (
             <div>
               <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2.5 block">
-                Address
+                Address <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
-                placeholder="e.g., Le Marais District, 75003"
+                placeholder="Adresse ou lieu (ex: Le Marais, 75003)"
+                required
                 className="w-full px-4 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-[var(--ember)]/30 transition-shadow"
               />
             </div>
@@ -224,7 +223,7 @@ function TipCreate() {
           <div>
             <div className="flex items-center justify-between mb-2.5">
               <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-                Content
+                Content <span className="text-red-500">*</span>
               </label>
               <div className="flex gap-2">
                 <button
@@ -252,7 +251,7 @@ function TipCreate() {
                     <textarea
                       value={block.value}
                       onChange={(e) => updateContentBlock(idx, e.target.value)}
-                      placeholder="Write your text..."
+                      placeholder="Écrivez votre texte..."
                       rows={3}
                       className="flex-1 px-4 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-[var(--ember)]/30 transition-shadow resize-none"
                     />

@@ -2,17 +2,14 @@ import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
 import { useState } from "react";
 import { ArrowLeft, Plus, X } from "lucide-react";
 import ImageUpload from "../components/ImageUpload";
-import { createGroup, saveClubPage } from "../lib/groups";
-import { toast } from "../lib/toast";
 import { getServices } from "../di/container";
+import { toast } from "../lib/toast";
 
 type ContentBlock = { type: "text" | "image"; value: string };
 
 export const Route = createFileRoute("/profile/groups/new")({
-  beforeLoad: async () => {
-    try {
-      await getServices().authService.getCurrentUser();
-    } catch {
+  beforeLoad: () => {
+    if (typeof window !== "undefined" && !localStorage.getItem("eat_user_profile")) {
       throw redirect({ to: "/login" });
     }
   },
@@ -21,19 +18,32 @@ export const Route = createFileRoute("/profile/groups/new")({
 
 function ClubCreate() {
   const navigate = useNavigate();
-  const stored = typeof window !== "undefined" ? localStorage.getItem("eat_user_profile") : null;
-  const profile = stored ? JSON.parse(stored) : null;
-  const email = profile?.email || "";
 
   const [name, setName] = useState("");
   const [image, setImage] = useState("");
   const [content, setContent] = useState<ContentBlock[]>([]);
   const [submitting, setSubmitting] = useState(false);
 
+  function getEmail(): string {
+    try {
+      const raw = localStorage.getItem("eat_user_profile");
+      return raw ? JSON.parse(raw).email || "" : "";
+    } catch {
+      return "";
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
     setSubmitting(true);
+
+    const email = getEmail();
+    if (!email) {
+      toast("Please log in first");
+      setSubmitting(false);
+      return;
+    }
 
     if (!image) {
       toast("Please add a cover image");
@@ -41,8 +51,9 @@ function ClubCreate() {
       return;
     }
 
-    const group = createGroup(name.trim(), email);
-    saveClubPage(
+    const svc = await getServices();
+    const group = await svc.groupService.create(name.trim(), email);
+    await svc.groupService.savePage(
       group.id,
       image,
       content.filter((b) => b.value.trim()),
@@ -50,6 +61,7 @@ function ClubCreate() {
 
     setSubmitting(false);
     toast("Club created");
+    window.dispatchEvent(new Event("data-changed"));
     navigate({ to: "/profile/groups" });
   };
 
@@ -86,13 +98,14 @@ function ClubCreate() {
 
           <div>
             <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2.5 block">
-              Name
+              Name <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. EFREI Esports"
+              placeholder="Donnez un nom à votre club"
+              required
               className="w-full px-4 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-[var(--ember)]/30 transition-shadow"
             />
           </div>
@@ -100,7 +113,7 @@ function ClubCreate() {
           <div>
             <div className="flex items-center justify-between mb-2.5">
               <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-                Content
+                Content <span className="text-red-500">*</span>
               </label>
               <div className="flex gap-2">
                 <button
@@ -128,7 +141,7 @@ function ClubCreate() {
                     <textarea
                       value={block.value}
                       onChange={(e) => updateContentBlock(idx, e.target.value)}
-                      placeholder="Write your text..."
+                      placeholder="Écrivez votre texte..."
                       rows={3}
                       className="flex-1 px-4 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-[var(--ember)]/30 transition-shadow resize-none"
                     />

@@ -132,6 +132,13 @@ export class DatabaseGroupRepository implements IGroupRepository {
     return userGroups.length > 0;
   }
 
+  async delete(groupId: string): Promise<boolean> {
+    const existing = await this.getById(groupId);
+    if (!existing) return false;
+    await getDb().delete(groups).where(eq(groups.id, groupId));
+    return true;
+  }
+
   userRole(group: Group, email: string): "Owner" | "Member" | null {
     if (group.owner === email) return "Owner";
     if (group.members.includes(email)) return "Member";
