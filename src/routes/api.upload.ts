@@ -48,9 +48,12 @@ async function handle({ request }: { request: Request }) {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
-  } catch (error) {
-    console.error("[/api/upload] Error:", error);
-    return new Response(JSON.stringify({ error: "Upload failed" }), {
+  } catch (error: any) {
+    console.error("[/api/upload] Error:", error?.message || error);
+    if (error?.$metadata) {
+      console.error("[/api/upload] SDK Error:", JSON.stringify(error.$metadata));
+    }
+    return new Response(JSON.stringify({ error: "Upload failed", detail: error?.message || String(error) }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });
